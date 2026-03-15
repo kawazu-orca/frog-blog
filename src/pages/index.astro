@@ -1,20 +1,23 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { dummyPosts } from "../lib/dummyPosts";
+import { getPublishedPosts } from "../lib/notion";
 
+const posts = await getPublishedPosts();
 ---
 
 <BaseLayout title="frog-blog">
 	<h1>記事一覧</h1>
 	<ul>
 		{
-			dummyPosts.map((post) => (
+			posts.map((post) => (
 				<li>
 					<article>
 						<h2>
 							<a href={`/posts/${post.slug}`}>{post.title}</a>
 						</h2>
-						<p>{post.excerpt}</p>
+						<p>{post.date ?? "日付なし"}</p>
+						<p>{post.tags.join(", ") || "タグなし"}</p>
+						<p>{post.description || "説明なし"}</p>
 					</article>
 				</li>
 			))

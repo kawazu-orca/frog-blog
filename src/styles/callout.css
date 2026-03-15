@@ -1,0 +1,61 @@
+.callout {
+	border-radius: 8px;
+	padding: 16px;
+	margin: 16px 0;
+}
+
+.callout .callout-icon {
+	flex: 0 0 auto;
+	line-height: 1.5;
+}
+
+.callout .callout-body {
+	display: flex;
+	gap: 10px;
+}
+
+.callout .callout-content {
+	flex: 1 1 auto;
+}
+
+.callout-definition {
+	border-left: 4px solid #3b82f6;
+	background: #eff6ff;
+}
+
+.callout-theorem {
+	border: 2px solid #f59e0b;
+	background: #fffbeb;
+}
+
+.callout-lemma {
+	border-left: 4px solid #8b5cf6;
+	background: #f5f3ff;
+}
+
+.callout-corollary {
+	border-left: 4px solid #10b981;
+	background: #ecfdf5;
+}
+
+.callout-example {
+	background: #fefce8;
+}
+
+.callout-warning {
+	border: 2px solid #ef4444;
+	background: #fef2f2;
+}
+
+.callout-intuition {
+	background: #f3f4f6;
+}
+
+.callout-summary {
+	background: #ecfdf5;
+}
+
+.callout-default {
+	border-left: 4px solid #d1d5db;
+	background: #f9fafb;
+}

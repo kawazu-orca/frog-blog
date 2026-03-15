@@ -12,6 +12,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.0.4"
+    "@notionhq/client": "^5.13.0",
+    "astro": "^6.0.4",
+    "katex": "^0.16.38"
   }
 }

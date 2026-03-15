@@ -1,26 +1,70 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { dummyPosts } from "../../lib/dummyPosts";
-import type { DummyPost } from "../../lib/dummyPosts";
+import {
+	getPostBlocks,
+	getPublishedPosts,
+} from "../../lib/notion";
+import { renderBlocks } from "../../lib/renderer";
 
-export function getStaticPaths() {
-	return dummyPosts.map((post) => ({
+export async function getStaticPaths() {
+	const posts = await getPublishedPosts();
+	return posts.map((post) => ({
 		params: { slug: post.slug },
-		props: { post },
 	}));
 }
 
-interface Props {
-	post: DummyPost;
+const slug = Astro.params.slug;
+const posts = await getPublishedPosts();
+const currentIndex = posts.findIndex((item) => item.slug === slug);
+const post = currentIndex >= 0 ? posts[currentIndex] : undefined;
+
+if (!post) {
+	throw new Error(`Post not found for slug: ${slug}`);
 }
 
-const { post } = Astro.props as Props;
+const previousPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
+const nextPost =
+	currentIndex >= 0 && currentIndex < posts.length - 1
+		? posts[currentIndex + 1]
+		: undefined;
+
+const blocks = await getPostBlocks(post.pageId);
+const contentHtml = renderBlocks(blocks);
 ---
 
 <BaseLayout title={post.title}>
 	<article>
 		<h1>{post.title}</h1>
-		<p>{post.content}</p>
+		<p>
+			{post.tags.length > 0 ? (
+				post.tags.map((tag, index) => (
+					<>
+						{index > 0 && " / "}
+						<a href={`/tags/${encodeURIComponent(tag)}`}>{tag}</a>
+					</>
+				))
+			) : (
+				"タグなし"
+			)}
+		</p>
+		<p>{post.date ?? "日付なし"}</p>
+		<div set:html={contentHtml} />
+		<nav>
+			{previousPost && (
+				<p>
+					<a href={`/posts/${previousPost.slug}`}>
+						← 前の記事: {previousPost.title}
+					</a>
+				</p>
+			)}
+			{nextPost && (
+				<p>
+					<a href={`/posts/${nextPost.slug}`}>
+						次の記事: {nextPost.title} →
+					</a>
+				</p>
+			)}
+		</nav>
 		<p><a href="/">← 記事一覧に戻る</a></p>
 	</article>
 </BaseLayout>

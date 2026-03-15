@@ -1,0 +1,56 @@
+:root {
+	--content-max-width: 720px;
+	--content-padding-mobile: 16px;
+	--content-padding-desktop: 24px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	line-height: 1.7;
+}
+
+main {
+	max-width: var(--content-max-width);
+	margin: 0 auto;
+	padding: 24px var(--content-padding-mobile);
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+.katex-display {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+@media (max-width: 768px) {
+	main {
+		padding-left: var(--content-padding-mobile);
+		padding-right: var(--content-padding-mobile);
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	main {
+		padding-left: var(--content-padding-desktop);
+		padding-right: var(--content-padding-desktop);
+	}
+}
+
+@media (min-width: 1025px) {
+	main {
+		padding-left: var(--content-padding-desktop);
+		padding-right: var(--content-padding-desktop);
+	}
+}
