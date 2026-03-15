@@ -1,2 +1,6 @@
 name = "frog-blog"
+compatibility_date = "2026-03-15"
 compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
+
+[assets]
+directory = "./dist"
