@@ -9,6 +9,8 @@ import {
 	type BlockObjectResponse,
 	type PageObjectResponse,
 } from "@notionhq/client";
+import { access, mkdir, writeFile } from "node:fs/promises";
+import { extname, join } from "node:path";
 
 export interface PublishedPost {
 	pageId: string;
@@ -21,6 +23,7 @@ export interface PublishedPost {
 
 export type NotionBlockWithChildren = BlockObjectResponse & {
 	children?: NotionBlockWithChildren[];
+	localImageSrc?: string;
 };
 
 function getRequiredEnv(name: "NOTION_API_KEY" | "NOTION_DATABASE_ID"): string {
@@ -142,14 +145,87 @@ async function fetchChildBlocks(
 
 	return Promise.all(
 		blocks.map(async (block) => {
+			let currentBlock: NotionBlockWithChildren = block;
+
+			if (block.type === "image") {
+				currentBlock = await processImageBlock(block);
+			}
+
 			if (!block.has_children) {
-				return block;
+				return currentBlock;
 			}
 
 			const children = await fetchChildBlocks(notion, block.id);
-			return { ...block, children };
+			return { ...currentBlock, children };
 		}),
 	);
+}
+
+function getImageUrl(block: Extract<BlockObjectResponse, { type: "image" }>): string {
+	return block.image.type === "external" ? block.image.external.url : block.image.file.url;
+}
+
+function isNotionSignedImageUrl(url: string): boolean {
+	return url.includes("secure.notion-static.com");
+}
+
+function getExtensionFromUrl(url: string): string {
+	try {
+		const pathname = new URL(url).pathname;
+		const extension = extname(pathname);
+		if (extension) {
+			return extension;
+		}
+	} catch {
+		// Ignore parse errors and fall back to .bin.
+	}
+
+	return ".bin";
+}
+
+async function ensureImageDownloaded(
+	imageUrl: string,
+	filename: string,
+): Promise<string> {
+	const imageDir = join(process.cwd(), "public", "images");
+	await mkdir(imageDir, { recursive: true });
+
+	const destination = join(imageDir, filename);
+
+	try {
+		await access(destination);
+		return `/images/${filename}`;
+	} catch {
+		// Continue to download when the file does not exist.
+	}
+
+	const response = await fetch(imageUrl);
+	if (!response.ok) {
+		throw new Error(`Failed to download image: ${response.status} ${response.statusText}`);
+	}
+
+	const buffer = Buffer.from(await response.arrayBuffer());
+	await writeFile(destination, buffer);
+
+	return `/images/${filename}`;
+}
+
+async function processImageBlock(
+	block: Extract<BlockObjectResponse, { type: "image" }>,
+): Promise<NotionBlockWithChildren> {
+	const imageUrl = getImageUrl(block);
+	if (!isNotionSignedImageUrl(imageUrl)) {
+		return block;
+	}
+
+	try {
+		const extension = getExtensionFromUrl(imageUrl);
+		const fileName = `${block.id}${extension}`;
+		const localImageSrc = await ensureImageDownloaded(imageUrl, fileName);
+		return { ...block, localImageSrc };
+	} catch {
+		return block;
+	}
 }
 
 export async function getPublishedPosts(): Promise<PublishedPost[]> {

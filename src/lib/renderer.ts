@@ -195,7 +195,9 @@ function renderBlock(block: NotionBlockWithChildren): string {
 		}
 		case "image": {
 			const item = block.image;
-			const src = item.type === "external" ? item.external.url : item.file.url;
+			const src =
+				block.localImageSrc ??
+				(item.type === "external" ? item.external.url : item.file.url);
 			const caption = renderRichText(item.caption);
 			return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(
 				item.caption.map((richTextItem) => richTextItem.plain_text).join(""),
