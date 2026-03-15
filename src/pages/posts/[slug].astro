@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { dummyPosts } from "../../lib/dummyPosts";
+import type { DummyPost } from "../../lib/dummyPosts";
+
+export function getStaticPaths() {
+	return dummyPosts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
+}
+
+interface Props {
+	post: DummyPost;
+}
+
+const { post } = Astro.props as Props;
+---
+
+<BaseLayout title={post.title}>
+	<article>
+		<h1>{post.title}</h1>
+		<p>{post.content}</p>
+		<p><a href="/">← 記事一覧に戻る</a></p>
+	</article>
+</BaseLayout>
