@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ShareButtons from "../../components/ShareButtons.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
 import {
 	getPostBlocks,
 	getPublishedPosts,
 } from "../../lib/notion";
-import { renderBlocks } from "../../lib/renderer";
+import { extractHeadings, renderBlocks } from "../../lib/renderer";
 
 export async function getStaticPaths() {
 	const posts = await getPublishedPosts();
@@ -30,6 +31,7 @@ const nextPost =
 		: undefined;
 
 const blocks = await getPostBlocks(post.pageId);
+const headings = extractHeadings(blocks);
 const contentHtml = await renderBlocks(blocks);
 const displayDate = post.date ?? "日付なし";
 ---
@@ -55,6 +57,13 @@ const displayDate = post.date ?? "日付なし";
 		</header>
 
 		<div class="article-body" set:html={contentHtml} />
+		{
+			headings.length > 2 && (
+				<aside class="toc-sidebar">
+					<TableOfContents headings={headings} />
+				</aside>
+			)
+		}
 
 		<hr />
 		<p>この記事をシェアする</p>

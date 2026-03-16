@@ -5,6 +5,9 @@ import type { NotionBlockWithChildren } from "./notion";
 
 type BlockType = NotionBlockWithChildren["type"];
 type BlockOf<T extends BlockType> = Extract<NotionBlockWithChildren, { type: T }>;
+type SlugCounter = Map<string, number>;
+
+export type Heading = { id: string; text: string; level: 2 | 3 };
 
 function escapeHtml(value: string): string {
 	return value
@@ -95,12 +98,36 @@ function renderRichText(items: RichTextItemResponse[]): string {
 	return items.map((item) => renderRichTextItem(item)).join("");
 }
 
-async function renderChildren(block: NotionBlockWithChildren): Promise<string> {
+function getRichTextPlainText(items: RichTextItemResponse[]): string {
+	return items.map((item) => item.plain_text).join("").trim();
+}
+
+function slugifyHeading(text: string): string {
+	return text
+		.toLowerCase()
+		.replace(/\s+/g, "-")
+		.replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff-]/g, "")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
+}
+
+function createUniqueHeadingId(text: string, slugCounter: SlugCounter): string {
+	const baseSlug = slugifyHeading(text) || "section";
+	const current = slugCounter.get(baseSlug) ?? 0;
+	const next = current + 1;
+	slugCounter.set(baseSlug, next);
+	return next === 1 ? baseSlug : `${baseSlug}-${next}`;
+}
+
+async function renderChildren(
+	block: NotionBlockWithChildren,
+	slugCounter: SlugCounter,
+): Promise<string> {
 	if (!block.children || block.children.length === 0) {
 		return "";
 	}
 
-	return await renderBlocks(block.children);
+	return await renderBlocks(block.children, slugCounter);
 }
 
 function renderCalloutIcon(block: BlockOf<"callout">): string {
@@ -136,19 +163,30 @@ function getCalloutClass(block: BlockOf<"callout">): string {
 
 async function renderBulletedListItem(
 	block: BlockOf<"bulleted_list_item">,
+	slugCounter: SlugCounter,
 ): Promise<string> {
 	const item = block.bulleted_list_item;
-	return `<li>${renderRichText(item.rich_text)}${await renderChildren(block)}</li>`;
+	return `<li>${renderRichText(item.rich_text)}${await renderChildren(
+		block,
+		slugCounter,
+	)}</li>`;
 }
 
 async function renderNumberedListItem(
 	block: BlockOf<"numbered_list_item">,
+	slugCounter: SlugCounter,
 ): Promise<string> {
 	const item = block.numbered_list_item;
-	return `<li>${renderRichText(item.rich_text)}${await renderChildren(block)}</li>`;
+	return `<li>${renderRichText(item.rich_text)}${await renderChildren(
+		block,
+		slugCounter,
+	)}</li>`;
 }
 
-async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
+async function renderBlock(
+	block: NotionBlockWithChildren,
+	slugCounter: SlugCounter,
+): Promise<string> {
 	switch (block.type) {
 		case "heading_1": {
 			const item = block.heading_1;
@@ -156,15 +194,22 @@ async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
 		}
 		case "heading_2": {
 			const item = block.heading_2;
-			return `<h2>${renderRichText(item.rich_text)}</h2>`;
+			const text = getRichTextPlainText(item.rich_text);
+			const id = createUniqueHeadingId(text, slugCounter);
+			return `<h2 id="${escapeAttr(id)}">${renderRichText(item.rich_text)}</h2>`;
 		}
 		case "heading_3": {
 			const item = block.heading_3;
-			return `<h3>${renderRichText(item.rich_text)}</h3>`;
+			const text = getRichTextPlainText(item.rich_text);
+			const id = createUniqueHeadingId(text, slugCounter);
+			return `<h3 id="${escapeAttr(id)}">${renderRichText(item.rich_text)}</h3>`;
 		}
 		case "paragraph": {
 			const item = block.paragraph;
-			return `<p>${renderRichText(item.rich_text)}</p>${await renderChildren(block)}`;
+			return `<p>${renderRichText(item.rich_text)}</p>${await renderChildren(
+				block,
+				slugCounter,
+			)}`;
 		}
 		case "callout": {
 			const item = block.callout;
@@ -175,13 +220,13 @@ async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
 				block,
 			)}<div class="callout-content">${renderRichText(
 				item.rich_text,
-			)}${await renderChildren(block)}</div></div></div>`;
+			)}${await renderChildren(block, slugCounter)}</div></div></div>`;
 		}
 		case "toggle": {
 			const item = block.toggle;
 			return `<details><summary>${renderRichText(
 				item.rich_text,
-			)}</summary>${await renderChildren(block)}</details>`;
+			)}</summary>${await renderChildren(block, slugCounter)}</details>`;
 		}
 		case "code": {
 			const item = block.code;
@@ -210,6 +255,7 @@ async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
 			const item = block.quote;
 			return `<blockquote>${renderRichText(item.rich_text)}${await renderChildren(
 				block,
+				slugCounter,
 			)}</blockquote>`;
 		}
 		case "divider":
@@ -218,18 +264,24 @@ async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
 			const item = block.to_do;
 			return `<label><input type="checkbox"${
 				item.checked ? " checked" : ""
-			} disabled /> ${renderRichText(item.rich_text)}</label>${await renderChildren(block)}`;
+			} disabled /> ${renderRichText(item.rich_text)}</label>${await renderChildren(
+				block,
+				slugCounter,
+			)}`;
 		}
 		case "bulleted_list_item":
-			return await renderBulletedListItem(block);
+			return await renderBulletedListItem(block, slugCounter);
 		case "numbered_list_item":
-			return await renderNumberedListItem(block);
+			return await renderNumberedListItem(block, slugCounter);
 		default:
 			return `<!-- unsupported block: ${block.type} -->`;
 	}
 }
 
-export async function renderBlocks(blocks: NotionBlockWithChildren[]): Promise<string> {
+export async function renderBlocks(
+	blocks: NotionBlockWithChildren[],
+	slugCounter: SlugCounter = new Map(),
+): Promise<string> {
 	const html: string[] = [];
 
 	for (let index = 0; index < blocks.length; index += 1) {
@@ -242,7 +294,7 @@ export async function renderBlocks(blocks: NotionBlockWithChildren[]): Promise<s
 				if (current.type !== "bulleted_list_item") {
 					break;
 				}
-				items.push(await renderBulletedListItem(current));
+				items.push(await renderBulletedListItem(current, slugCounter));
 			}
 			index -= 1;
 			html.push(`<ul>${items.join("")}</ul>`);
@@ -256,15 +308,47 @@ export async function renderBlocks(blocks: NotionBlockWithChildren[]): Promise<s
 				if (current.type !== "numbered_list_item") {
 					break;
 				}
-				items.push(await renderNumberedListItem(current));
+				items.push(await renderNumberedListItem(current, slugCounter));
 			}
 			index -= 1;
 			html.push(`<ol>${items.join("")}</ol>`);
 			continue;
 		}
 
-		html.push(await renderBlock(block));
+		html.push(await renderBlock(block, slugCounter));
 	}
 
 	return html.join("");
+}
+
+export function extractHeadings(blocks: NotionBlockWithChildren[]): Heading[] {
+	const slugCounter: SlugCounter = new Map();
+	const headings: Heading[] = [];
+
+	const walk = (items: NotionBlockWithChildren[]) => {
+		for (const block of items) {
+			if (block.type === "heading_2") {
+				const text = getRichTextPlainText(block.heading_2.rich_text);
+				headings.push({
+					id: createUniqueHeadingId(text, slugCounter),
+					text,
+					level: 2,
+				});
+			} else if (block.type === "heading_3") {
+				const text = getRichTextPlainText(block.heading_3.rich_text);
+				headings.push({
+					id: createUniqueHeadingId(text, slugCounter),
+					text,
+					level: 3,
+				});
+			}
+
+			if (block.children && block.children.length > 0) {
+				walk(block.children);
+			}
+		}
+	};
+
+	walk(blocks);
+	return headings;
 }
