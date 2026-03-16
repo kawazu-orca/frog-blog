@@ -413,13 +413,14 @@ img {
 .sidenote {
 	float: right;
 	clear: right;
-	margin-right: -40%;
-	width: 35%;
+	margin-right: -33%;
+	width: 28%;
+	padding-right: 1rem;
 	margin-top: 0;
 	margin-bottom: 0.5em;
-	font-size: 0.8rem;
-	line-height: 1.5;
-	color: #666;
+	font-size: 0.75rem;
+	line-height: 1.45;
+	color: #6b7280;
 	position: relative;
 }
 
@@ -584,5 +585,13 @@ html {
 
 	.toc-sidebar {
 		display: none;
+	}
+}
+
+@media (min-width: 1200px) and (max-width: 1400px) {
+	.sidenote {
+		margin-right: -30%;
+		width: 24%;
+		padding-right: 0.75rem;
 	}
 }
