@@ -29,7 +29,7 @@ const nextPost =
 		: undefined;
 
 const blocks = await getPostBlocks(post.pageId);
-const contentHtml = renderBlocks(blocks);
+const contentHtml = await renderBlocks(blocks);
 ---
 
 <BaseLayout title={post.title}>

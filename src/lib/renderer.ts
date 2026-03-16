@@ -1,5 +1,6 @@
 import type { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import katex from "katex";
+import { resolveImageSrc } from "./images";
 import type { NotionBlockWithChildren } from "./notion";
 
 type BlockType = NotionBlockWithChildren["type"];
@@ -94,12 +95,12 @@ function renderRichText(items: RichTextItemResponse[]): string {
 	return items.map((item) => renderRichTextItem(item)).join("");
 }
 
-function renderChildren(block: NotionBlockWithChildren): string {
+async function renderChildren(block: NotionBlockWithChildren): Promise<string> {
 	if (!block.children || block.children.length === 0) {
 		return "";
 	}
 
-	return renderBlocks(block.children);
+	return await renderBlocks(block.children);
 }
 
 function renderCalloutIcon(block: BlockOf<"callout">): string {
@@ -133,17 +134,21 @@ function getCalloutClass(block: BlockOf<"callout">): string {
 	return classMap[block.callout.icon.emoji] ?? "callout-default";
 }
 
-function renderBulletedListItem(block: BlockOf<"bulleted_list_item">): string {
+async function renderBulletedListItem(
+	block: BlockOf<"bulleted_list_item">,
+): Promise<string> {
 	const item = block.bulleted_list_item;
-	return `<li>${renderRichText(item.rich_text)}${renderChildren(block)}</li>`;
+	return `<li>${renderRichText(item.rich_text)}${await renderChildren(block)}</li>`;
 }
 
-function renderNumberedListItem(block: BlockOf<"numbered_list_item">): string {
+async function renderNumberedListItem(
+	block: BlockOf<"numbered_list_item">,
+): Promise<string> {
 	const item = block.numbered_list_item;
-	return `<li>${renderRichText(item.rich_text)}${renderChildren(block)}</li>`;
+	return `<li>${renderRichText(item.rich_text)}${await renderChildren(block)}</li>`;
 }
 
-function renderBlock(block: NotionBlockWithChildren): string {
+async function renderBlock(block: NotionBlockWithChildren): Promise<string> {
 	switch (block.type) {
 		case "heading_1": {
 			const item = block.heading_1;
@@ -159,7 +164,7 @@ function renderBlock(block: NotionBlockWithChildren): string {
 		}
 		case "paragraph": {
 			const item = block.paragraph;
-			return `<p>${renderRichText(item.rich_text)}</p>${renderChildren(block)}`;
+			return `<p>${renderRichText(item.rich_text)}</p>${await renderChildren(block)}`;
 		}
 		case "callout": {
 			const item = block.callout;
@@ -170,13 +175,13 @@ function renderBlock(block: NotionBlockWithChildren): string {
 				block,
 			)}<div class="callout-content">${renderRichText(
 				item.rich_text,
-			)}${renderChildren(block)}</div></div></div>`;
+			)}${await renderChildren(block)}</div></div></div>`;
 		}
 		case "toggle": {
 			const item = block.toggle;
 			return `<details><summary>${renderRichText(
 				item.rich_text,
-			)}</summary>${renderChildren(block)}</details>`;
+			)}</summary>${await renderChildren(block)}</details>`;
 		}
 		case "code": {
 			const item = block.code;
@@ -195,9 +200,7 @@ function renderBlock(block: NotionBlockWithChildren): string {
 		}
 		case "image": {
 			const item = block.image;
-			const src =
-				block.localImageSrc ??
-				(item.type === "external" ? item.external.url : item.file.url);
+			const src = await resolveImageSrc(block);
 			const caption = renderRichText(item.caption);
 			return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(
 				item.caption.map((richTextItem) => richTextItem.plain_text).join(""),
@@ -205,7 +208,7 @@ function renderBlock(block: NotionBlockWithChildren): string {
 		}
 		case "quote": {
 			const item = block.quote;
-			return `<blockquote>${renderRichText(item.rich_text)}${renderChildren(
+			return `<blockquote>${renderRichText(item.rich_text)}${await renderChildren(
 				block,
 			)}</blockquote>`;
 		}
@@ -215,18 +218,18 @@ function renderBlock(block: NotionBlockWithChildren): string {
 			const item = block.to_do;
 			return `<label><input type="checkbox"${
 				item.checked ? " checked" : ""
-			} disabled /> ${renderRichText(item.rich_text)}</label>${renderChildren(block)}`;
+			} disabled /> ${renderRichText(item.rich_text)}</label>${await renderChildren(block)}`;
 		}
 		case "bulleted_list_item":
-			return renderBulletedListItem(block);
+			return await renderBulletedListItem(block);
 		case "numbered_list_item":
-			return renderNumberedListItem(block);
+			return await renderNumberedListItem(block);
 		default:
 			return `<!-- unsupported block: ${block.type} -->`;
 	}
 }
 
-export function renderBlocks(blocks: NotionBlockWithChildren[]): string {
+export async function renderBlocks(blocks: NotionBlockWithChildren[]): Promise<string> {
 	const html: string[] = [];
 
 	for (let index = 0; index < blocks.length; index += 1) {
@@ -239,7 +242,7 @@ export function renderBlocks(blocks: NotionBlockWithChildren[]): string {
 				if (current.type !== "bulleted_list_item") {
 					break;
 				}
-				items.push(renderBulletedListItem(current));
+				items.push(await renderBulletedListItem(current));
 			}
 			index -= 1;
 			html.push(`<ul>${items.join("")}</ul>`);
@@ -253,14 +256,14 @@ export function renderBlocks(blocks: NotionBlockWithChildren[]): string {
 				if (current.type !== "numbered_list_item") {
 					break;
 				}
-				items.push(renderNumberedListItem(current));
+				items.push(await renderNumberedListItem(current));
 			}
 			index -= 1;
 			html.push(`<ol>${items.join("")}</ol>`);
 			continue;
 		}
 
-		html.push(renderBlock(block));
+		html.push(await renderBlock(block));
 	}
 
 	return html.join("");
