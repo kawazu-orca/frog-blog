@@ -65,19 +65,20 @@ const hasEnoughHeadings = headings.length > 2;
 		)}
 
 		<article class="article-main">
-			<div class="article-content article-body" set:html={contentHtml} />
-
-			{
-				footnotes.length > 0 && (
-					<aside class="sidenotes-container">
-						{footnotes.map((footnote) => (
-							<div class="sidenote" id={`fn-${footnote.id}`} role="note">
-								<sup>{footnote.id}</sup> {footnote.text}
-							</div>
-						))}
-					</aside>
-				)
-			}
+			<div class="article-body" style="position: relative;">
+				<div class="article-content" set:html={contentHtml} />
+				{
+					footnotes.length > 0 && (
+						<div class="sidenotes-container">
+							{footnotes.map((footnote) => (
+								<div class="sidenote" id={`fn-${footnote.id}`} role="note">
+									<sup>{footnote.id}</sup> {footnote.text}
+								</div>
+							))}
+						</div>
+					)
+				}
+			</div>
 
 			{
 				footnotes.length > 0 && (

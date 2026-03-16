@@ -413,12 +413,11 @@ img {
 
 /* デスクトップ: 右カラムに固定配置 */
 .sidenotes-container {
-	position: fixed;
-	top: 120px;
-	right: 2rem;
-	width: 220px;
-	max-height: calc(100vh - 160px);
-	overflow-y: auto;
+	position: absolute;
+	top: 0;
+	left: 100%;
+	margin-left: 2rem;
+	width: 200px;
 	font-size: 0.75rem;
 	line-height: 1.45;
 	color: #6b7280;
