@@ -20,6 +20,8 @@ html,
 body {
 	margin: 0;
 	padding: 0;
+	overflow-x: hidden;
+	max-width: 100vw;
 }
 
 body {
@@ -334,6 +336,7 @@ img {
 .article-main {
 	grid-column: 2;
 	grid-row: 2;
+	overflow-x: clip;
 }
 
 .article-header {
@@ -408,6 +411,11 @@ img {
 	color: #555;
 	font-style: italic;
 	margin: 1.5em 0;
+}
+
+.article-content,
+.article-body {
+	overflow-x: clip;
 }
 
 /* Footnote sidenotes */
