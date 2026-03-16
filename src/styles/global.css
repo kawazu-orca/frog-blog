@@ -430,11 +430,6 @@ img {
 	width: 100%;
 	margin: 0;
 	padding-bottom: 0.5rem;
-	border-bottom: 1px solid #e5e7eb;
-}
-
-.sidenote:last-child {
-	border-bottom: none;
 }
 
 .sidenote sup {
