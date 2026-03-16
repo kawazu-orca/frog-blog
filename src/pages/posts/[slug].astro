@@ -120,4 +120,55 @@ const hasEnoughHeadings = headings.length > 2;
 			<p><a href="/">← 記事一覧に戻る</a></p>
 		</article>
 	</div>
+
+	<script is:inline>
+		const layoutSidenotes = () => {
+			const articleBody = document.querySelector(".article-body");
+			if (!articleBody) return;
+
+			const container = articleBody.querySelector(".sidenotes-container");
+			const content = articleBody.querySelector(".article-content");
+			if (!container || !content) return;
+
+			const notes = Array.from(container.querySelectorAll(".sidenote"));
+			if (notes.length === 0) return;
+
+			if (window.matchMedia("(max-width: 1199px)").matches) {
+				container.style.height = "";
+				for (const note of notes) {
+					note.style.top = "";
+				}
+				return;
+			}
+
+			const bodyRect = articleBody.getBoundingClientRect();
+			let previousBottom = 0;
+			const minGap = 12;
+
+			for (const note of notes) {
+				const index = note.id.replace("fn-", "");
+				const ref = document.getElementById(`fnref-${index}`);
+				if (!ref) continue;
+
+				const desiredTop = ref.getBoundingClientRect().top - bodyRect.top;
+				const top = Math.max(desiredTop, previousBottom + minGap);
+				note.style.top = `${top}px`;
+				previousBottom = top + note.offsetHeight;
+			}
+
+			container.style.height = `${Math.max(previousBottom, content.scrollHeight)}px`;
+		};
+
+		let rafId = 0;
+		const requestLayout = () => {
+			if (rafId) cancelAnimationFrame(rafId);
+			rafId = requestAnimationFrame(layoutSidenotes);
+		};
+
+		requestLayout();
+		window.addEventListener("load", requestLayout);
+		window.addEventListener("resize", requestLayout);
+		window.addEventListener("scroll", requestLayout, { passive: true });
+		document.addEventListener("astro:page-load", requestLayout);
+	</script>
 </BaseLayout>

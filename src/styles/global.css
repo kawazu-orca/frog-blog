@@ -421,10 +421,14 @@ img {
 	font-size: 0.75rem;
 	line-height: 1.45;
 	color: #6b7280;
+	min-height: 100%;
 }
 
 .sidenote {
-	margin-bottom: 1rem;
+	position: absolute;
+	left: 0;
+	width: 100%;
+	margin: 0;
 	padding-bottom: 0.5rem;
 	border-bottom: 1px solid #e5e7eb;
 }
