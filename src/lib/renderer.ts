@@ -8,7 +8,7 @@ type BlockOf<T extends BlockType> = Extract<NotionBlockWithChildren, { type: T }
 type SlugCounter = Map<string, number>;
 
 export type Heading = { id: string; text: string; level: 2 | 3 };
-export type Footnote = { id: string; index: number; text: string };
+export type Footnote = { id: number; text: string };
 
 type RenderContext = {
 	slugCounter: SlugCounter;
@@ -139,40 +139,28 @@ function extractInlineCodeFootnote(item: RichTextItemResponse): string | null {
 	return text.length > 0 ? text : null;
 }
 
-function renderRichTextWithFootnotes(
+function renderRichTextWithFootnoteMarkers(
 	items: RichTextItemResponse[],
 	context: RenderContext,
-): { contentHtml: string; sidenotesHtml: string } {
-	const contentParts: string[] = [];
-	const sidenotes: string[] = [];
+): string {
+	const html: string[] = [];
 
 	for (const item of items) {
 		const footnoteText = extractInlineCodeFootnote(item);
 		if (!footnoteText) {
-			contentParts.push(renderRichTextItem(item));
+			html.push(renderRichTextItem(item));
 			continue;
 		}
 
 		context.footnoteIndex += 1;
 		const index = context.footnoteIndex;
-		const id = `fn-${index}`;
-		const refId = `fnref-${index}`;
-
-		context.footnotes.push({ id, index, text: footnoteText });
-
-		contentParts.push(
-			`<sup class="sidenote-ref" id="${refId}"><a href="#${id}" aria-describedby="${id}">${index}</a></sup>`,
-		);
-
-		sidenotes.push(
-			`<aside class="sidenote" id="${id}" role="note" tabindex="0"><sup>${index}</sup> ${escapeHtml(footnoteText)}</aside>`,
+		context.footnotes.push({ id: index, text: footnoteText });
+		html.push(
+			`<sup class="sidenote-ref" id="fnref-${index}"><a href="#fn-${index}" aria-describedby="fn-${index}">${index}</a></sup>`,
 		);
 	}
 
-	return {
-		contentHtml: contentParts.join(""),
-		sidenotesHtml: sidenotes.join(""),
-	};
+	return html.join("");
 }
 
 async function renderChildren(
@@ -222,8 +210,10 @@ async function renderBulletedListItem(
 	context: RenderContext,
 ): Promise<string> {
 	const item = block.bulleted_list_item;
-	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-	return `<li>${contentHtml}${await renderChildren(block, context)}${sidenotesHtml}</li>`;
+	return `<li>${renderRichTextWithFootnoteMarkers(
+		item.rich_text,
+		context,
+	)}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderNumberedListItem(
@@ -231,8 +221,10 @@ async function renderNumberedListItem(
 	context: RenderContext,
 ): Promise<string> {
 	const item = block.numbered_list_item;
-	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-	return `<li>${contentHtml}${await renderChildren(block, context)}${sidenotesHtml}</li>`;
+	return `<li>${renderRichTextWithFootnoteMarkers(
+		item.rich_text,
+		context,
+	)}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderBlock(
@@ -242,45 +234,54 @@ async function renderBlock(
 	switch (block.type) {
 		case "heading_1": {
 			const item = block.heading_1;
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h1>${contentHtml}</h1>${sidenotesHtml}`;
+			return `<h1>${renderRichTextWithFootnoteMarkers(item.rich_text, context)}</h1>`;
 		}
 		case "heading_2": {
 			const item = block.heading_2;
 			const text = getRichTextPlainText(item.rich_text);
 			const id = createUniqueHeadingId(text, context.slugCounter);
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h2 id="${escapeAttr(id)}">${contentHtml}</h2>${sidenotesHtml}`;
+			return `<h2 id="${escapeAttr(id)}">${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}</h2>`;
 		}
 		case "heading_3": {
 			const item = block.heading_3;
 			const text = getRichTextPlainText(item.rich_text);
 			const id = createUniqueHeadingId(text, context.slugCounter);
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h3 id="${escapeAttr(id)}">${contentHtml}</h3>${sidenotesHtml}`;
+			return `<h3 id="${escapeAttr(id)}">${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}</h3>`;
 		}
 		case "paragraph": {
 			const item = block.paragraph;
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<p>${contentHtml}</p>${sidenotesHtml}${await renderChildren(block, context)}`;
+			return `<p>${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}</p>${await renderChildren(block, context)}`;
 		}
 		case "callout": {
 			const item = block.callout;
 			const calloutClass = getCalloutClass(block);
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
 			return `<div class="callout ${calloutClass}" data-notion-color="${escapeAttr(
 				item.color,
 			)}"><div class="callout-body">${renderCalloutIcon(
 				block,
-			)}<div class="callout-content">${contentHtml}${await renderChildren(block, context)}</div></div></div>${sidenotesHtml}`;
+			)}<div class="callout-content">${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}${await renderChildren(block, context)}</div></div></div>`;
 		}
 		case "toggle": {
 			const item = block.toggle;
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<details><summary>${contentHtml}</summary>${await renderChildren(
+			return `<details><summary>${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}</summary>${await renderChildren(
 				block,
 				context,
-			)}</details>${sidenotesHtml}`;
+			)}</details>`;
 		}
 		case "code": {
 			const item = block.code;
@@ -307,20 +308,27 @@ async function renderBlock(
 		}
 		case "quote": {
 			const item = block.quote;
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<blockquote>${contentHtml}${await renderChildren(
+			return `<blockquote>${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}${await renderChildren(
 				block,
 				context,
-			)}</blockquote>${sidenotesHtml}`;
+			)}</blockquote>`;
 		}
 		case "divider":
 			return "<hr />";
 		case "to_do": {
 			const item = block.to_do;
-			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
 			return `<label><input type="checkbox"${
 				item.checked ? " checked" : ""
-			} disabled /> ${contentHtml}</label>${sidenotesHtml}${await renderChildren(block, context)}`;
+			} disabled /> ${renderRichTextWithFootnoteMarkers(
+				item.rich_text,
+				context,
+			)}</label>${await renderChildren(
+				block,
+				context,
+			)}`;
 		}
 		case "bulleted_list_item":
 			return await renderBulletedListItem(block, context);
@@ -384,10 +392,7 @@ export async function renderBlocks(
 	};
 
 	const html = await renderBlocksWithContext(blocks, context);
-	return {
-		html,
-		footnotes: context.footnotes,
-	};
+	return { html, footnotes: context.footnotes };
 }
 
 export function extractHeadings(blocks: NotionBlockWithChildren[]): Heading[] {

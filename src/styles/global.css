@@ -330,16 +330,9 @@ img {
 	grid-column: 2;
 }
 
-.article-body {
-	display: contents;
-}
-
-.article-body > * {
+.article-main {
 	grid-column: 2;
-}
-
-.article-footer {
-	grid-column: 2;
+	grid-row: 2;
 }
 
 .article-header {
@@ -416,23 +409,38 @@ img {
 	margin: 1.5em 0;
 }
 
-/* Footnote sidenotes */
-.sidenote {
-	grid-column: 3;
-	align-self: start;
+/* ===== サイドノート ===== */
+
+/* デスクトップ: 右カラムに固定配置 */
+.sidenotes-container {
+	position: fixed;
+	top: 120px;
+	right: 2rem;
+	width: 220px;
+	max-height: calc(100vh - 160px);
+	overflow-y: auto;
 	font-size: 0.75rem;
 	line-height: 1.45;
 	color: #6b7280;
-	padding: 0 1.5rem 0 1rem;
-	margin: 0;
+}
+
+.sidenote {
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.sidenote:last-child {
+	border-bottom: none;
 }
 
 .sidenote sup {
 	color: #2563eb;
 	font-weight: 600;
-	margin-right: 0.25em;
+	margin-right: 0.3em;
 }
 
+/* 本文内マーカー */
 .sidenote-ref a {
 	color: #2563eb;
 	text-decoration: none;
@@ -443,6 +451,7 @@ img {
 	text-decoration: underline;
 }
 
+/* 末尾脚注（モバイル用） */
 .footnotes {
 	display: none;
 	font-size: 0.875rem;
@@ -563,10 +572,6 @@ html {
 		grid-column: 1;
 	}
 
-	.article-body > * {
-		grid-column: 1;
-	}
-
 	.article-grid .full-width {
 		grid-column: 1;
 	}
@@ -576,13 +581,13 @@ html {
 	}
 
 	.article-header,
-	.article-footer {
+	.article-main {
 		grid-row: auto;
 	}
 }
 
 @media (max-width: 1199px) {
-	.sidenote {
+	.sidenotes-container {
 		display: none;
 	}
 

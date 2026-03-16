@@ -64,20 +64,30 @@ const hasEnoughHeadings = headings.length > 2;
 			</aside>
 		)}
 
-		<article class="article-body" set:html={contentHtml} />
+		<article class="article-main">
+			<div class="article-content article-body" set:html={contentHtml} />
 
-		<section class="article-footer">
+			{
+				footnotes.length > 0 && (
+					<aside class="sidenotes-container">
+						{footnotes.map((footnote) => (
+							<div class="sidenote" id={`fn-${footnote.id}`} role="note">
+								<sup>{footnote.id}</sup> {footnote.text}
+							</div>
+						))}
+					</aside>
+				)
+			}
+
 			{
 				footnotes.length > 0 && (
 					<section class="footnotes" aria-label="脚注">
 						<hr />
 						<ol>
 							{footnotes.map((footnote) => (
-								<li id={`${footnote.id}-mobile`}>
-									<span>
-										{footnote.index}. {footnote.text}
-									</span>{" "}
-									<a href={`#fnref-${footnote.index}`}>↩</a>
+								<li id={`fn-${footnote.id}-mobile`}>
+									<span>{footnote.text}</span>{" "}
+									<a href={`#fnref-${footnote.id}`}>↩</a>
 								</li>
 							))}
 						</ol>
@@ -107,6 +117,6 @@ const hasEnoughHeadings = headings.length > 2;
 			</nav>
 
 			<p><a href="/">← 記事一覧に戻る</a></p>
-		</section>
+		</article>
 	</div>
 </BaseLayout>
