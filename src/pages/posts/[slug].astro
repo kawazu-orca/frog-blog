@@ -34,6 +34,8 @@ const blocks = await getPostBlocks(post.pageId);
 const headings = extractHeadings(blocks);
 const contentHtml = await renderBlocks(blocks);
 const displayDate = post.date ?? "日付なし";
+const showToC = post.properties.ShowToC === true;
+const hasEnoughHeadings = headings.length > 2;
 ---
 
 <BaseLayout title={post.title}>
@@ -56,13 +58,11 @@ const displayDate = post.date ?? "日付なし";
 			</div>
 		</header>
 
-		{
-			headings.length > 2 && (
-				<aside class="toc-sidebar">
-					<TableOfContents headings={headings} />
-				</aside>
-			)
-		}
+		{showToC && hasEnoughHeadings && (
+			<aside class="toc-sidebar">
+				<TableOfContents headings={headings} />
+			</aside>
+		)}
 
 		<article class="article-main">
 			<div class="article-body" set:html={contentHtml} />

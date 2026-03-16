@@ -17,6 +17,9 @@ export interface PublishedPost {
 	date: string | null;
 	tags: string[];
 	description: string;
+	properties: {
+		ShowToC: boolean;
+	};
 }
 
 export type NotionBlockWithChildren = BlockObjectResponse & {
@@ -97,12 +100,23 @@ function getTagNames(property: PageObjectResponse["properties"][string]): string
 	return property.multi_select.map((tag) => tag.name);
 }
 
+function getCheckboxValue(
+	property: PageObjectResponse["properties"][string] | undefined,
+): boolean {
+	if (!property || property.type !== "checkbox") {
+		return false;
+	}
+
+	return property.checkbox;
+}
+
 function mapPageToPublishedPost(page: PageObjectResponse): PublishedPost {
 	const title = getPlainText(page.properties.Title);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
 	const tags = getTagNames(page.properties.Tags);
 	const description = getPlainText(page.properties.Description);
+	const showToC = getCheckboxValue(page.properties.ShowToC);
 
 	return {
 		pageId: page.id,
@@ -111,6 +125,9 @@ function mapPageToPublishedPost(page: PageObjectResponse): PublishedPost {
 		date,
 		tags,
 		description,
+		properties: {
+			ShowToC: showToC,
+		},
 	};
 }
 
