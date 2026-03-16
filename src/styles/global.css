@@ -20,7 +20,6 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	overflow-x: hidden;
 }
 
 body {
@@ -313,7 +312,6 @@ img {
 	width: 100%;
 	margin-left: 0;
 	margin-right: 0;
-	overflow-x: hidden;
 }
 
 .article-grid > * {
@@ -332,10 +330,16 @@ img {
 	grid-column: 2;
 }
 
-.article-main {
+.article-body {
+	display: contents;
+}
+
+.article-body > * {
 	grid-column: 2;
-	grid-row: 2;
-	overflow-x: clip;
+}
+
+.article-footer {
+	grid-column: 2;
 }
 
 .article-header {
@@ -412,24 +416,15 @@ img {
 	margin: 1.5em 0;
 }
 
-.article-content,
-.article-body {
-	overflow-x: clip;
-}
-
 /* Footnote sidenotes */
 .sidenote {
-	float: right;
-	clear: right;
-	margin-right: -33%;
-	width: 28%;
-	padding-right: 1rem;
-	margin-top: 0;
-	margin-bottom: 0.5em;
+	grid-column: 3;
+	align-self: start;
 	font-size: 0.75rem;
 	line-height: 1.45;
 	color: #6b7280;
-	position: relative;
+	padding: 0 1.5rem 0 1rem;
+	margin: 0;
 }
 
 .sidenote sup {
@@ -451,7 +446,7 @@ img {
 .footnotes {
 	display: none;
 	font-size: 0.875rem;
-	color: #666;
+	color: #6b7280;
 	margin-top: 2rem;
 }
 
@@ -568,6 +563,10 @@ html {
 		grid-column: 1;
 	}
 
+	.article-body > * {
+		grid-column: 1;
+	}
+
 	.article-grid .full-width {
 		grid-column: 1;
 	}
@@ -577,7 +576,7 @@ html {
 	}
 
 	.article-header,
-	.article-main {
+	.article-footer {
 		grid-row: auto;
 	}
 }
@@ -593,13 +592,5 @@ html {
 
 	.toc-sidebar {
 		display: none;
-	}
-}
-
-@media (min-width: 1200px) and (max-width: 1400px) {
-	.sidenote {
-		margin-right: -30%;
-		width: 24%;
-		padding-right: 0.75rem;
 	}
 }

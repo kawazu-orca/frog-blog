@@ -64,9 +64,9 @@ const hasEnoughHeadings = headings.length > 2;
 			</aside>
 		)}
 
-		<article class="article-main">
-			<div class="article-body" set:html={contentHtml} />
+		<article class="article-body" set:html={contentHtml} />
 
+		<section class="article-footer">
 			{
 				footnotes.length > 0 && (
 					<section class="footnotes" aria-label="脚注">
@@ -107,6 +107,6 @@ const hasEnoughHeadings = headings.length > 2;
 			</nav>
 
 			<p><a href="/">← 記事一覧に戻る</a></p>
-		</article>
+		</section>
 	</div>
 </BaseLayout>
