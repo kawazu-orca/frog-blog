@@ -4,7 +4,7 @@ import { getPublishedPosts } from "../../lib/notion";
 
 export async function getStaticPaths() {
 	const posts = await getPublishedPosts();
-	const tags = [...new Set(posts.flatMap((post) => post.tags))];
+	const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))];
 
 	return tags.map((tag) => ({
 		params: { tag },
@@ -13,24 +13,34 @@ export async function getStaticPaths() {
 
 const tagParam = Astro.params.tag ?? "";
 const tag = decodeURIComponent(tagParam);
-const posts = (await getPublishedPosts()).filter((post) => post.tags.includes(tag));
+const posts = (await getPublishedPosts()).filter((post) =>
+	(post.tags ?? []).includes(tag),
+);
 ---
 
 <BaseLayout title={`タグ: ${tag}`}>
-	<h1>タグ: {tag}</h1>
-	<ul>
-		{
-			posts.map((post) => (
-				<li>
-					<article>
-						<h2>
-							<a href={`/posts/${post.slug}`}>{post.title}</a>
-						</h2>
-						<p>{post.date ?? "日付なし"}</p>
-						<p>{post.description || "説明なし"}</p>
+	<section class="page-container">
+		<h1 class="page-title">Tag: {tag}</h1>
+		<div class="article-list">
+			{
+				posts.map((post) => (
+					<article class="article-card">
+						<a class="article-card-link" href={`/posts/${post.slug}`}>
+							<h2 class="article-card-title">{post.title}</h2>
+							<div class="article-card-meta">
+								<time datetime={post.date ?? ""}>{post.date ?? "日付なし"}</time>
+								{
+									post.tags?.length > 0 &&
+										post.tags.map((postTag) => <span class="tag-badge">{postTag}</span>)
+								}
+							</div>
+							{post.description && (
+								<p class="article-card-description">{post.description}</p>
+							)}
+						</a>
 					</article>
-				</li>
-			))
-		}
-	</ul>
+				))
+			}
+		</div>
+	</section>
 </BaseLayout>

@@ -6,21 +6,28 @@ const posts = await getPublishedPosts();
 ---
 
 <BaseLayout title="frog-blog">
-	<h1>記事一覧</h1>
-	<ul>
-		{
-			posts.map((post) => (
-				<li>
-					<article>
-						<h2>
-							<a href={`/posts/${post.slug}`}>{post.title}</a>
-						</h2>
-						<p>{post.date ?? "日付なし"}</p>
-						<p>{post.tags.join(", ") || "タグなし"}</p>
-						<p>{post.description || "説明なし"}</p>
+	<section class="page-container">
+		<h1 class="page-title">Articles</h1>
+		<div class="article-list">
+			{
+				posts.map((post) => (
+					<article class="article-card">
+						<a class="article-card-link" href={`/posts/${post.slug}`}>
+							<h2 class="article-card-title">{post.title}</h2>
+							<div class="article-card-meta">
+								<time datetime={post.date ?? ""}>{post.date ?? "日付なし"}</time>
+								{
+									post.tags?.length > 0 &&
+										post.tags.map((tag) => <span class="tag-badge">{tag}</span>)
+								}
+							</div>
+							{post.description && (
+								<p class="article-card-description">{post.description}</p>
+							)}
+						</a>
 					</article>
-				</li>
-			))
-		}
-	</ul>
+				))
+			}
+		</div>
+	</section>
 </BaseLayout>
