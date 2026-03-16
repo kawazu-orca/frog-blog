@@ -37,26 +37,7 @@ const displayDate = post.date ?? "日付なし";
 ---
 
 <BaseLayout title={post.title}>
-	<article class="article-container">
-		<header class="article-header">
-			<h1 class="article-title">{post.title}</h1>
-			<div class="article-meta">
-				<time datetime={post.date ?? ""}>{displayDate}</time>
-				{
-					post.tags.length > 0 && (
-						<span class="article-tags">
-							{post.tags.map((tag) => (
-								<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
-									{tag}
-								</a>
-							))}
-						</span>
-					)
-				}
-			</div>
-		</header>
-
-		<div class="article-body" set:html={contentHtml} />
+	<div class="article-grid">
 		{
 			headings.length > 2 && (
 				<aside class="toc-sidebar">
@@ -65,27 +46,49 @@ const displayDate = post.date ?? "日付なし";
 			)
 		}
 
-		<hr />
-		<p>この記事をシェアする</p>
-		<ShareButtons title={post.title} url={Astro.url.href} />
+		<article class="article-content">
+			<header class="article-header">
+				<h1 class="article-title">{post.title}</h1>
+				<div class="article-meta">
+					<time datetime={post.date ?? ""}>{displayDate}</time>
+					{
+						post.tags.length > 0 && (
+							<span class="article-tags">
+								{post.tags.map((tag) => (
+									<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
+										{tag}
+									</a>
+								))}
+							</span>
+						)
+					}
+				</div>
+			</header>
 
-		<nav>
-			{previousPost && (
-				<p>
-					<a href={`/posts/${previousPost.slug}`}>
-						← 前の記事: {previousPost.title}
-					</a>
-				</p>
-			)}
-			{nextPost && (
-				<p>
-					<a href={`/posts/${nextPost.slug}`}>
-						次の記事: {nextPost.title} →
-					</a>
-				</p>
-			)}
-		</nav>
+			<div class="article-body" set:html={contentHtml} />
 
-		<p><a href="/">← 記事一覧に戻る</a></p>
-	</article>
+			<hr />
+			<p>この記事をシェアする</p>
+			<ShareButtons title={post.title} url={Astro.url.href} />
+
+			<nav>
+				{previousPost && (
+					<p>
+						<a href={`/posts/${previousPost.slug}`}>
+							← 前の記事: {previousPost.title}
+						</a>
+					</p>
+				)}
+				{nextPost && (
+					<p>
+						<a href={`/posts/${nextPost.slug}`}>
+							次の記事: {nextPost.title} →
+						</a>
+					</p>
+				)}
+			</nav>
+
+			<p><a href="/">← 記事一覧に戻る</a></p>
+		</article>
+	</div>
 </BaseLayout>
