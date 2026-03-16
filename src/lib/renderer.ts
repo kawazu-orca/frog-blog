@@ -223,7 +223,7 @@ async function renderBulletedListItem(
 ): Promise<string> {
 	const item = block.bulleted_list_item;
 	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-	return `<li>${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</li>`;
+	return `<li>${sidenotesHtml}${contentHtml}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderNumberedListItem(
@@ -232,7 +232,7 @@ async function renderNumberedListItem(
 ): Promise<string> {
 	const item = block.numbered_list_item;
 	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-	return `<li>${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</li>`;
+	return `<li>${sidenotesHtml}${contentHtml}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderBlock(
@@ -243,26 +243,26 @@ async function renderBlock(
 		case "heading_1": {
 			const item = block.heading_1;
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h1>${contentHtml}</h1>${sidenotesHtml}`;
+			return `<h1>${sidenotesHtml}${contentHtml}</h1>`;
 		}
 		case "heading_2": {
 			const item = block.heading_2;
 			const text = getRichTextPlainText(item.rich_text);
 			const id = createUniqueHeadingId(text, context.slugCounter);
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h2 id="${escapeAttr(id)}">${contentHtml}</h2>${sidenotesHtml}`;
+			return `<h2 id="${escapeAttr(id)}">${sidenotesHtml}${contentHtml}</h2>`;
 		}
 		case "heading_3": {
 			const item = block.heading_3;
 			const text = getRichTextPlainText(item.rich_text);
 			const id = createUniqueHeadingId(text, context.slugCounter);
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<h3 id="${escapeAttr(id)}">${contentHtml}</h3>${sidenotesHtml}`;
+			return `<h3 id="${escapeAttr(id)}">${sidenotesHtml}${contentHtml}</h3>`;
 		}
 		case "paragraph": {
 			const item = block.paragraph;
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<p>${contentHtml}</p>${sidenotesHtml}${await renderChildren(block, context)}`;
+			return `<p>${sidenotesHtml}${contentHtml}</p>${await renderChildren(block, context)}`;
 		}
 		case "callout": {
 			const item = block.callout;
@@ -272,12 +272,12 @@ async function renderBlock(
 				item.color,
 			)}"><div class="callout-body">${renderCalloutIcon(
 				block,
-			)}<div class="callout-content">${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</div></div></div>`;
+			)}<div class="callout-content">${sidenotesHtml}${contentHtml}${await renderChildren(block, context)}</div></div></div>`;
 		}
 		case "toggle": {
 			const item = block.toggle;
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<details><summary>${contentHtml}</summary>${sidenotesHtml}${await renderChildren(
+			return `<details><summary>${sidenotesHtml}${contentHtml}</summary>${await renderChildren(
 				block,
 				context,
 			)}</details>`;
@@ -308,7 +308,7 @@ async function renderBlock(
 		case "quote": {
 			const item = block.quote;
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
-			return `<blockquote>${contentHtml}${sidenotesHtml}${await renderChildren(
+			return `<blockquote>${sidenotesHtml}${contentHtml}${await renderChildren(
 				block,
 				context,
 			)}</blockquote>`;
@@ -320,7 +320,7 @@ async function renderBlock(
 			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
 			return `<label><input type="checkbox"${
 				item.checked ? " checked" : ""
-			} disabled /> ${contentHtml}</label>${sidenotesHtml}${await renderChildren(block, context)}`;
+			} disabled /> ${sidenotesHtml}${contentHtml}</label>${await renderChildren(block, context)}`;
 		}
 		case "bulleted_list_item":
 			return await renderBulletedListItem(block, context);
