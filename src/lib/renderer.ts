@@ -16,11 +16,6 @@ type RenderContext = {
 	footnoteIndex: number;
 };
 
-type FootnoteMatch = {
-	raw: string;
-	text: string;
-};
-
 function escapeHtml(value: string): string {
 	return value
 		.replaceAll("&", "&amp;")
@@ -131,96 +126,51 @@ function createUniqueHeadingId(text: string, slugCounter: SlugCounter): string {
 	return next === 1 ? baseSlug : `${baseSlug}-${next}`;
 }
 
-function replaceFirst(source: string, target: string, replacement: string): string {
-	const index = source.indexOf(target);
-	if (index < 0) {
-		return source;
+function extractInlineCodeFootnote(item: RichTextItemResponse): string | null {
+	if (!item.annotations.code) {
+		return null;
 	}
 
-	return source.slice(0, index) + replacement + source.slice(index + target.length);
-}
-
-function parseFootnoteMatches(text: string): FootnoteMatch[] {
-	const matches: FootnoteMatch[] = [];
-	let index = 0;
-
-	while (index < text.length) {
-		const markerStart = text.indexOf("[^", index);
-		if (markerStart === -1) {
-			break;
-		}
-
-		if (markerStart > 0 && text[markerStart - 1] === "\\") {
-			index = markerStart + 2;
-			continue;
-		}
-
-		let cursor = markerStart + 2;
-		let body = "";
-		let closed = false;
-
-		while (cursor < text.length) {
-			const ch = text[cursor];
-			if (ch === "\\" && cursor + 1 < text.length && text[cursor + 1] === "]") {
-				body += "]";
-				cursor += 2;
-				continue;
-			}
-
-			if (ch === "]") {
-				closed = true;
-				break;
-			}
-
-			body += ch;
-			cursor += 1;
-		}
-
-		if (!closed) {
-			index = markerStart + 2;
-			continue;
-		}
-
-		const raw = text.slice(markerStart, cursor + 1);
-		matches.push({ raw, text: body.trim() });
-		index = cursor + 1;
+	if (!item.plain_text.startsWith("fn:")) {
+		return null;
 	}
 
-	return matches;
+	const text = item.plain_text.slice(3).trim();
+	return text.length > 0 ? text : null;
 }
 
 function renderRichTextWithFootnotes(
 	items: RichTextItemResponse[],
 	context: RenderContext,
 ): { contentHtml: string; sidenotesHtml: string } {
-	let richHtml = renderRichText(items);
-	const plainText = items.map((item) => item.plain_text).join("");
-	const matches = parseFootnoteMatches(plainText);
-
-	if (matches.length === 0) {
-		return { contentHtml: richHtml, sidenotesHtml: "" };
-	}
-
+	const contentParts: string[] = [];
 	const sidenotes: string[] = [];
 
-	for (const match of matches) {
+	for (const item of items) {
+		const footnoteText = extractInlineCodeFootnote(item);
+		if (!footnoteText) {
+			contentParts.push(renderRichTextItem(item));
+			continue;
+		}
+
 		context.footnoteIndex += 1;
 		const index = context.footnoteIndex;
 		const id = `fn-${index}`;
 		const refId = `fnref-${index}`;
 
-		context.footnotes.push({ id, index, text: match.text });
+		context.footnotes.push({ id, index, text: footnoteText });
 
-		const markerHtml = `<sup class="sidenote-ref" id="${refId}"><a href="#${id}" aria-describedby="${id}">${index}</a></sup>`;
-		richHtml = replaceFirst(richHtml, escapeHtml(match.raw), markerHtml);
+		contentParts.push(
+			`<sup class="sidenote-ref" id="${refId}"><a href="#${id}" aria-describedby="${id}">${index}</a></sup>`,
+		);
 
 		sidenotes.push(
-			`<span class="sidenote" id="${id}" role="note" tabindex="0"><sup>${index}</sup> ${escapeHtml(match.text)}</span>`,
+			`<span class="sidenote" id="${id}" role="note" tabindex="0"><sup>${index}</sup> ${escapeHtml(footnoteText)}</span>`,
 		);
 	}
 
 	return {
-		contentHtml: richHtml,
+		contentHtml: contentParts.join(""),
 		sidenotesHtml: sidenotes.join(""),
 	};
 }
