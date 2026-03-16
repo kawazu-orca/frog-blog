@@ -38,6 +38,24 @@ const displayDate = post.date ?? "日付なし";
 
 <BaseLayout title={post.title}>
 	<div class="article-grid">
+		<header class="article-header">
+			<h1 class="article-title">{post.title}</h1>
+			<div class="article-meta">
+				<time datetime={post.date ?? ""}>{displayDate}</time>
+				{
+					post.tags.length > 0 && (
+						<span class="article-tags">
+							{post.tags.map((tag) => (
+								<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
+									{tag}
+								</a>
+							))}
+						</span>
+					)
+				}
+			</div>
+		</header>
+
 		{
 			headings.length > 2 && (
 				<aside class="toc-sidebar">
@@ -46,25 +64,7 @@ const displayDate = post.date ?? "日付なし";
 			)
 		}
 
-		<article class="article-content">
-			<header class="article-header">
-				<h1 class="article-title">{post.title}</h1>
-				<div class="article-meta">
-					<time datetime={post.date ?? ""}>{displayDate}</time>
-					{
-						post.tags.length > 0 && (
-							<span class="article-tags">
-								{post.tags.map((tag) => (
-									<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
-										{tag}
-									</a>
-								))}
-							</span>
-						)
-					}
-				</div>
-			</header>
-
+		<article class="article-main">
 			<div class="article-body" set:html={contentHtml} />
 
 			<hr />
