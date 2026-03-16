@@ -9,8 +9,6 @@ import {
 	type BlockObjectResponse,
 	type PageObjectResponse,
 } from "@notionhq/client";
-import { access, mkdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
 
 export interface PublishedPost {
 	pageId: string;
@@ -172,7 +170,10 @@ function isNotionSignedImageUrl(url: string): boolean {
 function getExtensionFromUrl(url: string): string {
 	try {
 		const pathname = new URL(url).pathname;
-		const extension = extname(pathname);
+		const lastDotIndex = pathname.lastIndexOf(".");
+		const slashIndex = pathname.lastIndexOf("/");
+		const extension =
+			lastDotIndex > slashIndex ? pathname.slice(lastDotIndex).toLowerCase() : "";
 		if (extension) {
 			return extension;
 		}
@@ -187,6 +188,32 @@ async function ensureImageDownloaded(
 	imageUrl: string,
 	filename: string,
 ): Promise<string> {
+	if (process.env.CI) {
+		throw new Error("Skip local image cache in CI.");
+	}
+
+	let access: (path: string) => Promise<void>;
+	let mkdir: (
+		path: string,
+		options?: { recursive?: boolean },
+	) => Promise<string | undefined>;
+	let writeFile: (
+		file: string,
+		data: ArrayBufferView | ArrayBuffer | string,
+	) => Promise<void>;
+	let join: (...paths: string[]) => string;
+
+	try {
+		const fs = await import("node:fs/promises");
+		const path = await import("node:path");
+		access = fs.access;
+		mkdir = fs.mkdir;
+		writeFile = fs.writeFile;
+		join = path.join;
+	} catch {
+		throw new Error("Node filesystem modules are unavailable.");
+	}
+
 	const imageDir = join(process.cwd(), "public", "images");
 	await mkdir(imageDir, { recursive: true });
 
@@ -204,8 +231,8 @@ async function ensureImageDownloaded(
 		throw new Error(`Failed to download image: ${response.status} ${response.statusText}`);
 	}
 
-	const buffer = Buffer.from(await response.arrayBuffer());
-	await writeFile(destination, buffer);
+	const fileData = new Uint8Array(await response.arrayBuffer());
+	await writeFile(destination, fileData);
 
 	return `/images/${filename}`;
 }
