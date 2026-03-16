@@ -8,6 +8,18 @@ type BlockOf<T extends BlockType> = Extract<NotionBlockWithChildren, { type: T }
 type SlugCounter = Map<string, number>;
 
 export type Heading = { id: string; text: string; level: 2 | 3 };
+export type Footnote = { id: string; index: number; text: string };
+
+type RenderContext = {
+	slugCounter: SlugCounter;
+	footnotes: Footnote[];
+	footnoteIndex: number;
+};
+
+type FootnoteMatch = {
+	raw: string;
+	text: string;
+};
 
 function escapeHtml(value: string): string {
 	return value
@@ -119,15 +131,109 @@ function createUniqueHeadingId(text: string, slugCounter: SlugCounter): string {
 	return next === 1 ? baseSlug : `${baseSlug}-${next}`;
 }
 
+function replaceFirst(source: string, target: string, replacement: string): string {
+	const index = source.indexOf(target);
+	if (index < 0) {
+		return source;
+	}
+
+	return source.slice(0, index) + replacement + source.slice(index + target.length);
+}
+
+function parseFootnoteMatches(text: string): FootnoteMatch[] {
+	const matches: FootnoteMatch[] = [];
+	let index = 0;
+
+	while (index < text.length) {
+		const markerStart = text.indexOf("[^", index);
+		if (markerStart === -1) {
+			break;
+		}
+
+		if (markerStart > 0 && text[markerStart - 1] === "\\") {
+			index = markerStart + 2;
+			continue;
+		}
+
+		let cursor = markerStart + 2;
+		let body = "";
+		let closed = false;
+
+		while (cursor < text.length) {
+			const ch = text[cursor];
+			if (ch === "\\" && cursor + 1 < text.length && text[cursor + 1] === "]") {
+				body += "]";
+				cursor += 2;
+				continue;
+			}
+
+			if (ch === "]") {
+				closed = true;
+				break;
+			}
+
+			body += ch;
+			cursor += 1;
+		}
+
+		if (!closed) {
+			index = markerStart + 2;
+			continue;
+		}
+
+		const raw = text.slice(markerStart, cursor + 1);
+		matches.push({ raw, text: body.trim() });
+		index = cursor + 1;
+	}
+
+	return matches;
+}
+
+function renderRichTextWithFootnotes(
+	items: RichTextItemResponse[],
+	context: RenderContext,
+): { contentHtml: string; sidenotesHtml: string } {
+	let richHtml = renderRichText(items);
+	const plainText = items.map((item) => item.plain_text).join("");
+	const matches = parseFootnoteMatches(plainText);
+
+	if (matches.length === 0) {
+		return { contentHtml: richHtml, sidenotesHtml: "" };
+	}
+
+	const sidenotes: string[] = [];
+
+	for (const match of matches) {
+		context.footnoteIndex += 1;
+		const index = context.footnoteIndex;
+		const id = `fn-${index}`;
+		const refId = `fnref-${index}`;
+
+		context.footnotes.push({ id, index, text: match.text });
+
+		const markerHtml = `<sup class="sidenote-ref" id="${refId}"><a href="#${id}" aria-describedby="${id}">${index}</a></sup>`;
+		richHtml = replaceFirst(richHtml, escapeHtml(match.raw), markerHtml);
+
+		sidenotes.push(
+			`<span class="sidenote" id="${id}" role="note" tabindex="0"><sup>${index}</sup> ${escapeHtml(match.text)}</span>`,
+		);
+	}
+
+	return {
+		contentHtml: richHtml,
+		sidenotesHtml: sidenotes.join(""),
+	};
+}
+
 async function renderChildren(
 	block: NotionBlockWithChildren,
-	slugCounter: SlugCounter,
+	context: RenderContext,
 ): Promise<string> {
 	if (!block.children || block.children.length === 0) {
 		return "";
 	}
 
-	return await renderBlocks(block.children, slugCounter);
+	return await renderBlocksWithContext(block.children, context);
 }
 
 function renderCalloutIcon(block: BlockOf<"callout">): string {
@@ -163,70 +269,68 @@ function getCalloutClass(block: BlockOf<"callout">): string {
 
 async function renderBulletedListItem(
 	block: BlockOf<"bulleted_list_item">,
-	slugCounter: SlugCounter,
+	context: RenderContext,
 ): Promise<string> {
 	const item = block.bulleted_list_item;
-	return `<li>${renderRichText(item.rich_text)}${await renderChildren(
-		block,
-		slugCounter,
-	)}</li>`;
+	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+	return `<li>${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderNumberedListItem(
 	block: BlockOf<"numbered_list_item">,
-	slugCounter: SlugCounter,
+	context: RenderContext,
 ): Promise<string> {
 	const item = block.numbered_list_item;
-	return `<li>${renderRichText(item.rich_text)}${await renderChildren(
-		block,
-		slugCounter,
-	)}</li>`;
+	const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+	return `<li>${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</li>`;
 }
 
 async function renderBlock(
 	block: NotionBlockWithChildren,
-	slugCounter: SlugCounter,
+	context: RenderContext,
 ): Promise<string> {
 	switch (block.type) {
 		case "heading_1": {
 			const item = block.heading_1;
-			return `<h1>${renderRichText(item.rich_text)}</h1>`;
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<h1>${contentHtml}</h1>${sidenotesHtml}`;
 		}
 		case "heading_2": {
 			const item = block.heading_2;
 			const text = getRichTextPlainText(item.rich_text);
-			const id = createUniqueHeadingId(text, slugCounter);
-			return `<h2 id="${escapeAttr(id)}">${renderRichText(item.rich_text)}</h2>`;
+			const id = createUniqueHeadingId(text, context.slugCounter);
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<h2 id="${escapeAttr(id)}">${contentHtml}</h2>${sidenotesHtml}`;
 		}
 		case "heading_3": {
 			const item = block.heading_3;
 			const text = getRichTextPlainText(item.rich_text);
-			const id = createUniqueHeadingId(text, slugCounter);
-			return `<h3 id="${escapeAttr(id)}">${renderRichText(item.rich_text)}</h3>`;
+			const id = createUniqueHeadingId(text, context.slugCounter);
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<h3 id="${escapeAttr(id)}">${contentHtml}</h3>${sidenotesHtml}`;
 		}
 		case "paragraph": {
 			const item = block.paragraph;
-			return `<p>${renderRichText(item.rich_text)}</p>${await renderChildren(
-				block,
-				slugCounter,
-			)}`;
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<p>${contentHtml}</p>${sidenotesHtml}${await renderChildren(block, context)}`;
 		}
 		case "callout": {
 			const item = block.callout;
 			const calloutClass = getCalloutClass(block);
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
 			return `<div class="callout ${calloutClass}" data-notion-color="${escapeAttr(
 				item.color,
 			)}"><div class="callout-body">${renderCalloutIcon(
 				block,
-			)}<div class="callout-content">${renderRichText(
-				item.rich_text,
-			)}${await renderChildren(block, slugCounter)}</div></div></div>`;
+			)}<div class="callout-content">${contentHtml}${sidenotesHtml}${await renderChildren(block, context)}</div></div></div>`;
 		}
 		case "toggle": {
 			const item = block.toggle;
-			return `<details><summary>${renderRichText(
-				item.rich_text,
-			)}</summary>${await renderChildren(block, slugCounter)}</details>`;
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<details><summary>${contentHtml}</summary>${sidenotesHtml}${await renderChildren(
+				block,
+				context,
+			)}</details>`;
 		}
 		case "code": {
 			const item = block.code;
@@ -253,34 +357,33 @@ async function renderBlock(
 		}
 		case "quote": {
 			const item = block.quote;
-			return `<blockquote>${renderRichText(item.rich_text)}${await renderChildren(
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
+			return `<blockquote>${contentHtml}${sidenotesHtml}${await renderChildren(
 				block,
-				slugCounter,
+				context,
 			)}</blockquote>`;
 		}
 		case "divider":
 			return "<hr />";
 		case "to_do": {
 			const item = block.to_do;
+			const { contentHtml, sidenotesHtml } = renderRichTextWithFootnotes(item.rich_text, context);
 			return `<label><input type="checkbox"${
 				item.checked ? " checked" : ""
-			} disabled /> ${renderRichText(item.rich_text)}</label>${await renderChildren(
-				block,
-				slugCounter,
-			)}`;
+			} disabled /> ${contentHtml}</label>${sidenotesHtml}${await renderChildren(block, context)}`;
 		}
 		case "bulleted_list_item":
-			return await renderBulletedListItem(block, slugCounter);
+			return await renderBulletedListItem(block, context);
 		case "numbered_list_item":
-			return await renderNumberedListItem(block, slugCounter);
+			return await renderNumberedListItem(block, context);
 		default:
 			return `<!-- unsupported block: ${block.type} -->`;
 	}
 }
 
-export async function renderBlocks(
+async function renderBlocksWithContext(
 	blocks: NotionBlockWithChildren[],
-	slugCounter: SlugCounter = new Map(),
+	context: RenderContext,
 ): Promise<string> {
 	const html: string[] = [];
 
@@ -294,7 +397,7 @@ export async function renderBlocks(
 				if (current.type !== "bulleted_list_item") {
 					break;
 				}
-				items.push(await renderBulletedListItem(current, slugCounter));
+				items.push(await renderBulletedListItem(current, context));
 			}
 			index -= 1;
 			html.push(`<ul>${items.join("")}</ul>`);
@@ -308,17 +411,33 @@ export async function renderBlocks(
 				if (current.type !== "numbered_list_item") {
 					break;
 				}
-				items.push(await renderNumberedListItem(current, slugCounter));
+				items.push(await renderNumberedListItem(current, context));
 			}
 			index -= 1;
 			html.push(`<ol>${items.join("")}</ol>`);
 			continue;
 		}
 
-		html.push(await renderBlock(block, slugCounter));
+		html.push(await renderBlock(block, context));
 	}
 
 	return html.join("");
+}
+
+export async function renderBlocks(
+	blocks: NotionBlockWithChildren[],
+): Promise<{ html: string; footnotes: Footnote[] }> {
+	const context: RenderContext = {
+		slugCounter: new Map(),
+		footnotes: [],
+		footnoteIndex: 0,
+	};
+
+	const html = await renderBlocksWithContext(blocks, context);
+	return {
+		html,
+		footnotes: context.footnotes,
+	};
 }
 
 export function extractHeadings(blocks: NotionBlockWithChildren[]): Heading[] {

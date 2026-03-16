@@ -409,6 +409,55 @@ img {
 	margin: 1.5em 0;
 }
 
+/* Footnote sidenotes */
+.sidenote {
+	float: right;
+	clear: right;
+	margin-right: -45%;
+	width: 40%;
+	font-size: 0.8rem;
+	line-height: 1.5;
+	color: #666;
+	position: relative;
+}
+
+.sidenote sup {
+	color: #2563eb;
+	font-weight: 600;
+	margin-right: 0.25em;
+}
+
+.sidenote-ref a {
+	color: #2563eb;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.sidenote-ref a:hover {
+	text-decoration: underline;
+}
+
+.footnotes {
+	display: none;
+	font-size: 0.875rem;
+	color: #666;
+	margin-top: 2rem;
+}
+
+.footnotes ol {
+	padding-left: 1.5rem;
+}
+
+.footnotes li {
+	margin-bottom: 0.5rem;
+}
+
+.footnotes a {
+	color: #2563eb;
+	text-decoration: none;
+	margin-left: 0.25em;
+}
+
 /* --- Table of Contents (sticky sidebar) --- */
 .toc-sidebar {
 	grid-column: 1;
@@ -523,6 +572,14 @@ html {
 }
 
 @media (max-width: 1199px) {
+	.sidenote {
+		display: none;
+	}
+
+	.footnotes {
+		display: block;
+	}
+
 	.toc-sidebar {
 		display: none;
 	}

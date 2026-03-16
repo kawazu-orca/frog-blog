@@ -32,7 +32,7 @@ const nextPost =
 
 const blocks = await getPostBlocks(post.pageId);
 const headings = extractHeadings(blocks);
-const contentHtml = await renderBlocks(blocks);
+const { html: contentHtml, footnotes } = await renderBlocks(blocks);
 const displayDate = post.date ?? "日付なし";
 const showToC = post.properties.ShowToC === true;
 const hasEnoughHeadings = headings.length > 2;
@@ -66,6 +66,24 @@ const hasEnoughHeadings = headings.length > 2;
 
 		<article class="article-main">
 			<div class="article-body" set:html={contentHtml} />
+
+			{
+				footnotes.length > 0 && (
+					<section class="footnotes" aria-label="脚注">
+						<hr />
+						<ol>
+							{footnotes.map((footnote) => (
+								<li id={`${footnote.id}-mobile`}>
+									<span>
+										{footnote.index}. {footnote.text}
+									</span>{" "}
+									<a href={`#fnref-${footnote.index}`}>↩</a>
+								</li>
+							))}
+						</ol>
+					</section>
+				)
+			}
 
 			<hr />
 			<p>この記事をシェアする</p>
