@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShareButtons from "../../components/ShareButtons.astro";
 import {
 	getPostBlocks,
 	getPublishedPosts,
@@ -49,6 +50,9 @@ const contentHtml = await renderBlocks(blocks);
 		</p>
 		<p>{post.date ?? "日付なし"}</p>
 		<div set:html={contentHtml} />
+		<hr />
+		<p>この記事をシェアする</p>
+		<ShareButtons title={post.title} url={Astro.url.href} />
 		<nav>
 			{previousPost && (
 				<p>

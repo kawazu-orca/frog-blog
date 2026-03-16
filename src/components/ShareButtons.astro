@@ -1,0 +1,142 @@
+---
+interface Props {
+	title: string;
+	url: string;
+}
+
+const { title, url } = Astro.props as Props;
+
+const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}`;
+---
+
+<div class="share-buttons">
+	<a class="share-button x" href={xUrl} target="_blank" rel="noopener noreferrer">
+		<svg viewBox="0 0 24 24" aria-hidden="true">
+			<path
+				d="M18.901 1.153h3.68l-8.04 9.19 9.458 12.504h-7.406l-5.8-7.584-6.64 7.584H.47l8.6-9.83L0 1.153h7.594l5.243 6.932 6.064-6.932Zm-1.292 19.49h2.04L6.486 3.24H4.298l13.31 17.404Z"
+			/>
+		</svg>
+		<span class="label-text">X</span>
+	</a>
+
+	<a
+		class="share-button hatena"
+		href={hatenaUrl}
+		target="_blank"
+		rel="noopener noreferrer"
+	>
+		<svg viewBox="0 0 24 24" aria-hidden="true">
+			<path
+				d="M6 3h8.8C18.6 3 21 5.3 21 9.2c0 2.7-1.2 4.6-3.3 5.5 1.5.6 2.3 1.9 2.3 3.8V21h-4.2v-2.1c0-1.8-.8-2.5-2.7-2.5H10V21H6V3Zm4 9.9h3.7c2 0 3.1-1 3.1-2.9 0-1.8-1-2.8-3-2.8H10v5.7Z"
+			/>
+		</svg>
+		<span class="label-text">はてブ</span>
+	</a>
+
+	<button class="share-button copy" type="button" data-copy-url={url}>
+		<svg viewBox="0 0 24 24" aria-hidden="true">
+			<path
+				d="M16 1H6C4.9 1 4 1.9 4 3v12h2V3h10V1Zm3 4H10C8.9 5 8 5.9 8 7v14c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H10V7h9v14Z"
+			/>
+		</svg>
+		<span class="label-text">リンクコピー</span>
+		<span class="tooltip" aria-hidden="true">コピーしました</span>
+	</button>
+</div>
+
+<script>
+	const copyButtons = document.querySelectorAll(".share-button.copy");
+	for (const button of copyButtons) {
+		button.addEventListener("click", async () => {
+			const url = button.getAttribute("data-copy-url");
+			if (!url) return;
+			try {
+				await navigator.clipboard.writeText(url);
+				button.classList.add("copied");
+				window.setTimeout(() => {
+					button.classList.remove("copied");
+				}, 2000);
+			} catch {
+				// Ignore clipboard failures.
+			}
+		});
+	}
+</script>
+
+<style>
+	.share-buttons {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.share-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		border: 1px solid #d1d5db;
+		border-radius: 8px;
+		padding: 8px 10px;
+		background: #fff;
+		color: #111827;
+		text-decoration: none;
+		cursor: pointer;
+		transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+		font: inherit;
+		position: relative;
+	}
+
+	.share-button svg {
+		width: 18px;
+		height: 18px;
+		fill: currentColor;
+	}
+
+	.share-button.x:hover {
+		background: #111827;
+		border-color: #111827;
+		color: #fff;
+	}
+
+	.share-button.hatena:hover {
+		background: #00a4de;
+		border-color: #00a4de;
+		color: #fff;
+	}
+
+	.share-button.copy:hover {
+		background: #10b981;
+		border-color: #10b981;
+		color: #fff;
+	}
+
+	.tooltip {
+		position: absolute;
+		left: 50%;
+		bottom: calc(100% + 8px);
+		transform: translateX(-50%);
+		background: #111827;
+		color: #fff;
+		font-size: 12px;
+		padding: 4px 8px;
+		border-radius: 6px;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s;
+		white-space: nowrap;
+	}
+
+	.share-button.copied .tooltip {
+		opacity: 1;
+	}
+
+	@media (max-width: 768px) {
+		.label-text {
+			display: none;
+		}
+		.share-button {
+			padding: 8px;
+		}
+	}
+</style>
