@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
 import "../styles/callout.css";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import SEO from "../components/SEO.astro";
 
 interface Props {
 	title?: string;
@@ -14,85 +17,13 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 <!doctype html>
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"
-		/>
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={description} />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={Astro.url.toString()} />
-		<title>{title}</title>
+		<SEO title={title} description={description} />
 	</head>
 	<body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
-		<header class="site-header">
-			<div class="site-header-inner">
-				<a class="site-title" href="/">frog-blog</a>
-				<nav>
-					<ul class="site-nav">
-						<li><a href="/">Home</a></li>
-						<li><a href="/tags">Tags</a></li>
-					</ul>
-				</nav>
-			</div>
-		</header>
+		<Header />
 		<main>
 			<slot />
 		</main>
-		<footer class="site-footer">© 2026 frog-blog</footer>
+		<Footer />
 	</body>
 </html>
-
-<style>
-	.site-header {
-		background: #fff;
-		border-bottom: 1px solid #e5e7eb;
-	}
-
-	.site-header-inner {
-		max-width: 720px;
-		margin: 0 auto;
-		padding: 14px 16px;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 16px;
-	}
-
-	.site-title {
-		font-weight: 700;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.site-nav {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.site-nav a {
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.site-footer {
-		text-align: center;
-		padding: 24px 16px;
-	}
-
-	@media (min-width: 769px) {
-		.site-header-inner {
-			padding-left: 24px;
-			padding-right: 24px;
-		}
-	}
-</style>

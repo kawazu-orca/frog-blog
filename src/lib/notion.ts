@@ -204,8 +204,10 @@ async function ensureImageDownloaded(
 	let join: (...paths: string[]) => string;
 
 	try {
-		const fs = await import("node:fs/promises");
-		const path = await import("node:path");
+		const fsModule = `node:${"fs/promises"}`;
+		const pathModule = `node:${"path"}`;
+		const fs = await import(fsModule);
+		const path = await import(pathModule);
 		access = fs.access;
 		mkdir = fs.mkdir;
 		writeFile = fs.writeFile;
