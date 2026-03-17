@@ -19,7 +19,7 @@ const posts = (await getPublishedPosts()).filter((post) =>
 ---
 
 <BaseLayout title={`タグ: ${tag}`}>
-	<section class="page-container">
+	<section class="page-container list-page">
 		<h1 class="page-title">Tag: {tag}</h1>
 		<section class="article-list">
 			{

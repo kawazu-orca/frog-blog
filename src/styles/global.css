@@ -212,6 +212,10 @@ img {
 	padding: 2rem 1.5rem;
 }
 
+.list-page {
+	max-width: 980px;
+}
+
 .page-title {
 	font-family: var(--font-heading);
 	font-size: 2rem;
@@ -278,6 +282,87 @@ img {
 	color: #555;
 	line-height: 1.6;
 	margin: 0;
+}
+
+/* Top page article list (3-column grid) */
+.article-list-item {
+	display: grid;
+	grid-template-columns: 120px 1fr auto;
+	gap: 1.5rem;
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #eee;
+	align-items: start;
+}
+
+.article-list-item:last-child {
+	border-bottom: none;
+}
+
+.article-list-item .article-meta {
+	font-size: 0.85rem;
+	color: #999;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.article-list-item .series-badge {
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 2px 8px;
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #666;
+	margin-top: 0.5rem;
+}
+
+.article-list-item .article-body {
+	grid-column: 2;
+}
+
+.article-list-item .article-title {
+	font-family: var(--font-heading);
+	font-size: 1.1rem;
+	font-weight: 700;
+	line-height: 1.35;
+	margin: 0;
+}
+
+.article-list-item .article-title a {
+	color: var(--color-heading);
+	text-decoration: none;
+}
+
+.article-list-item .article-title a:hover {
+	color: var(--color-link);
+}
+
+.article-list-item .article-description {
+	font-size: 0.9rem;
+	color: #666;
+	margin-top: 0.3rem;
+}
+
+.article-list-item .article-tags {
+	margin-top: 0.5rem;
+}
+
+.article-list-item .article-tags .tag-badge {
+	font-size: 0.75rem;
+}
+
+.article-list-item .article-thumbnail {
+	width: 150px;
+}
+
+.article-list-item .article-thumbnail img {
+	display: block;
+	width: 150px;
+	height: 96px;
+	object-fit: cover;
+	border-radius: 4px;
 }
 
 .tag-cloud {
@@ -556,6 +641,35 @@ html {
 
 	.article-card-title {
 		font-size: 1.15rem;
+	}
+
+	.article-list-item {
+		grid-template-columns: 1fr;
+		gap: 0.6rem;
+	}
+
+	.article-list-item .article-body {
+		display: contents;
+	}
+
+	.article-list-item .article-meta {
+		order: 1;
+	}
+
+	.article-list-item .article-title {
+		order: 2;
+	}
+
+	.article-list-item .article-thumbnail {
+		order: 3;
+	}
+
+	.article-list-item .article-description {
+		order: 4;
+	}
+
+	.article-list-item .article-tags {
+		order: 5;
 	}
 
 	.article-grid {
