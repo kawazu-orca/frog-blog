@@ -1,61 +1,143 @@
 .callout {
-	border-radius: 8px;
-	padding: 16px;
+	border-radius: 6px;
+	padding: 14px 22px;
 	margin: 16px 0;
-}
-
-.callout .callout-icon {
-	flex: 0 0 auto;
-	line-height: 1.5;
+	border: 1px solid #dde4ee;
 }
 
 .callout .callout-body {
-	display: flex;
-	gap: 10px;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	column-gap: 0;
+	row-gap: 0;
+	align-items: start;
+}
+
+.callout .callout-icon {
+	display: none;
 }
 
 .callout .callout-content {
 	flex: 1 1 auto;
+	font-family:
+		"Noto Sans JP",
+		"Hiragino Kaku Gothic ProN",
+		"Yu Gothic",
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
+	color: #334155;
+	font-size: 1rem;
+	line-height: 1.72;
+	max-width: 60ch;
+	margin: 0;
+}
+
+.callout .callout-content > :first-child {
+	margin-top: 0;
+}
+
+.callout .callout-content > :last-child {
+	margin-bottom: 0;
+}
+
+.callout .callout-content > p:first-child > strong:first-child,
+.callout .callout-content > strong:first-child {
+	display: inline-block;
+	font-family: var(--font-heading);
+	font-weight: 700;
+	font-size: 1.04rem;
+	letter-spacing: 0.01em;
+	color: var(--callout-heading, #1f2b3a);
+	margin-bottom: 0.3rem;
+}
+
+.callout .callout-content p {
+	margin: 0 0 0.85rem;
+}
+
+.callout .callout-content p:last-child {
+	margin-bottom: 0;
+}
+
+.callout .callout-content ul,
+.callout .callout-content ol {
+	margin: 0;
+	padding-left: 1.35rem;
+}
+
+.callout .callout-content ul:last-child,
+.callout .callout-content ol:last-child {
+	margin-bottom: 0;
+}
+
+.callout .callout-content li {
+	margin-bottom: 0.35rem;
+}
+
+.callout .callout-content li:last-child {
+	margin-bottom: 0;
 }
 
 .callout-definition {
-	border-left: 4px solid #3b82f6;
-	background: #eff6ff;
+	--callout-heading: #234f8f;
+	border-left: 3px solid #5b8fda;
+	background: #f6f9fe;
+	border-color: #d9e5f6;
 }
 
 .callout-theorem {
-	border: 2px solid #f59e0b;
-	background: #fffbeb;
+	--callout-heading: #9d3656;
+	border-left: 3px solid #d17493;
+	background: #fdf5f8;
+	border-color: #f0d6df;
 }
 
 .callout-lemma {
-	border-left: 4px solid #8b5cf6;
-	background: #f5f3ff;
+	--callout-heading: #8b4d2f;
+	border-left: 3px solid #c78a64;
+	background: #fdf8f5;
+	border-color: #efdfd5;
 }
 
 .callout-corollary {
-	border-left: 4px solid #10b981;
-	background: #ecfdf5;
+	--callout-heading: #8a5534;
+	border-left: 3px solid #c99772;
+	background: #fdf9f6;
+	border-color: #efe3da;
 }
 
 .callout-example {
-	background: #fefce8;
+	--callout-heading: #6d5a27;
+	border-left: 3px solid #b7a166;
+	background: #fcfaf4;
+	border-color: #ece5d1;
 }
 
 .callout-warning {
-	border: 2px solid #ef4444;
-	background: #fef2f2;
+	--callout-heading: #9a3434;
+	border-left: 3px solid #c76666;
+	background: #fdf6f6;
+	border-color: #eed8d8;
 }
 
 .callout-intuition {
-	background: #f3f4f6;
+	--callout-heading: #4c596c;
+	border-left: 3px solid #7f8ea2;
+	background: #f7f9fb;
+	border-color: #dce3eb;
 }
 
 .callout-summary {
-	background: #ecfdf5;
+	--callout-heading: #2f6b72;
+	border-left: 3px solid #6f9ca3;
+	background: #f3f8f9;
+	border-color: #dbe8ea;
 }
 
 .callout-default {
-	border-left: 4px solid #d1d5db;
-	background: #f9fafb;
+	--callout-heading: #4f5d70;
+	border-left: 3px solid #95a2b4;
+	background: #f8fafc;
+	border-color: #dde4ed;
 }
