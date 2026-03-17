@@ -213,7 +213,7 @@ img {
 }
 
 .list-page {
-	max-width: 1120px;
+	max-width: 1320px;
 }
 
 .page-title {
@@ -370,7 +370,7 @@ img {
 
 @media (max-width: 1024px) {
 	.list-page {
-		max-width: 980px;
+		max-width: 1120px;
 	}
 
 	.article-list-item .article-thumbnail {
