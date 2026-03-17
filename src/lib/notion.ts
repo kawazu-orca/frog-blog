@@ -16,7 +16,9 @@ export interface PublishedPost {
 	slug: string;
 	date: string | null;
 	tags: string[];
+	series?: string;
 	description: string;
+	thumbnail?: string;
 	properties: {
 		ShowToC: boolean;
 	};
@@ -110,12 +112,43 @@ function getCheckboxValue(
 	return property.checkbox;
 }
 
+function getSelectValue(
+	property: PageObjectResponse["properties"][string] | undefined,
+): string | undefined {
+	if (!property || property.type !== "select") {
+		return undefined;
+	}
+
+	return property.select?.name ?? undefined;
+}
+
+function getThumbnailUrl(
+	property: PageObjectResponse["properties"][string] | undefined,
+): string | undefined {
+	if (!property || property.type !== "files") {
+		return undefined;
+	}
+
+	const first = property.files[0];
+	if (!first) {
+		return undefined;
+	}
+
+	if (first.type === "external") {
+		return first.external.url;
+	}
+
+	return first.file.url;
+}
+
 function mapPageToPublishedPost(page: PageObjectResponse): PublishedPost {
 	const title = getPlainText(page.properties.Title);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
 	const tags = getTagNames(page.properties.Tags);
+	const series = getSelectValue(page.properties.Series);
 	const description = getPlainText(page.properties.Description);
+	const thumbnail = getThumbnailUrl(page.properties.Thumbnail);
 	const showToC = getCheckboxValue(page.properties.ShowToC);
 
 	return {
@@ -124,7 +157,9 @@ function mapPageToPublishedPost(page: PageObjectResponse): PublishedPost {
 		slug: slug || page.id,
 		date,
 		tags,
+		series,
 		description,
+		thumbnail,
 		properties: {
 			ShowToC: showToC,
 		},

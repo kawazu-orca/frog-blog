@@ -21,26 +21,39 @@ const posts = (await getPublishedPosts()).filter((post) =>
 <BaseLayout title={`タグ: ${tag}`}>
 	<section class="page-container">
 		<h1 class="page-title">Tag: {tag}</h1>
-		<div class="article-list">
+		<section class="article-list">
 			{
 				posts.map((post) => (
-					<article class="article-card">
-						<a class="article-card-link" href={`/posts/${post.slug}`}>
-							<h2 class="article-card-title">{post.title}</h2>
-							<div class="article-card-meta">
-								<time datetime={post.date ?? ""}>{post.date ?? "日付なし"}</time>
-								{
-									post.tags?.length > 0 &&
-										post.tags.map((postTag) => <span class="tag-badge">{postTag}</span>)
-								}
-							</div>
+					<article class="article-list-item">
+						<div class="article-meta">
+							<div>{post.date ?? "日付なし"}</div>
+							{post.series && <div class="series-badge">{post.series}</div>}
+						</div>
+						<div class="article-body">
+							<h2 class="article-title">
+								<a href={`/posts/${post.slug}`}>{post.title}</a>
+							</h2>
 							{post.description && (
-								<p class="article-card-description">{post.description}</p>
+								<p class="article-description">{post.description}</p>
 							)}
-						</a>
+							{post.tags?.length > 0 && (
+								<div class="article-tags">
+									{post.tags.map((postTag) => (
+										<a class="tag-badge" href={`/tags/${encodeURIComponent(postTag)}`}>
+											{postTag}
+										</a>
+									))}
+								</div>
+							)}
+						</div>
+						{post.thumbnail && (
+							<div class="article-thumbnail">
+								<img src={post.thumbnail} alt={post.title} loading="lazy" />
+							</div>
+						)}
 					</article>
 				))
 			}
-		</div>
+		</section>
 	</section>
 </BaseLayout>
