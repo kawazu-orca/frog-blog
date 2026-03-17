@@ -644,6 +644,7 @@ img {
 	line-height: 1.72;
 	letter-spacing: 0.01em;
 	color: #2f3a47;
+	margin-top: 0;
 	margin-bottom: 1.5rem;
 }
 
@@ -674,6 +675,7 @@ img {
 	line-height: 1.72;
 	letter-spacing: 0.01em;
 	color: #2f3a47;
+	margin-top: 0;
 	margin-bottom: 1.5rem;
 }
 
@@ -703,6 +705,40 @@ img {
 	color: #2a3a4f;
 	margin-top: 2rem;
 	margin-bottom: 0.5rem;
+}
+
+.article-main .article-body details {
+	max-width: 60ch;
+	margin: 1.4rem 0 1.6rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+.article-main .article-body details > summary {
+	cursor: pointer;
+	margin: 0;
+	font-family: inherit;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.72;
+	letter-spacing: 0.01em;
+	color: #2f3a47;
+	list-style-position: inside;
+	padding-left: 0;
+}
+
+.article-main .article-body details > summary:hover {
+	color: #253447;
+}
+
+.article-main .article-body details[open] > summary {
+	margin-bottom: 0.7rem;
+}
+
+.article-main .article-body details > :not(summary) {
+	max-width: 60ch;
 }
 
 .article-main .article-content > h2:first-child,
