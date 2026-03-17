@@ -4,12 +4,15 @@
 		sans-serif;
 	--font-code: "JetBrains Mono", "SFMono-Regular", "Consolas", monospace;
 	--color-text: #333;
-	--color-heading: #111;
-	--color-bg: #fafafa;
+	--color-heading: #18212c;
+	--color-bg: #f8fafc;
 	--color-link: #2563eb;
 	--color-link-hover: #1d4ed8;
 	--color-code-bg: #f0f0f0;
 	--color-border: #e5e5e5;
+	--color-muted: #64748b;
+	--color-surface: #ffffff;
+	--shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.05);
 }
 
 * {
@@ -32,6 +35,7 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	font-feature-settings: "palt";
+	transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 main {
@@ -87,6 +91,7 @@ li {
 a {
 	color: var(--color-link);
 	text-decoration: none;
+	transition: color 0.2s ease;
 }
 
 a:hover {
@@ -151,14 +156,15 @@ img {
 
 /* Distill-style shared layout */
 .site-header {
-	border-bottom: 1px solid #eef2f6;
-	background: #eef2f6;
+	border-bottom: 1px solid #e2e8f0;
+	background: linear-gradient(180deg, #eef2f6 0%, #e8edf3 100%);
+	backdrop-filter: saturate(120%);
 }
 
 .header-inner {
-	max-width: 960px;
+	max-width: 980px;
 	margin: 0 auto;
-	padding: 1rem 1.5rem;
+	padding: 1.05rem 1.75rem;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -168,36 +174,38 @@ img {
 	font-family: var(--font-heading);
 	font-size: 1.25rem;
 	font-weight: 700;
-	color: #1f2937;
+	color: #18212c;
 	text-decoration: none;
+	letter-spacing: 0.01em;
 }
 
 .site-nav a {
 	font-family: var(--font-heading);
 	font-size: 0.875rem;
-	color: #4b5563;
+	color: #475569;
 	text-decoration: none;
-	transition: color 0.2s;
+	transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .site-nav a:hover {
-	color: #1f2937;
+	color: #0f172a;
+	opacity: 0.88;
 	text-decoration: none;
 }
 
 .site-footer {
-	border-top: 1px solid var(--color-border, #e5e5e5);
-	background: var(--color-bg, #fafafa);
+	border-top: 1px solid #e5e7eb;
+	background: #f4f6f9;
 	margin-top: 4rem;
 }
 
 .footer-inner {
-	max-width: 960px;
+	max-width: 980px;
 	margin: 0 auto;
 	padding: 2rem 1.5rem;
 	text-align: center;
 	font-size: 0.8rem;
-	color: #999;
+	color: #7b8794;
 }
 
 .footer-inner p {
@@ -211,7 +219,7 @@ img {
 }
 
 .list-page {
-	max-width: 900px;
+	max-width: 930px;
 	padding-top: 5rem;
 }
 
@@ -287,11 +295,12 @@ img {
 /* Top page article list (3-column grid) */
 .article-list-item {
 	display: grid;
-	grid-template-columns: 92px 1.08rem minmax(20ch, 1fr) 0.72rem 276px;
+	grid-template-columns: 92px 1.08rem minmax(20ch, 1fr) 0.48rem 276px;
 	row-gap: 0.45rem;
 	padding: 1.85rem 0;
 	border-bottom: 1px solid #eee;
 	align-items: start;
+	transition: background-color 0.2s ease;
 }
 
 .article-list-item:last-child {
@@ -301,7 +310,7 @@ img {
 .article-list-item .article-meta {
 	grid-column: 1;
 	font-size: 0.85rem;
-	color: #4b5563;
+	color: #475569;
 	line-height: 1.25;
 	display: flex;
 	flex-direction: column;
@@ -340,19 +349,19 @@ img {
 }
 
 .article-list-item .article-title a {
-	color: #1f2937;
+	color: #243142;
 	text-decoration: none;
 }
 
 .article-list-item .article-title a:hover {
-	color: #111827;
+	color: #162030;
 	opacity: 0.9;
 	text-decoration: none;
 }
 
 .article-list-item .article-description {
 	font-size: 0.86rem;
-	color: #666;
+	color: #5b6675;
 	margin: 0.4rem 0 0;
 	line-height: 1.65;
 	max-inline-size: calc(20ch * 1.56);
@@ -360,7 +369,7 @@ img {
 
 @supports (width: 1ic) {
 	.article-list-item {
-		grid-template-columns: 92px 1.08rem minmax(20ic, 1fr) 0.72rem 276px;
+		grid-template-columns: 92px 1.08rem minmax(20ic, 1fr) 0.48rem 276px;
 	}
 
 	.article-list-item .article-title {
@@ -393,21 +402,22 @@ img {
 	height: 170px;
 	object-fit: cover;
 	border-radius: 4px;
+	box-shadow: var(--shadow-soft);
 }
 
 
 @media (max-width: 1024px) {
-.list-page {
-	max-width: 1080px;
-}
+	.list-page {
+		max-width: 880px;
+	}
 
 	.article-list-item {
-		grid-template-columns: 88px 0.98rem minmax(18ch, 1fr) 0.62rem 232px;
+		grid-template-columns: 88px 0.98rem minmax(18ch, 1fr) 0.42rem 232px;
 	}
 
 	@supports (width: 1ic) {
 		.article-list-item {
-			grid-template-columns: 88px 0.98rem minmax(18ic, 1fr) 0.62rem 232px;
+			grid-template-columns: 88px 0.98rem minmax(18ic, 1fr) 0.42rem 232px;
 		}
 	}
 
