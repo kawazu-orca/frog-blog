@@ -9,6 +9,7 @@ import {
 	type BlockObjectResponse,
 	type PageObjectResponse,
 } from "@notionhq/client";
+import { downloadAndOptimizeImage } from "./images";
 
 export interface PublishedPost {
 	pageId: string;
@@ -141,15 +142,39 @@ function getThumbnailUrl(
 	return first.file.url;
 }
 
-function mapPageToPublishedPost(page: PageObjectResponse): PublishedPost {
+async function mapPageToPublishedPost(
+	page: PageObjectResponse,
+): Promise<PublishedPost> {
 	const title = getPlainText(page.properties.Title);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
 	const tags = getTagNames(page.properties.Tags);
 	const series = getSelectValue(page.properties.Series);
 	const description = getPlainText(page.properties.Description);
-	const thumbnail = getThumbnailUrl(page.properties.Thumbnail);
+	const thumbnailUrl = getThumbnailUrl(page.properties.Thumbnail);
 	const showToC = getCheckboxValue(page.properties.ShowToC);
+	let thumbnail = thumbnailUrl;
+
+	if (thumbnailUrl) {
+		try {
+			thumbnail = await downloadAndOptimizeImage(
+				thumbnailUrl,
+				`thumb-${page.id}`,
+				{
+					subdir: "thumbnails",
+					width: 880,
+					height: 560,
+					fit: "cover",
+					quality: 86,
+				},
+			);
+		} catch (error) {
+			console.error(
+				`[notion] Failed to optimize thumbnail for page ${page.id}; using source URL.`,
+				error,
+			);
+		}
+	}
 
 	return {
 		pageId: page.id,
@@ -228,10 +253,11 @@ export async function getPublishedPosts(): Promise<PublishedPost[]> {
 			},
 		);
 
-		return results
-			.filter(isFullPage)
-			.map(mapPageToPublishedPost)
-			.sort((a, b) => {
+		const posts = await Promise.all(
+			results.filter(isFullPage).map((page) => mapPageToPublishedPost(page)),
+		);
+
+		return posts.sort((a, b) => {
 				if (a.date === b.date) {
 					return 0;
 				}

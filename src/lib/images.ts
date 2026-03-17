@@ -1,6 +1,23 @@
 import type { NotionBlockWithChildren } from "./notion";
 
 type ImageBlock = Extract<NotionBlockWithChildren, { type: "image" }>;
+type ImageFit = "cover" | "contain" | "fill" | "inside" | "outside";
+
+type OptimizeImageOptions = {
+	subdir?: string;
+	width?: number;
+	height?: number;
+	fit?: ImageFit;
+	quality?: number;
+};
+
+type NodeImagePipeline = {
+	fs: typeof import("node:fs/promises");
+	path: typeof import("node:path");
+	sharp: typeof import("sharp").default;
+};
+
+let nodeImagePipeline: NodeImagePipeline | null | undefined;
 
 function getImageUrl(block: ImageBlock): string {
 	return block.image.type === "external" ? block.image.external.url : block.image.file.url;
@@ -17,23 +34,59 @@ function shouldOptimizeAtBuildTime(): boolean {
 	);
 }
 
-async function optimizeNotionImageToWebp(
+function sanitizeFileKey(fileKey: string): string {
+	return fileKey.replace(/[^a-zA-Z0-9-_]/g, "-");
+}
+
+async function loadNodeImagePipeline(): Promise<NodeImagePipeline | null> {
+	if (nodeImagePipeline !== undefined) {
+		return nodeImagePipeline;
+	}
+
+	try {
+		const fsModule = `node:${"fs/promises"}`;
+		const pathModule = `node:${"path"}`;
+		const sharpModule = "sharp";
+
+		const fs = await import(fsModule);
+		const path = await import(pathModule);
+		const sharpImport = await import(sharpModule);
+		const sharp = sharpImport.default;
+
+		nodeImagePipeline = { fs, path, sharp };
+		return nodeImagePipeline;
+	} catch {
+		nodeImagePipeline = null;
+		return null;
+	}
+}
+
+export async function downloadAndOptimizeImage(
 	imageUrl: string,
-	blockId: string,
+	fileKey: string,
+	options: OptimizeImageOptions = {},
 ): Promise<string> {
-	const fsModule = `node:${"fs/promises"}`;
-	const pathModule = `node:${"path"}`;
-	const sharpModule = "sharp";
+	if (!shouldOptimizeAtBuildTime()) {
+		return imageUrl;
+	}
 
-	const fs = await import(fsModule);
-	const path = await import(pathModule);
-	const sharpImport = await import(sharpModule);
-	const sharp = sharpImport.default;
+	const nodeTools = await loadNodeImagePipeline();
+	if (!nodeTools) {
+		return imageUrl;
+	}
 
-	const imageDir = path.join(process.cwd(), "public", "images", "posts");
+	const { fs, path, sharp } = nodeTools;
+
+	const subdir = options.subdir ?? "posts";
+	const width = options.width ?? 1200;
+	const height = options.height;
+	const fit = options.fit ?? (height ? "cover" : "inside");
+	const quality = options.quality ?? 80;
+
+	const imageDir = path.join(process.cwd(), "public", "images", subdir);
 	await fs.mkdir(imageDir, { recursive: true });
 
-	const fileName = `${blockId}.webp`;
+	const fileName = `${sanitizeFileKey(fileKey)}.webp`;
 	const destination = path.join(imageDir, fileName);
 
 	try {
@@ -49,12 +102,27 @@ async function optimizeNotionImageToWebp(
 	}
 
 	const sourceData = new Uint8Array(await response.arrayBuffer());
-	await sharp(sourceData)
-		.resize({ width: 1200, withoutEnlargement: true })
-		.webp({ quality: 80 })
-		.toFile(destination);
+	const imagePipeline = sharp(sourceData).resize({
+		width,
+		height,
+		fit,
+		withoutEnlargement: true,
+	});
 
-	return `/images/posts/${fileName}`;
+	await imagePipeline.webp({ quality }).toFile(destination);
+
+	return `/images/${subdir}/${fileName}`;
+}
+
+async function optimizeNotionImageToWebp(
+	imageUrl: string,
+	blockId: string,
+): Promise<string> {
+	return await downloadAndOptimizeImage(imageUrl, blockId, {
+		subdir: "posts",
+		width: 1200,
+		quality: 80,
+	});
 }
 
 export async function resolveImageSrc(block: ImageBlock): Promise<string> {
