@@ -213,7 +213,7 @@ img {
 }
 
 .list-page {
-	max-width: 980px;
+	max-width: 1080px;
 }
 
 .page-title {
@@ -287,8 +287,8 @@ img {
 /* Top page article list (3-column grid) */
 .article-list-item {
 	display: grid;
-	grid-template-columns: 120px 1fr auto;
-	gap: 1.5rem;
+	grid-template-columns: 130px 1fr auto;
+	gap: 2rem;
 	padding: 1.5rem 0;
 	border-bottom: 1px solid #eee;
 	align-items: start;
@@ -354,13 +354,13 @@ img {
 }
 
 .article-list-item .article-thumbnail {
-	width: 150px;
+	width: 180px;
 }
 
 .article-list-item .article-thumbnail img {
 	display: block;
-	width: 150px;
-	height: 96px;
+	width: 180px;
+	height: 112px;
 	object-fit: cover;
 	border-radius: 4px;
 }
@@ -645,7 +645,7 @@ html {
 
 	.article-list-item {
 		grid-template-columns: 1fr;
-		gap: 0.6rem;
+		gap: 0.5rem;
 	}
 
 	.article-list-item .article-body {
@@ -654,13 +654,28 @@ html {
 
 	.article-list-item .article-meta {
 		order: 1;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.6rem;
 	}
 
-	.article-list-item .article-title {
-		order: 2;
+	.article-list-item .series-badge {
+		margin-top: 0;
 	}
 
 	.article-list-item .article-thumbnail {
+		order: 2;
+		width: 100%;
+	}
+
+	.article-list-item .article-thumbnail img {
+		width: 100%;
+		max-width: 360px;
+		height: auto;
+	}
+
+	.article-list-item .article-title {
 		order: 3;
 	}
 
