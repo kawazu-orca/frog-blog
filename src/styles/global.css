@@ -213,7 +213,7 @@ img {
 }
 
 .list-page {
-	max-width: 1080px;
+	max-width: 980px;
 }
 
 .page-title {
@@ -287,8 +287,9 @@ img {
 /* Top page article list (3-column grid) */
 .article-list-item {
 	display: grid;
-	grid-template-columns: 130px 1fr auto;
-	gap: 2rem;
+	grid-template-columns: 100px minmax(0, 1fr) auto;
+	column-gap: 2rem;
+	row-gap: 0.4rem;
 	padding: 1.5rem 0;
 	border-bottom: 1px solid #eee;
 	align-items: start;
@@ -354,13 +355,14 @@ img {
 }
 
 .article-list-item .article-thumbnail {
-	width: 180px;
+	width: min(150px, 30vw);
 }
 
 .article-list-item .article-thumbnail img {
 	display: block;
-	width: 180px;
-	height: 112px;
+	width: min(150px, 100%);
+	max-width: 150px;
+	height: 96px;
 	object-fit: cover;
 	border-radius: 4px;
 }
