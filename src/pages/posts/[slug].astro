@@ -96,28 +96,30 @@ const hasEnoughHeadings = headings.length > 2;
 				)
 			}
 
-			<hr />
-			<p>この記事をシェアする</p>
-			<ShareButtons title={post.title} url={Astro.url.href} />
+			<section class="article-share">
+				<hr />
+				<p class="article-share-label">この記事をシェアする</p>
+				<ShareButtons title={post.title} url={Astro.url.href} />
+			</section>
 
-			<nav>
+			<nav class="article-pagination">
 				{previousPost && (
-					<p>
-						<a href={`/posts/${previousPost.slug}`}>
+					<p class="article-pagination-prev">
+						<a class="article-pagination-link" href={`/posts/${previousPost.slug}`}>
 							← 前の記事: {previousPost.title}
 						</a>
 					</p>
 				)}
 				{nextPost && (
-					<p>
-						<a href={`/posts/${nextPost.slug}`}>
+					<p class="article-pagination-next">
+						<a class="article-pagination-link" href={`/posts/${nextPost.slug}`}>
 							次の記事: {nextPost.title} →
 						</a>
 					</p>
 				)}
 			</nav>
 
-			<p><a href="/">← 記事一覧に戻る</a></p>
+			<p class="article-back"><a href="/">← 記事一覧に戻る</a></p>
 		</article>
 	</div>
 
