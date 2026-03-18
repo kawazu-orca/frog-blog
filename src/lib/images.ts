@@ -18,6 +18,19 @@ type NodeImagePipeline = {
 };
 
 let nodeImagePipeline: NodeImagePipeline | null | undefined;
+const warnedReasons = new Set<string>();
+
+function warnOnce(key: string, message: string, error?: unknown): void {
+	if (warnedReasons.has(key)) {
+		return;
+	}
+	warnedReasons.add(key);
+	if (error) {
+		console.warn(message, error);
+		return;
+	}
+	console.warn(message);
+}
 
 function getImageUrl(block: ImageBlock): string {
 	return block.image.type === "external" ? block.image.external.url : block.image.file.url;
@@ -25,13 +38,6 @@ function getImageUrl(block: ImageBlock): string {
 
 function isNotionSignedUrl(url: string): boolean {
 	return url.includes("secure.notion-static.com");
-}
-
-function shouldOptimizeAtBuildTime(): boolean {
-	return (
-		process.env.npm_lifecycle_event === "build" ||
-		process.env.GITHUB_ACTIONS === "true"
-	);
 }
 
 function sanitizeFileKey(fileKey: string): string {
@@ -55,7 +61,12 @@ async function loadNodeImagePipeline(): Promise<NodeImagePipeline | null> {
 
 		nodeImagePipeline = { fs, path, sharp };
 		return nodeImagePipeline;
-	} catch {
+	} catch (error) {
+		warnOnce(
+			"image-pipeline-unavailable",
+			"[images] Node image pipeline is unavailable. Falling back to source URLs.",
+			error,
+		);
 		nodeImagePipeline = null;
 		return null;
 	}
@@ -66,18 +77,21 @@ export async function downloadAndOptimizeImage(
 	fileKey: string,
 	options: OptimizeImageOptions = {},
 ): Promise<string> {
-	if (!shouldOptimizeAtBuildTime()) {
-		return imageUrl;
-	}
+	const subdir = options.subdir ?? "posts";
+	const fileName = `${sanitizeFileKey(fileKey)}.webp`;
+	const localPath = `/images/${subdir}/${fileName}`;
 
 	const nodeTools = await loadNodeImagePipeline();
 	if (!nodeTools) {
-		return imageUrl;
+		warnOnce(
+			"image-opt-skipped-no-tools",
+			"[images] Optimization skipped because fs/path/sharp could not be loaded. Returning local image path.",
+		);
+		return localPath;
 	}
 
 	const { fs, path, sharp } = nodeTools;
 
-	const subdir = options.subdir ?? "posts";
 	const width = options.width ?? 1200;
 	const height = options.height;
 	const fit = options.fit ?? (height ? "cover" : "inside");
@@ -86,12 +100,11 @@ export async function downloadAndOptimizeImage(
 	const imageDir = path.join(process.cwd(), "public", "images", subdir);
 	await fs.mkdir(imageDir, { recursive: true });
 
-	const fileName = `${sanitizeFileKey(fileKey)}.webp`;
 	const destination = path.join(imageDir, fileName);
 
 	try {
 		await fs.access(destination);
-		return `/images/${subdir}/${fileName}`;
+		return localPath;
 	} catch {
 		// Keep going when the file does not exist yet.
 	}
@@ -111,7 +124,7 @@ export async function downloadAndOptimizeImage(
 
 	await imagePipeline.webp({ quality }).toFile(destination);
 
-	return `/images/${subdir}/${fileName}`;
+	return localPath;
 }
 
 async function optimizeNotionImageToWebp(
@@ -132,7 +145,7 @@ export async function resolveImageSrc(block: ImageBlock): Promise<string> {
 		return sourceUrl;
 	}
 
-	if (!block.id || !shouldOptimizeAtBuildTime()) {
+	if (!block.id) {
 		return sourceUrl;
 	}
 

@@ -31,3 +31,4 @@ pnpm-debug.log*
 
 # build-time generated optimized images
 public/images/posts/
+public/images/thumbnails/

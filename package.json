@@ -7,11 +7,12 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run prepare:thumbnails && astro build",
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
     "generate-types": "wrangler types",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "prepare:thumbnails": "node scripts/prepare-thumbnails.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.1",
