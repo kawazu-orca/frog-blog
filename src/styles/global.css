@@ -26,6 +26,7 @@
 	--space-8: 2rem;
 	--article-top-offset: 5.75rem;
 	--article-body-offset: 1.5rem;
+	--article-text-measure: 34em;
 }
 
 * {
@@ -180,8 +181,8 @@ img {
 
 /* Distill-style shared layout */
 .site-header {
-	border-bottom: 1px solid #dbe3ee;
-	background: linear-gradient(180deg, #eef2f6 0%, #e8edf3 100%);
+	border-bottom: 0;
+	background: var(--color-bg);
 	backdrop-filter: saturate(120%);
 }
 
@@ -218,8 +219,8 @@ img {
 }
 
 .site-footer {
-	border-top: 1px solid #dbe3ee;
-	background: #f4f6f9;
+	border-top: 0;
+	background: var(--color-bg);
 	margin-top: 4rem;
 }
 
@@ -330,7 +331,8 @@ img {
 	grid-template-columns: 92px 1.08rem minmax(20ch, 1fr) 0.48rem 276px;
 	row-gap: 0.42rem;
 	padding: var(--space-8) 0;
-	border-bottom: 1px solid #dbe3ee;
+	min-height: 170px;
+	border-bottom: 0;
 	align-items: start;
 	transition: background-color var(--motion-base);
 }
@@ -433,8 +435,8 @@ img {
 	display: block;
 	width: 100%;
 	max-width: none;
-	aspect-ratio: 16 / 10;
-	height: auto;
+	height: 170px;
+	max-height: 170px;
 	object-fit: cover;
 	border-radius: 4px;
 	box-shadow: var(--shadow-soft);
@@ -448,6 +450,7 @@ img {
 
 	.article-list-item {
 		grid-template-columns: 88px 0.98rem minmax(18ch, 1fr) 0.42rem 232px;
+		min-height: 144px;
 	}
 
 	@supports (width: 1ic) {
@@ -465,8 +468,8 @@ img {
 	.article-list-item .article-thumbnail img {
 		width: 100%;
 		max-width: none;
-		aspect-ratio: 16 / 10;
-		height: auto;
+		height: 144px;
+		max-height: 144px;
 	}
 }
 
@@ -528,7 +531,9 @@ img {
 	grid-column: 2;
 	grid-row: 2;
 	width: 100%;
-	max-width: 66ch;
+	max-width: var(--article-text-measure);
+	margin-left: auto;
+	margin-right: auto;
 	margin-top: var(--article-body-offset);
 	background: transparent;
 	border: 0;
@@ -540,7 +545,9 @@ img {
 	grid-column: 2;
 	grid-row: 1;
 	width: 100%;
-	max-width: 62ch;
+	max-width: var(--article-text-measure);
+	margin-left: auto;
+	margin-right: auto;
 	margin-bottom: 2.75em;
 	padding-bottom: 1.25em;
 	border-bottom: 1px solid #dbe3ee;
@@ -612,7 +619,7 @@ img {
 }
 
 .article-main .article-body blockquote {
-	max-width: 60ch;
+	max-width: 100%;
 	border-left: 2px solid #c7d5e6;
 	padding-left: 1rem;
 	font-family:
@@ -632,7 +639,7 @@ img {
 }
 
 .article-main .article-body p {
-	max-width: 60ch;
+	max-width: 100%;
 	font-family:
 		"Noto Sans JP",
 		"Hiragino Kaku Gothic ProN",
@@ -652,7 +659,7 @@ img {
 	font-size: 1.03em;
 	line-height: 1.75;
 	color: #273342;
-	max-width: 60ch;
+	max-width: 100%;
 	margin-top: 0;
 	margin-bottom: 2rem;
 }
@@ -663,7 +670,7 @@ img {
 
 .article-main .article-body ul,
 .article-main .article-body ol {
-	max-width: 60ch;
+	max-width: 100%;
 	font-family:
 		"Noto Sans JP",
 		"Hiragino Kaku Gothic ProN",
@@ -689,14 +696,6 @@ img {
 	margin-bottom: 0.625rem;
 }
 
-.article-main .article-body h2::after {
-	content: "";
-	display: block;
-	width: 2.5rem;
-	border-top: 1px solid #d8e1ee;
-	margin-top: 0.5rem;
-}
-
 .article-main .article-body h3 {
 	font-size: 1.24rem;
 	font-weight: 600;
@@ -708,7 +707,7 @@ img {
 }
 
 .article-main .article-body details {
-	max-width: 60ch;
+	max-width: 100%;
 	margin: 1.4rem 0 1.6rem;
 	padding: 0;
 	border: 0;
@@ -738,7 +737,7 @@ img {
 }
 
 .article-main .article-body details > :not(summary) {
-	max-width: 60ch;
+	max-width: 100%;
 }
 
 .article-main .article-content > h2:first-child,
@@ -746,9 +745,18 @@ img {
 	margin-top: 0;
 }
 
-.article-share {
-	margin-top: 2.25rem;
+.article-end {
+	margin-top: 2.5rem;
 	padding-top: 0.25rem;
+}
+
+.article-share {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+.article-share hr {
+	margin: 0 0 1rem;
 }
 
 .article-share-label {
@@ -763,41 +771,77 @@ img {
 .article-pagination {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 0.5rem;
-	margin-top: 1.5rem;
-	padding-top: 0.25rem;
+	gap: 0.45rem;
+	margin-top: 1.1rem;
+	padding-top: 0;
+}
+
+.article-pagination.has-both-navigation {
+	grid-template-columns: 1fr 1fr;
+	column-gap: 1.25rem;
 }
 
 .article-pagination-prev,
 .article-pagination-next {
 	margin: 0;
+	display: block;
 }
 
-.article-pagination-link {
-	display: inline-block;
-	font-size: 0.9rem;
-	color: #4a5b71;
-	transition: color var(--motion-base), opacity var(--motion-base);
+.article-pagination-next {
+	justify-self: end;
 }
 
-.article-pagination-link:hover {
-	color: #2c3d52;
-	opacity: 0.86;
+.article-pagination-block {
+	display: grid;
+	gap: 0.15rem;
+	text-align: left;
+	text-decoration: none;
+	transition: opacity var(--motion-base);
+}
+
+.article-pagination-next .article-pagination-block {
+	text-align: right;
+}
+
+.article-pagination-block:hover {
+	opacity: 0.92;
 	text-decoration: none;
 }
 
+.article-pagination-label {
+	font-size: 0.72rem;
+	letter-spacing: 0.02em;
+	color: #8a97a8;
+}
+
+.article-pagination-link {
+	display: block;
+	font-size: 0.88rem;
+	color: #516278;
+	line-height: 1.5;
+	transition: color var(--motion-base), opacity var(--motion-base);
+}
+
+.article-pagination-block:hover .article-pagination-link {
+	color: #36465a;
+}
+
+.article-pagination-block:hover .article-pagination-label {
+	color: #748296;
+}
+
 .article-back {
-	margin-top: 1.2rem;
+	margin-top: 1rem;
 	margin-bottom: 0;
 }
 
 .article-back a {
-	font-size: 0.86rem;
-	color: #6b7a8e;
+	font-size: 0.82rem;
+	color: #7a8798;
 }
 
 .article-back a:hover {
-	color: #4e6077;
+	color: #617082;
 	text-decoration: none;
 }
 
@@ -808,7 +852,7 @@ img {
 	position: absolute;
 	top: 0;
 	left: 100%;
-	margin-left: 2rem;
+	margin-left: 2.75rem;
 	width: 200px;
 	font-family:
 		"Noto Sans JP",
@@ -884,7 +928,7 @@ img {
 	grid-row: 2;
 	align-self: stretch;
 	justify-self: end;
-	padding-right: 2rem;
+	padding-right: 0.9rem;
 	padding-top: var(--article-body-offset);
 }
 
@@ -970,6 +1014,7 @@ html {
 	.article-list-item {
 		grid-template-columns: 1fr;
 		gap: 0.5rem;
+		min-height: 0;
 	}
 
 	.article-list-item .article-body {

@@ -11,7 +11,14 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 ---
 
 <div class="share-buttons">
-	<a class="share-button x" href={xUrl} target="_blank" rel="noopener noreferrer">
+	<a
+		class="share-button x"
+		href={xUrl}
+		target="_blank"
+		rel="noopener noreferrer"
+		aria-label="Xでシェア"
+		title="Xでシェア"
+	>
 		<svg viewBox="0 0 24 24" aria-hidden="true">
 			<path
 				d="M18.901 1.153h3.68l-8.04 9.19 9.458 12.504h-7.406l-5.8-7.584-6.64 7.584H.47l8.6-9.83L0 1.153h7.594l5.243 6.932 6.064-6.932Zm-1.292 19.49h2.04L6.486 3.24H4.298l13.31 17.404Z"
@@ -25,6 +32,8 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 		href={hatenaUrl}
 		target="_blank"
 		rel="noopener noreferrer"
+		aria-label="はてなブックマークでシェア"
+		title="はてなブックマークでシェア"
 	>
 		<svg viewBox="0 0 24 24" aria-hidden="true">
 			<path
@@ -34,7 +43,13 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 		<span class="label-text">はてブ</span>
 	</a>
 
-	<button class="share-button copy" type="button" data-copy-url={url}>
+	<button
+		class="share-button copy"
+		type="button"
+		data-copy-url={url}
+		aria-label="リンクをコピー"
+		title="リンクをコピー"
+	>
 		<svg viewBox="0 0 24 24" aria-hidden="true">
 			<path
 				d="M16 1H6C4.9 1 4 1.9 4 3v12h2V3h10V1Zm3 4H10C8.9 5 8 5.9 8 7v14c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H10V7h9v14Z"
@@ -67,60 +82,67 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 <style>
 	.share-buttons {
 		display: flex;
-		gap: 10px;
+		gap: 8px;
 		flex-wrap: wrap;
 	}
 
 	.share-button {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		border: 1px solid #d1d5db;
-		border-radius: 8px;
-		padding: 8px 10px;
-		background: #fff;
-		color: #111827;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border: 0;
+		border-radius: 6px;
+		padding: 0;
+		background: transparent;
+		color: #6b7280;
 		text-decoration: none;
 		cursor: pointer;
-		transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+		transition: color 0.2s, background-color 0.2s, opacity 0.2s;
 		font: inherit;
 		position: relative;
 	}
 
 	.share-button svg {
-		width: 18px;
-		height: 18px;
+		width: 17px;
+		height: 17px;
 		fill: currentColor;
 	}
 
-	.share-button.x:hover {
-		background: #111827;
-		border-color: #111827;
-		color: #fff;
+	.share-button:hover {
+		background: #f3f6fb;
+		color: #334155;
+		text-decoration: none;
 	}
 
-	.share-button.hatena:hover {
-		background: #00a4de;
-		border-color: #00a4de;
-		color: #fff;
+	.share-button:focus-visible {
+		outline: 2px solid #93c5fd;
+		outline-offset: 2px;
 	}
 
-	.share-button.copy:hover {
-		background: #10b981;
-		border-color: #10b981;
-		color: #fff;
+	.label-text {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.tooltip {
 		position: absolute;
 		left: 50%;
-		bottom: calc(100% + 8px);
+		bottom: calc(100% + 6px);
 		transform: translateX(-50%);
-		background: #111827;
+		background: #2f3a47;
 		color: #fff;
-		font-size: 12px;
-		padding: 4px 8px;
-		border-radius: 6px;
+		font-size: 11px;
+		padding: 3px 7px;
+		border-radius: 5px;
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.2s;
@@ -132,11 +154,9 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 	}
 
 	@media (max-width: 768px) {
-		.label-text {
-			display: none;
-		}
 		.share-button {
-			padding: 8px;
+			width: 34px;
+			height: 34px;
 		}
 	}
 </style>
