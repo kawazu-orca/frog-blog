@@ -883,8 +883,9 @@ img {
 
 /* 本文内マーカー */
 .sidenote-ref a {
-	color: #2d61bf;
+	color: #4e73b0;
 	text-decoration: none;
+	font-size: 0.88em;
 	font-weight: 600;
 	vertical-align: baseline;
 }
