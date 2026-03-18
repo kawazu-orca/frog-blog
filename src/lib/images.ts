@@ -91,7 +91,7 @@ export async function downloadAndOptimizeImage(
 
 	try {
 		await fs.access(destination);
-		return `/images/posts/${fileName}`;
+		return `/images/${subdir}/${fileName}`;
 	} catch {
 		// Keep going when the file does not exist yet.
 	}
