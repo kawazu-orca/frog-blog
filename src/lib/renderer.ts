@@ -193,7 +193,7 @@ function renderXEmbed(url: string): string {
 		)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></p>`;
 	}
 	const canonical = toXPostUrl(url) ?? `https://twitter.com/i/web/status/${postId}`;
-	return `<blockquote class="twitter-tweet" data-dnt="true" data-align="center" data-width="420"><a href="${escapeAttr(
+	return `<blockquote class="twitter-tweet" data-dnt="true" data-align="center" data-width="420" data-theme="light"><a href="${escapeAttr(
 		canonical,
 	)}">${escapeHtml(canonical)}</a></blockquote>`;
 }

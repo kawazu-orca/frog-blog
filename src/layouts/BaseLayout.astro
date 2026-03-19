@@ -18,6 +18,30 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 <html lang="ja">
 	<head>
 		<SEO title={title} description={description} />
+		<meta name="twitter:widgets:theme" content="light" />
+		<script is:inline>
+			(() => {
+				try {
+					const stored = localStorage.getItem("theme");
+					const systemDark = window.matchMedia?.("(prefers-color-scheme: dark)")
+						?.matches;
+					const theme = stored === "dark" || stored === "light"
+						? stored
+						: systemDark
+							? "dark"
+							: "light";
+					document.documentElement.dataset.theme = theme;
+					const meta = document.querySelector(
+						'meta[name="twitter:widgets:theme"]',
+					);
+					if (meta) {
+						meta.setAttribute("content", theme);
+					}
+				} catch {
+					document.documentElement.dataset.theme = "light";
+				}
+			})();
+		</script>
 		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	</head>
 	<body>
@@ -27,8 +51,45 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 		</main>
 		<Footer />
 		<script is:inline>
+			const getCurrentTheme = () =>
+				document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+
+			const applyTwitterEmbedTheme = () => {
+				const theme = getCurrentTheme();
+				const meta = document.querySelector('meta[name="twitter:widgets:theme"]');
+				if (meta) {
+					meta.setAttribute("content", theme);
+				}
+
+				for (const el of document.querySelectorAll("blockquote.twitter-tweet")) {
+					if (!(el instanceof HTMLElement)) continue;
+					el.dataset.theme = theme;
+				}
+
+				for (const frame of document.querySelectorAll(
+					'iframe[src*="platform.twitter.com/embed"]',
+				)) {
+					if (!(frame instanceof HTMLIFrameElement)) continue;
+					try {
+						const src = new URL(frame.src);
+						if (theme === "dark") {
+							src.searchParams.set("theme", "dark");
+						} else {
+							src.searchParams.delete("theme");
+						}
+						const next = src.toString();
+						if (next !== frame.src) {
+							frame.src = next;
+						}
+					} catch {
+						// ignore invalid iframe src
+					}
+				}
+			};
+
 			const loadTwitterWidgets = () => {
 				if (typeof window === "undefined") return;
+				applyTwitterEmbedTheme();
 				const twttr = window.twttr;
 				if (twttr?.widgets?.load) {
 					twttr.widgets.load(document.body);
@@ -43,6 +104,10 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 
 			window.addEventListener("load", () => {
 				window.setTimeout(loadTwitterWidgets, 0);
+			});
+
+			window.addEventListener("themechange", () => {
+				loadTwitterWidgets();
 			});
 		</script>
 	</body>

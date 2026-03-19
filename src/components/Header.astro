@@ -3,6 +3,61 @@
 		<a href="/" class="site-logo">frog-blog</a>
 		<nav class="site-nav">
 			<a href="/tags">Tags</a>
+			<button
+				type="button"
+				class="theme-toggle"
+				aria-label="ダークモード切り替え"
+				title="ダークモード切り替え"
+			>
+				<svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						fill="currentColor"
+						d="M21 13.2A9 9 0 1 1 10.8 3a7 7 0 1 0 10.2 10.2Z"
+					></path>
+				</svg>
+				<svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						fill="currentColor"
+						d="M12 18a6 6 0 1 1 0-12a6 6 0 0 1 0 12Zm0-16a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1Zm0 17a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1Zm10-8a1 1 0 0 1 0 2h-2a1 1 0 1 1 0-2h2ZM5 12a1 1 0 0 1-1 1H2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1Zm12.95 6.54a1 1 0 0 1-1.41 1.41l-1.42-1.41a1 1 0 0 1 1.42-1.42l1.41 1.42ZM8.88 8.88A1 1 0 0 1 7.46 7.46L6.05 6.05a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.42Zm9.07-1.42a1 1 0 0 1-1.41-1.41l1.41-1.42a1 1 0 0 1 1.42 1.42l-1.42 1.41ZM8.88 15.12a1 1 0 0 1 0 1.42l-1.42 1.41a1 1 0 0 1-1.41-1.41l1.41-1.42a1 1 0 0 1 1.42 0Z"
+					></path>
+				</svg>
+			</button>
 		</nav>
 	</div>
 </header>
+
+<script is:inline>
+	const syncThemeToggle = () => {
+		const button = document.querySelector(".theme-toggle");
+		if (!(button instanceof HTMLButtonElement)) return;
+		const isDark = document.documentElement.dataset.theme === "dark";
+		button.setAttribute("aria-pressed", String(isDark));
+		button.title = isDark ? "ライトモードに切り替え" : "ダークモードに切り替え";
+	};
+
+	const toggleTheme = () => {
+		const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+		const next = current === "dark" ? "light" : "dark";
+		document.documentElement.dataset.theme = next;
+		try {
+			localStorage.setItem("theme", next);
+		} catch {
+			// ignore
+		}
+		window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
+		syncThemeToggle();
+	};
+
+	const initThemeToggle = () => {
+		const button = document.querySelector(".theme-toggle");
+		if (!(button instanceof HTMLButtonElement)) return;
+		button.addEventListener("click", toggleTheme);
+		syncThemeToggle();
+	};
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initThemeToggle);
+	} else {
+		initThemeToggle();
+	}
+</script>

@@ -141,3 +141,75 @@
 	background: #f8fafc;
 	border-color: #dde4ed;
 }
+
+:root[data-theme="dark"] .callout {
+	border-color: #3a404a;
+	background: #1d222b;
+}
+
+:root[data-theme="dark"] .callout .callout-content {
+	color: #b2bbc8;
+}
+
+:root[data-theme="dark"] .callout-definition {
+	--callout-heading: #a6bddf;
+	border-left-color: #607d9f;
+	background: #1a232f;
+	border-color: #304359;
+}
+
+:root[data-theme="dark"] .callout-theorem {
+	--callout-heading: #d4a8b6;
+	border-left-color: #9b6576;
+	background: #281f25;
+	border-color: #473441;
+}
+
+:root[data-theme="dark"] .callout-lemma {
+	--callout-heading: #d1b49f;
+	border-left-color: #8f725c;
+	background: #26221f;
+	border-color: #443830;
+}
+
+:root[data-theme="dark"] .callout-corollary {
+	--callout-heading: #d0b8a6;
+	border-left-color: #8f7a66;
+	background: #272321;
+	border-color: #443b35;
+}
+
+:root[data-theme="dark"] .callout-example {
+	--callout-heading: #cabd95;
+	border-left-color: #847956;
+	background: #262520;
+	border-color: #413d30;
+}
+
+:root[data-theme="dark"] .callout-warning {
+	--callout-heading: #d3abab;
+	border-left-color: #9a6767;
+	background: #2a2020;
+	border-color: #4a3636;
+}
+
+:root[data-theme="dark"] .callout-intuition {
+	--callout-heading: #b7c0cc;
+	border-left-color: #6c7786;
+	background: #1f242c;
+	border-color: #343d48;
+}
+
+:root[data-theme="dark"] .callout-summary {
+	--callout-heading: #a8c1c4;
+	border-left-color: #607f83;
+	background: #1d2628;
+	border-color: #314346;
+}
+
+:root[data-theme="dark"] .callout-default {
+	--callout-heading: #b2bccb;
+	border-left-color: #6e7a8a;
+	background: #1f242c;
+	border-color: #343d48;
+}
