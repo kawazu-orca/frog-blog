@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@500;700&family=Manrope:wght@500;600;700&display=swap");
 
 :root {
-	--font-body: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic",
-		-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--font-body: "Manrope", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
+		"Yu Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--font-heading: "Manrope", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
 		"Helvetica Neue", sans-serif;
 	--font-title: "Manrope", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
@@ -657,18 +657,18 @@ img {
 .article-main .article-body p {
 	max-width: 100%;
 	font-family: var(--font-body);
-	font-size: 1rem;
-	line-height: 1.72;
-	letter-spacing: 0.01em;
-	color: #2f3a47;
+	font-size: 0.98rem;
+	line-height: 1.66;
+	letter-spacing: 0.003em;
+	color: #425163;
 	margin-top: 0;
 	margin-bottom: 1.5rem;
 }
 
 .article-main .article-body > p:first-of-type {
-	font-size: 1.03em;
-	line-height: 1.75;
-	color: #273342;
+	font-size: 1rem;
+	line-height: 1.68;
+	color: #3d4b5c;
 	max-width: 100%;
 	margin-top: 0;
 	margin-bottom: 2rem;
@@ -682,10 +682,10 @@ img {
 .article-main .article-body ol {
 	max-width: 100%;
 	font-family: var(--font-body);
-	font-size: 1rem;
-	line-height: 1.72;
-	letter-spacing: 0.01em;
-	color: #2f3a47;
+	font-size: 0.98rem;
+	line-height: 1.66;
+	letter-spacing: 0.003em;
+	color: #425163;
 	margin-top: 0;
 	margin-bottom: 1.5rem;
 }

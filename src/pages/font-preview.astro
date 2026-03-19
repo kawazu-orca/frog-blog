@@ -1,0 +1,583 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const sampleTags = ["Math", "Astro", "Notion"];
+const sampleCode = 'const f = (x: number) => x * x + 1;';
+---
+
+<BaseLayout
+	title="Font Preview | frog-blog"
+	description="フォント比較プレビュー"
+>
+	<section class="page-container font-preview-page">
+		<header class="preview-header">
+			<h1>Font Preview</h1>
+			<p>
+				同じサンプルでフォントセットを比較できます。気に入った組み合わせを本番に反映します。
+			</p>
+		</header>
+
+		<section class="font-grid">
+			<article class="font-card font-inter">
+				<p class="font-name">Inter + Noto Sans JP</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+				<pre><code>{sampleCode}</code></pre>
+				<div class="sample-tags">
+					{sampleTags.map((tag) => <span>{tag}</span>)}
+				</div>
+			</article>
+
+			<article class="font-card font-manrope">
+				<p class="font-name">Manrope + Noto Sans JP</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+				<pre><code>{sampleCode}</code></pre>
+				<div class="sample-tags">
+					{sampleTags.map((tag) => <span>{tag}</span>)}
+				</div>
+			</article>
+
+			<article class="font-card font-ibm">
+				<p class="font-name">IBM Plex Sans + Noto Sans JP</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+				<pre><code>{sampleCode}</code></pre>
+				<div class="sample-tags">
+					{sampleTags.map((tag) => <span>{tag}</span>)}
+				</div>
+			</article>
+		</section>
+
+		<section class="preview-subsection">
+			<h2>Japanese Font Comparison (English fixed: Manrope)</h2>
+			<p>英字は Manrope で固定し、日本語フォントのみ比較します。</p>
+		</section>
+
+		<section class="font-grid">
+			<article class="font-card font-ja-noto">
+				<p class="font-name">Noto Sans JP</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-biz">
+				<p class="font-name">BIZ UDPGothic</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-mplus">
+				<p class="font-name">M PLUS 1p</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-ibmjp">
+				<p class="font-name">IBM Plex Sans JP</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-shippori">
+				<p class="font-name">Shippori Gothic</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-zenkaku">
+				<p class="font-name">Zen Kaku Gothic New</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-ja-mplus2">
+				<p class="font-name">M PLUS 2</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-specimen">Sphinx of black quartz, judge my vow. 0123456789</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+		</section>
+
+		<section class="preview-subsection">
+			<h2>Noto Sans JP Tone Variations</h2>
+			<p>Noto Sans JP のまま、太さ・字間・行間だけ変えた比較です。</p>
+		</section>
+
+		<section class="font-grid">
+			<article class="font-card font-noto-cool">
+				<p class="font-name">Noto Sans JP / Cool</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-cool-mid">
+				<p class="font-name">Noto Sans JP / Cool Mid</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-cool-mid-neutral-space">
+				<p class="font-name">Noto Sans JP / Cool Mid + Neutral Spacing</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-cool-mid-size-only">
+				<p class="font-name">Noto Sans JP / Cool Mid + Size Only</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-cool-mid-leading-only">
+				<p class="font-name">Noto Sans JP / Cool Mid + Leading Only</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-cool-light">
+				<p class="font-name">Noto Sans JP / Cool Light</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-neutral">
+				<p class="font-name">Noto Sans JP / Neutral</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+
+			<article class="font-card font-noto-soft">
+				<p class="font-name">Noto Sans JP / Soft</p>
+				<h2 class="sample-title">線形写像の見通しをよくする3つの視点</h2>
+				<p class="sample-title-latin">Linear Maps: Three Practical Viewpoints</p>
+				<p class="sample-body">
+					抽象的な定義から入ると難しく感じますが、基底と行列表現、像と核、合成の順で押さえると理解しやすくなります。
+				</p>
+			</article>
+		</section>
+	</section>
+</BaseLayout>
+
+<style>
+	@import url("https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&family=M+PLUS+1p:wght@400;500;700&family=M+PLUS+2:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Shippori+Gothic:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap");
+
+	.font-preview-page {
+		max-width: 980px;
+		padding-top: 3rem;
+		padding-bottom: 3rem;
+	}
+
+	.preview-header h1 {
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+		font-size: 2rem;
+	}
+
+	.preview-header p {
+		margin-top: 0;
+		margin-bottom: 2rem;
+		color: #556275;
+	}
+
+	.font-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.preview-subsection {
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+	}
+
+	.preview-subsection h2 {
+		margin: 0;
+		font-size: 1.1rem;
+		color: #334155;
+	}
+
+	.preview-subsection p {
+		margin: 0.35rem 0 0;
+		font-size: 0.9rem;
+		color: #5b6a7b;
+	}
+
+	.font-card {
+		border: 1px solid #d8e1ec;
+		border-radius: 10px;
+		padding: 1rem;
+		background: #f3f7fb;
+	}
+
+	.font-name {
+		margin: 0 0 0.9rem;
+		font-size: 0.78rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		color: #607084;
+	}
+
+	.sample-title {
+		margin: 0;
+		font-size: 1.34rem;
+		line-height: 1.3;
+		font-weight: 700;
+		color: #334155;
+	}
+
+	.sample-body {
+		margin: 0.8rem 0;
+		font-size: 1rem;
+		line-height: 1.72;
+		color: #334155;
+	}
+
+	.sample-title-latin {
+		margin: 0.35rem 0 0;
+		font-size: 1.08rem;
+		line-height: 1.45;
+		color: #334155;
+		font-family: var(--preview-heading-latin) !important;
+		font-weight: 600;
+	}
+
+	.sample-specimen {
+		margin: 0.25rem 0 0.8rem;
+		font-size: 0.92rem;
+		letter-spacing: 0.01em;
+		color: #4b5d72;
+		font-family: var(--preview-heading-latin) !important;
+	}
+
+	.font-card pre {
+		margin: 0;
+		padding: 0.75rem;
+		border-radius: 6px;
+		background: #e8eff7;
+		font-size: 0.8rem;
+		overflow-x: auto;
+	}
+
+	.sample-tags {
+		display: flex;
+		gap: 0.4rem;
+		margin-top: 0.8rem;
+	}
+
+	.sample-tags span {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.15rem 0.5rem;
+		border-radius: 999px;
+		background: #dde7f2;
+		font-size: 0.74rem;
+		color: #4b5d72;
+	}
+
+	.font-inter {
+		--preview-heading: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Inter", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-manrope {
+		--preview-heading: "Manrope", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ibm {
+		--preview-heading: "IBM Plex Sans", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-card .sample-title {
+		font-family: var(--preview-heading) !important;
+	}
+
+	.font-card .sample-body,
+	.font-card .sample-tags,
+	.font-card .font-name {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+	}
+
+	.font-ja-noto {
+		--preview-heading: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-biz {
+		--preview-heading: "BIZ UDPGothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-mplus {
+		--preview-heading: "M PLUS 1p", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-ibmjp {
+		--preview-heading: "IBM Plex Sans JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-shippori {
+		--preview-heading: "Shippori Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-zenkaku {
+		--preview-heading: "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-mplus2 {
+		--preview-heading: "M PLUS 2", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+		--preview-heading-latin: "Manrope", "Helvetica Neue", Arial, sans-serif;
+	}
+
+	.font-ja-noto .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-biz .sample-body {
+		font-family: "BIZ UDPGothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-mplus .sample-body {
+		font-family: "M PLUS 1p", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-ibmjp .sample-body {
+		font-family: "IBM Plex Sans JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-shippori .sample-body {
+		font-family: "Shippori Gothic", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-zenkaku .sample-body {
+		font-family: "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-ja-mplus2 .sample-body {
+		font-family: "M PLUS 2", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+	}
+
+	.font-noto-cool .sample-title,
+	.font-noto-cool .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.002em;
+	}
+
+	.font-noto-cool .sample-title {
+		font-size: 1.38rem;
+		font-weight: 700;
+		color: #2f3f53;
+	}
+
+	.font-noto-cool .sample-body {
+		font-size: 0.97rem;
+		font-weight: 400;
+		line-height: 1.64;
+		color: #3d4b5c;
+	}
+
+	.font-noto-cool-mid .sample-title,
+	.font-noto-cool-mid .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.003em;
+	}
+
+	.font-noto-cool-mid .sample-title {
+		font-size: 1.37rem;
+		font-weight: 600;
+		color: #344457;
+	}
+
+	.font-noto-cool-mid .sample-body {
+		font-size: 0.98rem;
+		font-weight: 400;
+		line-height: 1.66;
+		color: #425163;
+	}
+
+	.font-noto-cool-mid-neutral-space .sample-title,
+	.font-noto-cool-mid-neutral-space .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.003em;
+	}
+
+	.font-noto-cool-mid-neutral-space .sample-title {
+		font-size: 1.37rem;
+		font-weight: 600;
+		color: #344457;
+	}
+
+	.font-noto-cool-mid-neutral-space .sample-body {
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.72;
+		color: #425163;
+	}
+
+	.font-noto-cool-mid-size-only .sample-title,
+	.font-noto-cool-mid-size-only .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.003em;
+	}
+
+	.font-noto-cool-mid-size-only .sample-title {
+		font-size: 1.37rem;
+		font-weight: 600;
+		color: #344457;
+	}
+
+	.font-noto-cool-mid-size-only .sample-body {
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.66;
+		color: #425163;
+	}
+
+	.font-noto-cool-mid-leading-only .sample-title,
+	.font-noto-cool-mid-leading-only .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.003em;
+	}
+
+	.font-noto-cool-mid-leading-only .sample-title {
+		font-size: 1.37rem;
+		font-weight: 600;
+		color: #344457;
+	}
+
+	.font-noto-cool-mid-leading-only .sample-body {
+		font-size: 0.98rem;
+		font-weight: 400;
+		line-height: 1.72;
+		color: #425163;
+	}
+
+	.font-noto-cool-light .sample-title,
+	.font-noto-cool-light .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.004em;
+	}
+
+	.font-noto-cool-light .sample-title {
+		font-size: 1.36rem;
+		font-weight: 500;
+		color: #3b4b5e;
+	}
+
+	.font-noto-cool-light .sample-body {
+		font-size: 0.99rem;
+		font-weight: 400;
+		line-height: 1.68;
+		color: #4b5a6c;
+	}
+
+	.font-noto-neutral .sample-title,
+	.font-noto-neutral .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.01em;
+	}
+
+	.font-noto-neutral .sample-title {
+		font-size: 1.34rem;
+		font-weight: 500;
+		color: #475569;
+	}
+
+	.font-noto-neutral .sample-body {
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.72;
+		color: #4b5d72;
+	}
+
+	.font-noto-soft .sample-title,
+	.font-noto-soft .sample-body {
+		font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif !important;
+		letter-spacing: 0.02em;
+	}
+
+	.font-noto-soft .sample-title {
+		font-size: 1.3rem;
+		font-weight: 500;
+		color: #55667a;
+	}
+
+	.font-noto-soft .sample-body {
+		font-size: 1.03rem;
+		font-weight: 400;
+		line-height: 1.86;
+		color: #607084;
+	}
+
+	@media (max-width: 960px) {
+		.font-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
