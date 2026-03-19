@@ -64,6 +64,199 @@ function renderInlineColor(
 	)}" data-notion-color="${escapeAttr(color)}">${text}</span>`;
 }
 
+function tryParseUrl(url: string): URL | null {
+	try {
+		return new URL(url);
+	} catch {
+		return null;
+	}
+}
+
+function toYouTubeEmbedUrl(url: string): string | null {
+	const parsed = tryParseUrl(url);
+	if (!parsed) {
+		return null;
+	}
+
+	if (parsed.hostname.includes("youtu.be")) {
+		const videoId = parsed.pathname.split("/").filter(Boolean)[0];
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	}
+
+	if (
+		parsed.hostname.includes("youtube.com") ||
+		parsed.hostname.includes("youtube-nocookie.com")
+	) {
+		if (parsed.pathname === "/watch") {
+			const videoId = parsed.searchParams.get("v");
+			return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+		}
+
+		if (parsed.pathname.startsWith("/shorts/")) {
+			const videoId = parsed.pathname.split("/").filter(Boolean)[1];
+			return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+		}
+
+		if (parsed.pathname.startsWith("/live/")) {
+			const videoId = parsed.pathname.split("/").filter(Boolean)[1];
+			return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+		}
+
+		if (parsed.pathname.startsWith("/embed/")) {
+			return url;
+		}
+	}
+
+	return null;
+}
+
+function toVimeoEmbedUrl(url: string): string | null {
+	const parsed = tryParseUrl(url);
+	if (!parsed) {
+		return null;
+	}
+
+	if (!parsed.hostname.includes("vimeo.com")) {
+		return null;
+	}
+
+	const id = parsed.pathname.split("/").filter(Boolean)[0];
+	return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
+}
+
+function toEmbedUrl(url: string): string {
+	return toYouTubeEmbedUrl(url) ?? toVimeoEmbedUrl(url) ?? url;
+}
+
+function toXPostUrl(url: string): string | null {
+	const parsed = tryParseUrl(url);
+	if (!parsed) {
+		return null;
+	}
+
+	const isXDomain =
+		parsed.hostname.includes("x.com") ||
+		parsed.hostname.includes("twitter.com") ||
+		parsed.hostname.includes("www.twitter.com");
+	if (!isXDomain) {
+		return null;
+	}
+
+	const parts = parsed.pathname.split("/").filter(Boolean);
+	// /{user}/status/{id}
+	if (parts.length >= 3 && parts[1] === "status" && parts[2]) {
+		return `https://twitter.com/${parts[0]}/status/${parts[2]}`;
+	}
+	// /i/web/status/{id}
+	if (
+		parts.length >= 4 &&
+		parts[0] === "i" &&
+		parts[1] === "web" &&
+		parts[2] === "status" &&
+		parts[3]
+	) {
+		return `https://twitter.com/i/web/status/${parts[3]}`;
+	}
+
+	return null;
+}
+
+function extractXPostId(url: string): string | null {
+	const parsed = tryParseUrl(url);
+	if (!parsed) {
+		return null;
+	}
+
+	const parts = parsed.pathname.split("/").filter(Boolean);
+	if (parts.length >= 3 && parts[1] === "status" && /^\d+$/.test(parts[2])) {
+		return parts[2];
+	}
+
+	if (
+		parts.length >= 4 &&
+		parts[0] === "i" &&
+		parts[1] === "web" &&
+		parts[2] === "status" &&
+		/^\d+$/.test(parts[3])
+	) {
+		return parts[3];
+	}
+
+	return null;
+}
+
+function renderXEmbed(url: string): string {
+	const postId = extractXPostId(url);
+	if (!postId) {
+		return `<p><a href="${escapeAttr(
+			url,
+		)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></p>`;
+	}
+	const canonical = toXPostUrl(url) ?? `https://twitter.com/i/web/status/${postId}`;
+	return `<blockquote class="twitter-tweet" data-dnt="true" data-align="center" data-width="420"><a href="${escapeAttr(
+		canonical,
+	)}">${escapeHtml(canonical)}</a></blockquote>`;
+}
+
+function extractStandaloneUrlFromRichText(
+	items: RichTextItemResponse[],
+): string | null {
+	const joined = items.map((item) => item.plain_text).join("").trim();
+	if (!joined) {
+		return null;
+	}
+
+	// 段落全体がURLのみ（前後の空白のみ許可）の場合に抽出
+	const urlOnlyMatch = joined.match(
+		/^(https?:\/\/[^\s<>"'`]+)$/i,
+	);
+	if (urlOnlyMatch) {
+		return urlOnlyMatch[1];
+	}
+
+	// link属性付きテキストが1つだけの場合の保険
+	const linked = items
+		.filter((item) => item.type === "text" && item.text.link?.url)
+		.map((item) => item.text.link!.url);
+	if (linked.length === 1) {
+		return linked[0];
+	}
+
+	return null;
+}
+
+function extractFileLikeUrl(
+	item: unknown,
+): { url: string | null; kind: "external" | "file" | "unknown" } {
+	if (!item || typeof item !== "object") {
+		return { url: null, kind: "unknown" };
+	}
+
+	const source = item as {
+		type?: string;
+		external?: { url?: string };
+		file?: { url?: string };
+	};
+
+	if (source.type === "external") {
+		return { url: source.external?.url ?? null, kind: "external" };
+	}
+
+	if (source.type === "file") {
+		return { url: source.file?.url ?? null, kind: "file" };
+	}
+
+	if (source.external?.url) {
+		return { url: source.external.url, kind: "external" };
+	}
+
+	if (source.file?.url) {
+		return { url: source.file.url, kind: "file" };
+	}
+
+	return { url: null, kind: "unknown" };
+}
+
 function renderRichTextItem(item: RichTextItemResponse): string {
 	const annotations = item.annotations;
 	let content = "";
@@ -256,6 +449,15 @@ async function renderBlock(
 		}
 		case "paragraph": {
 			const item = block.paragraph;
+			const maybeStandaloneUrl = extractStandaloneUrlFromRichText(
+				item.rich_text,
+			);
+			if (maybeStandaloneUrl) {
+				const xPostUrl = toXPostUrl(maybeStandaloneUrl.trim());
+				if (xPostUrl) {
+					return renderXEmbed(xPostUrl);
+				}
+			}
 			return `<p>${renderRichTextWithFootnoteMarkers(
 				item.rich_text,
 				context,
@@ -315,6 +517,81 @@ async function renderBlock(
 				block,
 				context,
 			)}</blockquote>`;
+		}
+		case "video": {
+			const item = block.video;
+			const { url } = extractFileLikeUrl(item);
+			if (!url) {
+				return "<!-- unsupported block: video(no-url) -->";
+			}
+			const maybeEmbedUrl = toEmbedUrl(url);
+			if (maybeEmbedUrl !== url) {
+				const caption = renderRichText(item.caption);
+				return `<figure><div class="embed-block"><iframe src="${escapeAttr(
+					maybeEmbedUrl,
+				)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>${
+					caption ? `<figcaption>${caption}</figcaption>` : ""
+				}</figure>`;
+			}
+			const caption = renderRichText(item.caption);
+			return `<figure><video controls preload="metadata" src="${escapeAttr(
+				url,
+			)}"></video>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
+		}
+		case "audio": {
+			const item = block.audio;
+			const { url } = extractFileLikeUrl(item);
+			if (!url) {
+				return "<!-- unsupported block: audio(no-url) -->";
+			}
+			const caption = renderRichText(item.caption);
+			return `<figure><audio controls preload="metadata" src="${escapeAttr(
+				url,
+			)}"></audio>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
+		}
+		case "embed": {
+			const item = block.embed;
+			const xPostUrl = toXPostUrl(item.url);
+			if (xPostUrl) {
+				return renderXEmbed(xPostUrl);
+			}
+			const embedUrl = toEmbedUrl(item.url);
+			return `<div class="embed-block"><iframe src="${escapeAttr(
+				embedUrl,
+			)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
+		}
+		case "bookmark": {
+			const item = block.bookmark;
+			const xPostUrl = toXPostUrl(item.url);
+			if (xPostUrl) {
+				return renderXEmbed(xPostUrl);
+			}
+			return `<p><a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+				item.url,
+			)}</a></p>`;
+		}
+		case "file": {
+			const item = block.file;
+			const { url } = extractFileLikeUrl(item);
+			if (!url) {
+				return "<!-- unsupported block: file(no-url) -->";
+			}
+			const caption = renderRichText(item.caption);
+			return `<p><a href="${escapeAttr(
+				url,
+			)}" target="_blank" rel="noopener noreferrer">ファイルを開く</a>${
+				caption ? ` ${caption}` : ""
+			}</p>`;
+		}
+		case "pdf": {
+			const item = block.pdf;
+			const { url } = extractFileLikeUrl(item);
+			if (!url) {
+				return "<!-- unsupported block: pdf(no-url) -->";
+			}
+			return `<div class="embed-block"><iframe src="${escapeAttr(
+				url,
+			)}" loading="lazy"></iframe></div>`;
 		}
 		case "divider":
 			return "<hr />";

@@ -18,6 +18,7 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 <html lang="ja">
 	<head>
 		<SEO title={title} description={description} />
+		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	</head>
 	<body>
 		<Header />
@@ -25,5 +26,24 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 			<slot />
 		</main>
 		<Footer />
+		<script is:inline>
+			const loadTwitterWidgets = () => {
+				if (typeof window === "undefined") return;
+				const twttr = window.twttr;
+				if (twttr?.widgets?.load) {
+					twttr.widgets.load(document.body);
+				}
+			};
+
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", loadTwitterWidgets);
+			} else {
+				loadTwitterWidgets();
+			}
+
+			window.addEventListener("load", () => {
+				window.setTimeout(loadTwitterWidgets, 0);
+			});
+		</script>
 	</body>
 </html>
