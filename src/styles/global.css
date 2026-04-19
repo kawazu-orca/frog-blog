@@ -381,6 +381,7 @@ img {
 :root[data-theme="dark"] .diary-featured-title,
 :root[data-theme="dark"] .diary-timeline-body h3 a,
 :root[data-theme="dark"] .diary-entry-title,
+:root[data-theme="dark"] .diary-list-title,
 :root[data-theme="dark"] .article-main .article-body h2,
 :root[data-theme="dark"] .article-main .article-body h3 {
 	color: #c8ced7;
@@ -434,6 +435,8 @@ img {
 :root[data-theme="dark"] .diary-featured-meta,
 :root[data-theme="dark"] .diary-featured-excerpt,
 :root[data-theme="dark"] .diary-timeline-body p,
+:root[data-theme="dark"] .diary-list-excerpt,
+:root[data-theme="dark"] .article-list--compact .article-description,
 :root[data-theme="dark"] .diary-timeline-date,
 :root[data-theme="dark"] .diary-timeline-month-label,
 :root[data-theme="dark"] .diary-entry-weekday {
@@ -745,6 +748,106 @@ img {
 
 .article-list--text .article-description {
 	max-inline-size: 46em;
+}
+
+.article-index-grid .article-header,
+.diary-index-grid .article-header {
+	margin-bottom: 1.85rem;
+}
+
+.article-list--compact {
+	display: block;
+}
+
+.article-list--compact .article-list-item {
+	display: block;
+	min-height: 0;
+	padding: 0 0 1.85rem;
+	margin-bottom: 1.85rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
+}
+
+.article-list--compact .article-list-item:last-child {
+	margin-bottom: 0;
+	border-bottom: 0;
+}
+
+.article-list--compact .article-meta {
+	margin-bottom: 0.65rem;
+}
+
+.article-list--compact .article-body {
+	display: block;
+}
+
+.article-list--compact .article-title {
+	font-size: 1.34rem;
+	max-inline-size: none;
+	margin: 0;
+}
+
+.article-list--compact .article-description {
+	max-inline-size: none;
+	margin-top: 0.55rem;
+	font-size: 0.92rem;
+	line-height: 1.66;
+	color: #5f6b7a;
+}
+
+.article-list--compact .article-tags {
+	margin-top: 0.7rem;
+}
+
+.diary-list {
+	display: block;
+}
+
+.diary-list-item {
+	padding: 0 0 1.85rem;
+	margin-bottom: 1.85rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
+}
+
+.diary-list-item:last-child {
+	margin-bottom: 0;
+	border-bottom: 0;
+}
+
+.diary-list-meta {
+	margin-bottom: 0.65rem;
+}
+
+.diary-list-title {
+	font-family: var(--font-title);
+	font-size: 1.34rem;
+	font-weight: 600;
+	line-height: 1.24;
+	letter-spacing: -0.004em;
+	color: #475569;
+	margin: 0;
+}
+
+.diary-list-title a {
+	color: inherit;
+	text-decoration: none;
+	transition: color var(--motion-base), opacity var(--motion-base);
+}
+
+.diary-list-title a:hover {
+	color: #334155;
+	opacity: 0.86;
+	text-decoration: none;
+}
+
+.diary-list-excerpt {
+	margin: 0.55rem 0 0;
+	font-size: 0.92rem;
+	line-height: 1.66;
+	color: #5f6b7a;
+}
+
+.diary-list-item .article-tags {
+	margin-top: 0.7rem;
 }
 
 
@@ -1743,6 +1846,10 @@ html {
 
 	.article-list-item .article-body {
 		display: contents;
+	}
+
+	.article-list--compact .article-body {
+		display: block;
 	}
 
 	.article-list-item .article-body > * {

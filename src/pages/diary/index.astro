@@ -19,16 +19,6 @@ function parseDiaryDate(post: PublishedPost): Date | null {
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function formatMonthLabel(date: Date | null): string {
-	if (!date) {
-		return "日付なし";
-	}
-
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	return `${year}年${month}月`;
-}
-
 function formatDateLabel(date: Date | null, fallback: string): string {
 	if (!date) {
 		return fallback || "日付なし";
@@ -77,104 +67,51 @@ const entries = await Promise.all(
 			displayTitle: formatDiaryDisplayTitle(post),
 			dateLabel: formatDateLabel(diaryDate, post.date ?? post.title),
 			weekday: formatWeekday(diaryDate),
-			monthLabel: formatMonthLabel(diaryDate),
 			excerpt: truncateText(excerptSource, 110),
-			featuredExcerpt: truncateText(excerptSource, 200),
 		};
 	}),
 );
-
-const [featuredEntry, ...timelineEntries] = entries;
-
-const timelineGroups = timelineEntries.reduce<
-	Array<{ monthLabel: string; entries: typeof entries }>
->((groups, entry) => {
-	const currentGroup = groups.at(-1);
-
-	if (currentGroup?.monthLabel === entry.monthLabel) {
-		currentGroup.entries.push(entry);
-		return groups;
-	}
-
-	groups.push({ monthLabel: entry.monthLabel, entries: [entry] });
-	return groups;
-}, []);
 ---
 
-<BaseLayout title="Diary | frog-blog">
-	<section class="page-container diary-index-page">
-		<header class="diary-index-hero">
-			<h1>Diary</h1>
-			<p>日々の短い記録を新しい順に並べています。</p>
-			<span>{entries.length} entries</span>
+<BaseLayout title="Diary | frog-blog" headerVariant="narrow">
+	<div class="article-grid diary-index-grid">
+		<header class="article-header diary-index-header">
+			<h1 class="article-title">Diary</h1>
+			<div class="article-meta">
+				<span>{entries.length} entries</span>
+			</div>
 		</header>
 
-		{
-			featuredEntry && (
-				<a class="diary-featured" href={`/diary/${featuredEntry.slug}`}>
-					<div class="diary-featured-meta">
-						<time datetime={featuredEntry.date ?? ""}>{featuredEntry.dateLabel}</time>
-						{featuredEntry.weekday && <span>({featuredEntry.weekday})</span>}
-					</div>
-					<h2 class="diary-featured-title">{featuredEntry.displayTitle}</h2>
-					{featuredEntry.featuredExcerpt && (
-						<p class="diary-featured-excerpt">{featuredEntry.featuredExcerpt}</p>
-					)}
-					{featuredEntry.tags.length > 0 && (
-						<div class="diary-featured-tags" aria-label="タグ">
-							{featuredEntry.tags.map((tag) => (
-								<span class="tag-badge">{tag}</span>
-							))}
-						</div>
-					)}
-				</a>
-			)
-		}
-
-		{
-			entries.length === 0 ? (
-				<p class="diary-empty">まだ公開された日記はありません。</p>
-			) : timelineEntries.length === 0 ? (
-				<p class="diary-empty">タイムラインに表示する過去の日記はまだありません。</p>
-			) : (
-				<section class="diary-timeline" aria-label="日記タイムライン">
-					{timelineGroups.map((group) => (
-						<section class="diary-timeline-month" aria-labelledby={`diary-${group.monthLabel}`}>
-							<div class="diary-timeline-track">
-								<h2 class="diary-timeline-month-label" id={`diary-${group.monthLabel}`}>
-									{group.monthLabel}
+		<article class="article-main">
+			{
+				entries.length === 0 ? (
+					<p class="diary-empty">まだ公開された日記はありません。</p>
+				) : (
+					<section class="diary-list" aria-label="日記一覧">
+						{entries.map((entry) => (
+							<article class="diary-list-item">
+								<div class="article-meta diary-list-meta">
+									<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
+									{entry.weekday && <span>({entry.weekday})</span>}
+								</div>
+								<h2 class="diary-list-title">
+									<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
 								</h2>
-							</div>
-							<div class="diary-timeline-entries">
-								{group.entries.map((entry) => (
-									<article class="diary-timeline-entry">
-										<span class="diary-timeline-dot" aria-hidden="true" />
-										<div class="diary-timeline-date">
-											<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-											{entry.weekday && <span>({entry.weekday})</span>}
-										</div>
-										<div class="diary-timeline-body">
-											<h3>
-												<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
-											</h3>
-											{entry.excerpt && <p>{entry.excerpt}</p>}
-											{entry.tags.length > 0 && (
-												<div class="article-tags">
-													{entry.tags.map((tag) => (
-														<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
-															{tag}
-														</a>
-													))}
-												</div>
-											)}
-										</div>
-									</article>
-								))}
-							</div>
-						</section>
-					))}
-				</section>
-			)
-		}
-	</section>
+								{entry.excerpt && <p class="diary-list-excerpt">{entry.excerpt}</p>}
+								{entry.tags.length > 0 && (
+									<div class="article-tags">
+										{entry.tags.map((tag) => (
+											<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
+												{tag}
+											</a>
+										))}
+									</div>
+								)}
+							</article>
+						))}
+					</section>
+				)
+			}
+		</article>
+	</div>
 </BaseLayout>

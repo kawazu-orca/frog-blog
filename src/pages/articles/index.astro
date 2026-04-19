@@ -5,9 +5,17 @@ import { getPublishedPosts } from "../../lib/notion";
 const posts = await getPublishedPosts({ type: "Article" });
 ---
 
-<BaseLayout title="Articles | frog-blog">
-	<section class="page-container list-page">
-		<section class="article-list article-list--text">
+<BaseLayout title="Articles | frog-blog" headerVariant="narrow">
+	<div class="article-grid article-index-grid">
+		<header class="article-header">
+			<h1 class="article-title">Articles</h1>
+			<div class="article-meta">
+				<span>{posts.length} articles</span>
+			</div>
+		</header>
+
+		<article class="article-main">
+			<section class="article-list article-list--compact" aria-label="記事一覧">
 			{
 				posts.map((post) => (
 					<article class="article-list-item">
@@ -35,6 +43,7 @@ const posts = await getPublishedPosts({ type: "Article" });
 					</article>
 				))
 			}
-		</section>
-	</section>
+			</section>
+		</article>
+	</div>
 </BaseLayout>
