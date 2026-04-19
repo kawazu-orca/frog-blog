@@ -1,46 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
+	formatDateWithSlash,
+	formatDiaryDateLabel,
 	formatDiaryDisplayTitle,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
+	truncateText,
 	type PublishedPost,
 } from "../lib/notion";
 import { extractPlainTextFromBlocks } from "../lib/renderer";
-
-const weekdayFormatter = new Intl.DateTimeFormat("en", { weekday: "short" });
-
-function parseDiaryDate(post: PublishedPost): Date | null {
-	const value = post.date ?? post.title;
-	const parsed = new Date(`${value.slice(0, 10)}T00:00:00`);
-
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function formatDateLabel(date: Date | null, fallback: string): string {
-	if (!date) {
-		return fallback || "日付なし";
-	}
-
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	return `${year}/${month}/${day}`;
-}
-
-function formatWeekday(date: Date | null): string {
-	return date ? weekdayFormatter.format(date) : "";
-}
-
-function truncateText(value: string, maxLength: number): string {
-	const normalized = value.replace(/\s+/g, " ").trim();
-	if (normalized.length <= maxLength) {
-		return normalized;
-	}
-
-	return `${normalized.slice(0, maxLength).trimEnd()}...`;
-}
 
 async function createDiaryExcerpt(post: PublishedPost): Promise<string> {
 	if (post.description.trim()) {
@@ -55,16 +25,19 @@ const latestArticles = (await getPublishedPosts({ type: "Article" })).slice(0, 3
 const latestDiaryPosts = (await getPublishedPosts({ type: "Diary" })).slice(0, 2);
 const latestDiaryEntries = await Promise.all(
 	latestDiaryPosts.map(async (post) => {
-		const diaryDate = parseDiaryDate(post);
 		const excerptSource = await createDiaryExcerpt(post);
+		const { dateLabel, weekday } = formatDiaryDateLabel(
+			post.date ?? post.title,
+			post.date ?? post.title,
+		);
 
 		return {
 			...post,
 			diarySlug: resolveDiarySlug(post),
 			displayTitle: formatDiaryDisplayTitle(post),
-			dateLabel: formatDateLabel(diaryDate, post.date ?? post.title),
-			weekday: formatWeekday(diaryDate),
-			excerpt: truncateText(excerptSource, 110),
+			dateLabel,
+			weekday,
+			excerpt: truncateText(excerptSource, 80),
 		};
 	}),
 );
@@ -90,15 +63,15 @@ const latestDiaryEntries = await Promise.all(
 						latestArticles.map((post) => (
 							<article class="article-list-item">
 								<div class="article-meta">
-									<div>{post.date ?? "日付なし"}</div>
+									<div>{formatDateWithSlash(post.date) ?? "日付なし"}</div>
 									{post.series && <div class="series-badge">{post.series}</div>}
 								</div>
 								<div class="article-body">
-									<h2 class="article-title">
+									<h2 class="article-list-title">
 										<a href={`/posts/${post.slug}`}>{post.title}</a>
 									</h2>
 									{post.description && (
-										<p class="article-description">{post.description}</p>
+										<p class="article-description">{truncateText(post.description, 100)}</p>
 									)}
 									{post.tags?.length > 0 && (
 										<div class="article-tags">

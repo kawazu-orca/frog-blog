@@ -2,46 +2,15 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
 	assertUniqueDiarySlugs,
+	formatDiaryDateLabel,
 	formatDiaryDisplayTitle,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
+	truncateText,
 	type PublishedPost,
 } from "../../lib/notion";
 import { extractPlainTextFromBlocks } from "../../lib/renderer";
-
-const weekdayFormatter = new Intl.DateTimeFormat("en", { weekday: "short" });
-
-function parseDiaryDate(post: PublishedPost): Date | null {
-	const value = post.date ?? post.title;
-	const parsed = new Date(`${value.slice(0, 10)}T00:00:00`);
-
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function formatDateLabel(date: Date | null, fallback: string): string {
-	if (!date) {
-		return fallback || "日付なし";
-	}
-
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	return `${year}/${month}/${day}`;
-}
-
-function formatWeekday(date: Date | null): string {
-	return date ? weekdayFormatter.format(date) : "";
-}
-
-function truncateText(value: string, maxLength: number): string {
-	const normalized = value.replace(/\s+/g, " ").trim();
-	if (normalized.length <= maxLength) {
-		return normalized;
-	}
-
-	return `${normalized.slice(0, maxLength).trimEnd()}...`;
-}
 
 async function createExcerptSource(post: PublishedPost): Promise<string> {
 	if (post.description.trim()) {
@@ -57,16 +26,19 @@ assertUniqueDiarySlugs(posts);
 
 const entries = await Promise.all(
 	posts.map(async (post) => {
-		const diaryDate = parseDiaryDate(post);
 		const slug = resolveDiarySlug(post);
 		const excerptSource = await createExcerptSource(post);
+		const { dateLabel, weekday } = formatDiaryDateLabel(
+			post.date ?? post.title,
+			post.date ?? post.title,
+		);
 
 		return {
 			...post,
 			slug,
 			displayTitle: formatDiaryDisplayTitle(post),
-			dateLabel: formatDateLabel(diaryDate, post.date ?? post.title),
-			weekday: formatWeekday(diaryDate),
+			dateLabel,
+			weekday,
 			excerpt: truncateText(excerptSource, 110),
 		};
 	}),

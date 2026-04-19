@@ -155,7 +155,7 @@ function formatDateYmd(date: string | null): string | null {
 	return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
 }
 
-function formatDateWithSlash(date: string | null): string | null {
+export function formatDateWithSlash(date: string | null): string | null {
 	const ymd = formatDateYmd(date);
 	if (!ymd) {
 		return null;
@@ -164,13 +164,30 @@ function formatDateWithSlash(date: string | null): string | null {
 	return ymd.replaceAll("-", "/");
 }
 
-function formatWeekday(date: string | null): string | null {
+export function formatWeekday(date: string | null): string | null {
 	const parsed = parseDateValue(date);
 	if (!parsed) {
 		return null;
 	}
 
 	return new Intl.DateTimeFormat("en", { weekday: "short" }).format(parsed);
+}
+
+export function formatDiaryDateLabel(
+	date: string | null,
+	fallback: string,
+): { dateLabel: string; weekday: string } {
+	return {
+		dateLabel: formatDateWithSlash(date) ?? (fallback || "日付なし"),
+		weekday: formatWeekday(date) ?? "",
+	};
+}
+
+export function truncateText(text: string, maxLength: number): string {
+	const normalized = text.replace(/\s+/g, " ").trim();
+	return normalized.length > maxLength
+		? `${normalized.slice(0, maxLength).trimEnd()}...`
+		: normalized;
 }
 
 export function resolveDiarySlug(post: PublishedPost): string {

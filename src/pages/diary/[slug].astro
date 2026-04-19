@@ -2,37 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
 	assertUniqueDiarySlugs,
+	formatDiaryDateLabel,
 	formatDiaryDisplayTitle,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
-	type PublishedPost,
 } from "../../lib/notion";
 import { renderBlocks } from "../../lib/renderer";
-
-const weekdayFormatter = new Intl.DateTimeFormat("en", { weekday: "short" });
-
-function parseDiaryDate(post: PublishedPost): Date | null {
-	const value = post.date ?? post.title;
-	const parsed = new Date(`${value.slice(0, 10)}T00:00:00`);
-
-	return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function formatDateLabel(date: Date | null, fallback: string): string {
-	if (!date) {
-		return fallback || "日付なし";
-	}
-
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	return `${year}/${month}/${day}`;
-}
-
-function formatWeekday(date: Date | null): string {
-	return date ? weekdayFormatter.format(date) : "";
-}
 
 export async function getStaticPaths() {
 	const posts = await getPublishedPosts({ type: "Diary" });
@@ -61,10 +37,11 @@ const olderDiary =
 		: undefined;
 const hasBothNavigation = Boolean(newerDiary && olderDiary);
 
-const diaryDate = parseDiaryDate(post);
 const displayTitle = formatDiaryDisplayTitle(post);
-const displayDate = formatDateLabel(diaryDate, post.date ?? post.title);
-const weekday = formatWeekday(diaryDate);
+const { dateLabel: displayDate, weekday } = formatDiaryDateLabel(
+	post.date ?? post.title,
+	post.date ?? post.title,
+);
 const blocks = await getPostBlocks(post.pageId);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 	idPrefix: `diary-detail-${post.pageId}-`,

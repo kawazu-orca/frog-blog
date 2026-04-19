@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ShareButtons from "../../components/ShareButtons.astro";
 import TableOfContents from "../../components/TableOfContents.astro";
 import {
+	formatDateWithSlash,
 	getPostBlocks,
 	getPublishedPosts,
 } from "../../lib/notion";
@@ -34,7 +35,7 @@ const hasBothNavigation = Boolean(previousPost && nextPost);
 const blocks = await getPostBlocks(post.pageId);
 const headings = extractHeadings(blocks);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks);
-const displayDate = post.date ?? "日付なし";
+const displayDate = formatDateWithSlash(post.date) ?? "日付なし";
 const showToC = post.properties.ShowToC === true;
 const hasEnoughHeadings = headings.length > 2;
 ---

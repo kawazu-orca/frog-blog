@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getPublishedPosts } from "../../lib/notion";
+import {
+	formatDateWithSlash,
+	getPublishedPosts,
+	truncateText,
+} from "../../lib/notion";
 
 const posts = await getPublishedPosts({ type: "Article" });
 const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) =>
@@ -18,6 +22,7 @@ const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) 
 		</header>
 
 		<article class="article-main">
+			<p class="article-filter-label">Filter by tag</p>
 			<div class="article-filter" role="group" aria-label="タグフィルタ">
 				<button
 					type="button"
@@ -41,7 +46,17 @@ const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) 
 				}
 			</div>
 
-			<p class="article-empty" data-article-empty hidden>該当する記事がありません</p>
+			{
+				posts.length === 0 ? (
+					<p class="article-empty article-empty--initial">
+						まだ公開された記事はありません。
+					</p>
+				) : (
+					<p class="article-empty" data-article-empty hidden>
+						該当する記事がありません
+					</p>
+				)
+			}
 
 			<section class="article-list article-list--compact" aria-label="記事一覧">
 			{
@@ -51,15 +66,15 @@ const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) 
 						data-tags={(post.tags ?? []).map((tag) => encodeURIComponent(tag)).join(" ")}
 					>
 						<div class="article-meta">
-							<div>{post.date ?? "日付なし"}</div>
+							<div>{formatDateWithSlash(post.date) ?? "日付なし"}</div>
 							{post.series && <div class="series-badge">{post.series}</div>}
 						</div>
 						<div class="article-body">
-							<h2 class="article-title">
+							<h2 class="article-list-title">
 								<a href={`/posts/${post.slug}`}>{post.title}</a>
 							</h2>
 							{post.description && (
-								<p class="article-description">{post.description}</p>
+								<p class="article-description">{truncateText(post.description, 140)}</p>
 							)}
 							{post.tags?.length > 0 && (
 								<div class="article-tags">
