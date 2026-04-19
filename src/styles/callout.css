@@ -142,6 +142,35 @@
 	border-color: #dde4ed;
 }
 
+.callout-pullquote {
+	border: 0;
+	border-left: 3px solid var(--color-link);
+	border-radius: 0;
+	background: transparent;
+	color: var(--color-heading);
+	font-size: 1.25rem;
+	font-weight: 500;
+	line-height: 1.6;
+	margin: 1.5rem 0;
+	padding: 0.5rem 0 0.5rem 1.25rem;
+}
+
+.callout-pullquote .callout-icon {
+	display: none;
+}
+
+.callout-pullquote .callout-body {
+	display: block;
+}
+
+.callout-pullquote .callout-content {
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	max-width: 100%;
+}
+
 :root[data-theme="dark"] .callout {
 	border-color: #3a404a;
 	background: #1d222b;
@@ -212,4 +241,18 @@
 	border-left-color: #6e7a8a;
 	background: #1f242c;
 	border-color: #343d48;
+}
+
+:root[data-theme="dark"] .callout-pullquote {
+	border: 0;
+	border-left: 3px solid var(--color-link);
+	background: transparent;
+	color: var(--color-heading);
+}
+
+@media (max-width: 768px) {
+	.callout-pullquote {
+		padding-left: 1rem;
+		font-size: 1.1rem;
+	}
 }

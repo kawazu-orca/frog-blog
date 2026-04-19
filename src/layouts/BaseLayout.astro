@@ -49,6 +49,9 @@ const {
 		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	</head>
 	<body>
+		<div class="scroll-progress" aria-hidden="true">
+			<div class="scroll-progress-bar"></div>
+		</div>
 		<Header variant={headerVariant} />
 		<main>
 			<slot />
@@ -65,54 +68,75 @@ const {
 					meta.setAttribute("content", theme);
 				}
 
-				for (const el of document.querySelectorAll("blockquote.twitter-tweet")) {
-					if (!(el instanceof HTMLElement)) continue;
-					el.dataset.theme = theme;
-				}
-
-				for (const frame of document.querySelectorAll(
-					'iframe[src*="platform.twitter.com/embed"]',
-				)) {
-					if (!(frame instanceof HTMLIFrameElement)) continue;
-					try {
-						const src = new URL(frame.src);
-						if (theme === "dark") {
-							src.searchParams.set("theme", "dark");
-						} else {
-							src.searchParams.delete("theme");
-						}
-						const next = src.toString();
-						if (next !== frame.src) {
-							frame.src = next;
-						}
-					} catch {
-						// ignore invalid iframe src
+					for (const el of document.querySelectorAll("blockquote.twitter-tweet")) {
+						if (!(el instanceof HTMLElement)) continue;
+						el.dataset.theme = theme;
 					}
+
+					for (const frame of document.querySelectorAll(
+						'iframe[src*="platform.twitter.com/embed"]',
+					)) {
+						if (!(frame instanceof HTMLIFrameElement)) continue;
+						try {
+							const src = new URL(frame.src);
+							if (theme === "dark") {
+								src.searchParams.set("theme", "dark");
+							} else {
+								src.searchParams.delete("theme");
+							}
+							const next = src.toString();
+							if (next !== frame.src) {
+								frame.src = next;
+							}
+						} catch {
+							// ignore invalid iframe src
+						}
+					}
+				};
+
+				const initScrollProgress = () => {
+					const bar = document.querySelector(".scroll-progress-bar");
+					if (!(bar instanceof HTMLElement)) return;
+
+					const updateBar = () => {
+						const doc = document.documentElement;
+						const scrollTop = doc.scrollTop || document.body.scrollTop;
+						const max = doc.scrollHeight - doc.clientHeight;
+						const progress = max > 0
+							? Math.min(100, Math.max(0, (scrollTop / max) * 100))
+							: 0;
+						bar.style.width = `${progress}%`;
+					};
+
+					updateBar();
+					window.addEventListener("scroll", updateBar, { passive: true });
+					window.addEventListener("resize", updateBar);
+				};
+
+				const loadTwitterWidgets = () => {
+					if (typeof window === "undefined") return;
+					applyTwitterEmbedTheme();
+					const twttr = window.twttr;
+					if (twttr?.widgets?.load) {
+						twttr.widgets.load(document.body);
+					}
+				};
+
+				if (document.readyState === "loading") {
+					document.addEventListener("DOMContentLoaded", initScrollProgress);
+					document.addEventListener("DOMContentLoaded", loadTwitterWidgets);
+				} else {
+					initScrollProgress();
+					loadTwitterWidgets();
 				}
-			};
 
-			const loadTwitterWidgets = () => {
-				if (typeof window === "undefined") return;
-				applyTwitterEmbedTheme();
-				const twttr = window.twttr;
-				if (twttr?.widgets?.load) {
-					twttr.widgets.load(document.body);
-				}
-			};
+				window.addEventListener("load", () => {
+					window.setTimeout(loadTwitterWidgets, 0);
+				});
 
-			if (document.readyState === "loading") {
-				document.addEventListener("DOMContentLoaded", loadTwitterWidgets);
-			} else {
-				loadTwitterWidgets();
-			}
-
-			window.addEventListener("load", () => {
-				window.setTimeout(loadTwitterWidgets, 0);
-			});
-
-			window.addEventListener("themechange", () => {
-				loadTwitterWidgets();
-			});
-		</script>
+				window.addEventListener("themechange", () => {
+					loadTwitterWidgets();
+				});
+			</script>
 	</body>
 </html>

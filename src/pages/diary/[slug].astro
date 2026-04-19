@@ -7,6 +7,7 @@ import {
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
+	truncateText,
 } from "../../lib/notion";
 import { renderBlocks } from "../../lib/renderer";
 
@@ -36,6 +37,18 @@ const olderDiary =
 		? posts[currentIndex + 1]
 		: undefined;
 const hasBothNavigation = Boolean(newerDiary && olderDiary);
+const newerDiaryDate = newerDiary
+	? formatDiaryDateLabel(
+			newerDiary.date ?? newerDiary.title,
+			newerDiary.date ?? newerDiary.title,
+		)
+	: undefined;
+const olderDiaryDate = olderDiary
+	? formatDiaryDateLabel(
+			olderDiary.date ?? olderDiary.title,
+			olderDiary.date ?? olderDiary.title,
+		)
+	: undefined;
 
 const displayTitle = formatDiaryDisplayTitle(post);
 const { dateLabel: displayDate, weekday } = formatDiaryDateLabel(
@@ -100,27 +113,45 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 							<a
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(newerDiary)}`}
-							>
-								<span class="article-pagination-label">新しい日記</span>
-								<span class="article-pagination-link">
-									{formatDiaryDisplayTitle(newerDiary)}
-								</span>
-							</a>
-						</p>
-					)}
+								>
+									<span class="article-pagination-label">新しい日記</span>
+									<span class="article-pagination-date">
+										{newerDiaryDate?.dateLabel}
+										{newerDiaryDate?.weekday && <> ({newerDiaryDate.weekday})</>}
+									</span>
+									<span class="article-pagination-title">
+										{formatDiaryDisplayTitle(newerDiary)}
+									</span>
+									{newerDiary.description && (
+										<span class="article-pagination-excerpt">
+											{truncateText(newerDiary.description, 110)}
+										</span>
+									)}
+								</a>
+							</p>
+						)}
 					{olderDiary && (
 						<p class="article-pagination-next">
 							<a
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(olderDiary)}`}
-							>
-								<span class="article-pagination-label">古い日記</span>
-								<span class="article-pagination-link">
-									{formatDiaryDisplayTitle(olderDiary)}
-								</span>
-							</a>
-						</p>
-					)}
+								>
+									<span class="article-pagination-label">古い日記</span>
+									<span class="article-pagination-date">
+										{olderDiaryDate?.dateLabel}
+										{olderDiaryDate?.weekday && <> ({olderDiaryDate.weekday})</>}
+									</span>
+									<span class="article-pagination-title">
+										{formatDiaryDisplayTitle(olderDiary)}
+									</span>
+									{olderDiary.description && (
+										<span class="article-pagination-excerpt">
+											{truncateText(olderDiary.description, 110)}
+										</span>
+									)}
+								</a>
+							</p>
+						)}
 				</nav>
 
 				<p class="article-back"><a href="/diary">日記一覧に戻る</a></p>

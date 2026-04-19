@@ -457,6 +457,7 @@ function getCalloutClass(block: BlockOf<"callout">): string {
 	}
 
 	const classMap: Record<string, string> = {
+		"📣": "callout-pullquote",
 		"📘": "callout-definition",
 		"⭐": "callout-theorem",
 		"🧩": "callout-lemma",

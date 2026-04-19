@@ -6,6 +6,7 @@ import {
 	formatDateWithSlash,
 	getPostBlocks,
 	getPublishedPosts,
+	truncateText,
 } from "../../lib/notion";
 import { extractHeadings, renderBlocks } from "../../lib/renderer";
 
@@ -44,17 +45,18 @@ const hasEnoughHeadings = headings.length > 2;
 	<div class="article-grid">
 		<header class="article-header">
 			<h1 class="article-title">{post.title}</h1>
-			<div class="article-meta">
-				<time datetime={post.date ?? ""}>{displayDate}</time>
-				{
-					post.tags.length > 0 && (
-						<span class="article-tags">
-							{post.tags.map((tag) => (
-								<a class="tag-link" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-									{tag}
-								</a>
-							))}
-						</span>
+				<div class="article-meta">
+					<time datetime={post.date ?? ""}>{displayDate}</time>
+					{post.series && <span class="series-badge">{post.series}</span>}
+					{
+						post.tags.length > 0 && (
+							<span class="article-tags">
+								{post.tags.map((tag) => (
+									<a class="tag-link" href={`/articles?tag=${encodeURIComponent(tag)}`}>
+										#{tag}
+									</a>
+								))}
+							</span>
 					)
 				}
 			</div>
@@ -108,22 +110,38 @@ const hasEnoughHeadings = headings.length > 2;
 					class={`article-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
 					aria-label="前後の記事"
 				>
-					{previousPost && (
-						<p class="article-pagination-prev">
-							<a class="article-pagination-block" href={`/posts/${previousPost.slug}`}>
-								<span class="article-pagination-label">前の記事</span>
-								<span class="article-pagination-link">{previousPost.title}</span>
-							</a>
-						</p>
-					)}
-					{nextPost && (
-						<p class="article-pagination-next">
-							<a class="article-pagination-block" href={`/posts/${nextPost.slug}`}>
-								<span class="article-pagination-label">次の記事</span>
-								<span class="article-pagination-link">{nextPost.title}</span>
-							</a>
-						</p>
-					)}
+						{previousPost && (
+							<p class="article-pagination-prev">
+								<a class="article-pagination-block" href={`/posts/${previousPost.slug}`}>
+									<span class="article-pagination-label">前の記事</span>
+									<span class="article-pagination-title">{previousPost.title}</span>
+									<span class="article-pagination-date">
+										{formatDateWithSlash(previousPost.date) ?? "日付なし"}
+									</span>
+									{previousPost.description && (
+										<span class="article-pagination-excerpt">
+											{truncateText(previousPost.description, 140)}
+										</span>
+									)}
+								</a>
+							</p>
+						)}
+						{nextPost && (
+							<p class="article-pagination-next">
+								<a class="article-pagination-block" href={`/posts/${nextPost.slug}`}>
+									<span class="article-pagination-label">次の記事</span>
+									<span class="article-pagination-title">{nextPost.title}</span>
+									<span class="article-pagination-date">
+										{formatDateWithSlash(nextPost.date) ?? "日付なし"}
+									</span>
+									{nextPost.description && (
+										<span class="article-pagination-excerpt">
+											{truncateText(nextPost.description, 140)}
+										</span>
+									)}
+								</a>
+							</p>
+						)}
 				</nav>
 
 				<p class="article-back"><a href="/articles">記事一覧に戻る</a></p>
