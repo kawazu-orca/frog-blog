@@ -1,7 +1,17 @@
+---
+interface Props {
+	variant?: "default" | "narrow";
+}
+
+const { variant = "default" } = Astro.props as Props;
+---
+
 <header class="site-header">
-	<div class="header-inner">
+	<div class={`header-inner${variant === "narrow" ? " header-inner--narrow" : ""}`}>
 		<a href="/" class="site-logo">frog-blog</a>
 		<nav class="site-nav">
+			<a href="/articles">Articles</a>
+			<a href="/diary">Diary</a>
 			<a href="/tags">Tags</a>
 			<button
 				type="button"

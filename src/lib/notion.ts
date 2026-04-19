@@ -9,20 +9,25 @@ import {
 	type BlockObjectResponse,
 	type PageObjectResponse,
 } from "@notionhq/client";
-import { downloadAndOptimizeImage } from "./images";
+
+export type PostType = "Article" | "Diary";
 
 export interface PublishedPost {
 	pageId: string;
+	type: PostType;
 	title: string;
 	slug: string;
 	date: string | null;
 	tags: string[];
 	series?: string;
 	description: string;
-	thumbnail?: string;
 	properties: {
 		ShowToC: boolean;
 	};
+}
+
+interface GetPublishedPostsOptions {
+	type?: PostType;
 }
 
 export type NotionBlockWithChildren = BlockObjectResponse & {
@@ -123,68 +128,35 @@ function getSelectValue(
 	return property.select?.name ?? undefined;
 }
 
-function getThumbnailUrl(
+function getPostType(
 	property: PageObjectResponse["properties"][string] | undefined,
-): string | undefined {
-	if (!property || property.type !== "files") {
-		return undefined;
-	}
+): PostType {
+	const value = getSelectValue(property);
 
-	const first = property.files[0];
-	if (!first) {
-		return undefined;
-	}
-
-	if (first.type === "external") {
-		return first.external.url;
-	}
-
-	return first.file.url;
+	return value === "Diary" ? "Diary" : "Article";
 }
 
 async function mapPageToPublishedPost(
 	page: PageObjectResponse,
 ): Promise<PublishedPost> {
 	const title = getPlainText(page.properties.Title);
+	const type = getPostType(page.properties.Type);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
 	const tags = getTagNames(page.properties.Tags);
 	const series = getSelectValue(page.properties.Series);
 	const description = getPlainText(page.properties.Description);
-	const thumbnailUrl = getThumbnailUrl(page.properties.Thumbnail);
 	const showToC = getCheckboxValue(page.properties.ShowToC);
-	let thumbnail = thumbnailUrl;
-
-	if (thumbnailUrl) {
-		try {
-			thumbnail = await downloadAndOptimizeImage(
-				thumbnailUrl,
-				`thumb-${page.id}`,
-				{
-					subdir: "thumbnails",
-					width: 880,
-					height: 560,
-					fit: "cover",
-					quality: 86,
-				},
-			);
-		} catch (error) {
-			console.error(
-				`[notion] Failed to optimize thumbnail for page ${page.id}; using source URL.`,
-				error,
-			);
-		}
-	}
 
 	return {
 		pageId: page.id,
+		type,
 		title: title || "Untitled",
 		slug: slug || page.id,
 		date,
 		tags,
 		series,
 		description,
-		thumbnail,
 		properties: {
 			ShowToC: showToC,
 		},
@@ -229,7 +201,9 @@ async function fetchChildBlocks(
 	);
 }
 
-export async function getPublishedPosts(): Promise<PublishedPost[]> {
+export async function getPublishedPosts(
+	options: GetPublishedPostsOptions = {},
+): Promise<PublishedPost[]> {
 	try {
 		const { notion, databaseId } = createNotionClient();
 		const dataSourceId = await resolveDataSourceId(notion, databaseId);
@@ -257,7 +231,11 @@ export async function getPublishedPosts(): Promise<PublishedPost[]> {
 			results.filter(isFullPage).map((page) => mapPageToPublishedPost(page)),
 		);
 
-		return posts.sort((a, b) => {
+		const filteredPosts = options.type
+			? posts.filter((post) => post.type === options.type)
+			: posts;
+
+		return filteredPosts.sort((a, b) => {
 				if (a.date === b.date) {
 					return 0;
 				}

@@ -8,12 +8,17 @@ type BlockOf<T extends BlockType> = Extract<NotionBlockWithChildren, { type: T }
 type SlugCounter = Map<string, number>;
 
 export type Heading = { id: string; text: string; level: 2 | 3 };
-export type Footnote = { id: number; text: string };
+export type Footnote = { id: number; targetId: string; text: string };
+
+interface RenderBlocksOptions {
+	idPrefix?: string;
+}
 
 type RenderContext = {
 	slugCounter: SlugCounter;
 	footnotes: Footnote[];
 	footnoteIndex: number;
+	idPrefix: string;
 };
 
 function escapeHtml(value: string): string {
@@ -347,9 +352,10 @@ function renderRichTextWithFootnoteMarkers(
 
 		context.footnoteIndex += 1;
 		const index = context.footnoteIndex;
-		context.footnotes.push({ id: index, text: footnoteText });
+		const targetId = `${context.idPrefix}${index}`;
+		context.footnotes.push({ id: index, targetId, text: footnoteText });
 		html.push(
-			`<sup class="sidenote-ref" id="fnref-${index}"><a href="#fn-${index}" aria-describedby="fn-${index}">${index}</a></sup>`,
+			`<sup class="sidenote-ref" id="fnref-${targetId}"><a href="#fn-${targetId}" aria-describedby="fn-${targetId}">${index}</a></sup>`,
 		);
 	}
 
@@ -661,11 +667,13 @@ async function renderBlocksWithContext(
 
 export async function renderBlocks(
 	blocks: NotionBlockWithChildren[],
+	options: RenderBlocksOptions = {},
 ): Promise<{ html: string; footnotes: Footnote[] }> {
 	const context: RenderContext = {
 		slugCounter: new Map(),
 		footnotes: [],
 		footnoteIndex: 0,
+		idPrefix: options.idPrefix ?? "",
 	};
 
 	const html = await renderBlocksWithContext(blocks, context);

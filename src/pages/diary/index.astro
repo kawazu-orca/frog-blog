@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPostBlocks, getPublishedPosts } from "../../lib/notion";
+import { renderBlocks } from "../../lib/renderer";
+
+const weekdayFormatter = new Intl.DateTimeFormat("en", {
+	weekday: "short",
+});
+
+function parseDiaryDate(date: string | null, title: string): Date | null {
+	const value = date ?? title;
+	const parsed = new Date(`${value}T00:00:00`);
+
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDiaryDate(date: Date | null, fallback: string): string {
+	if (!date) {
+		return fallback || "日付なし";
+	}
+
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+
+	return `${year}.${month}.${day}`;
+}
+
+function formatDiaryWeekday(date: Date | null): string {
+	return date ? weekdayFormatter.format(date) : "";
+}
+
+const posts = await getPublishedPosts({ type: "Diary" });
+const entries = await Promise.all(
+	posts.map(async (post) => {
+		const diaryDate = parseDiaryDate(post.date, post.title);
+		const blocks = await getPostBlocks(post.pageId);
+		const rendered = await renderBlocks(blocks, {
+			idPrefix: `diary-${post.pageId}-`,
+		});
+
+		return {
+			...post,
+			diaryDate,
+			displayDate: formatDiaryDate(diaryDate, post.title || post.date || ""),
+			weekday: formatDiaryWeekday(diaryDate),
+			contentHtml: rendered.html,
+			footnotes: rendered.footnotes,
+		};
+	}),
+);
+---
+
+<BaseLayout title="Diary | frog-blog" headerVariant="narrow">
+	<section class="page-container list-page diary-page">
+		<h1 class="page-title">Diary</h1>
+		<section class="diary-timeline">
+			{
+				entries.map((entry) => (
+					<article class="diary-entry article-main" id={entry.slug}>
+						<header class="diary-entry-header">
+							<div class="diary-entry-heading">
+							<h2 class="diary-entry-title">
+								<a href={`/posts/${entry.slug}`}>
+									<time datetime={entry.date ?? ""}>{entry.displayDate}</time>
+									{entry.weekday && (
+										<span class="diary-entry-weekday">({entry.weekday})</span>
+									)}
+								</a>
+							</h2>
+							</div>
+						</header>
+						<div class="article-body">
+							<div class="article-content" set:html={entry.contentHtml} />
+						</div>
+						{entry.footnotes.length > 0 && (
+							<section class="footnotes diary-entry-footnotes" aria-label="脚注">
+								<hr />
+								<ol>
+									{entry.footnotes.map((footnote) => (
+										<li id={`fn-${footnote.targetId}`}>
+											<span>{footnote.text}</span>{" "}
+											<a href={`#fnref-${footnote.targetId}`}>↩</a>
+										</li>
+									))}
+								</ol>
+							</section>
+						)}
+					</article>
+				))
+			}
+		</section>
+	</section>
+</BaseLayout>

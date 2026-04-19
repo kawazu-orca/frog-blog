@@ -1,15 +1,41 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getPublishedPosts } from "../lib/notion";
+import { getPostBlocks, getPublishedPosts } from "../lib/notion";
+import { renderBlocks } from "../lib/renderer";
 
-const posts = await getPublishedPosts();
+const latestArticles = (await getPublishedPosts({ type: "Article" })).slice(0, 3);
+const latestDiaryPosts = (await getPublishedPosts({ type: "Diary" })).slice(0, 2);
+const latestDiaryEntries = await Promise.all(
+	latestDiaryPosts.map(async (post) => {
+		const blocks = await getPostBlocks(post.pageId);
+		const rendered = await renderBlocks(blocks, {
+			idPrefix: `home-diary-${post.pageId}-`,
+		});
+
+		return {
+			...post,
+			contentHtml: rendered.html,
+			footnotes: rendered.footnotes,
+		};
+	}),
+);
 ---
 
 <BaseLayout title="frog-blog">
-	<section class="page-container list-page">
-		<section class="article-list">
+	<section class="page-container home-page">
+		<section class="home-hero" aria-labelledby="home-title">
+			<h1 id="home-title">frog-blog</h1>
+			<p>まとまった記事と、日々の短い記録を置いています。</p>
+		</section>
+
+		<section class="home-latest" aria-labelledby="latest-articles-title">
+			<div class="home-section-header">
+				<h2 id="latest-articles-title">Latest Articles</h2>
+				<a href="/articles">All Articles</a>
+			</div>
+			<section class="article-list article-list--text">
 			{
-				posts.map((post) => (
+				latestArticles.map((post) => (
 					<article class="article-list-item">
 						<div class="article-meta">
 							<div>{post.date ?? "日付なし"}</div>
@@ -32,14 +58,53 @@ const posts = await getPublishedPosts();
 								</div>
 							)}
 						</div>
-						{post.thumbnail && (
-							<div class="article-thumbnail">
-								<img src={post.thumbnail} alt={post.title} loading="lazy" />
-							</div>
-						)}
 					</article>
 				))
 			}
+			</section>
+		</section>
+
+		<section class="home-latest" aria-labelledby="latest-diary-title">
+			<div class="home-section-header">
+				<h2 id="latest-diary-title">Latest Diary</h2>
+				<a href="/diary">All Diary</a>
+			</div>
+			<section class="diary-timeline home-diary-timeline">
+				{
+					latestDiaryEntries.map((entry) => (
+						<article class="diary-entry article-main" id={`home-${entry.slug}`}>
+							<header class="diary-entry-header">
+								<div class="article-meta">
+									<a class="diary-entry-link" href={`/posts/${entry.slug}`}>
+										Permalink
+									</a>
+								</div>
+								<h2 class="diary-entry-title">
+									<time datetime={entry.date ?? ""}>
+										{entry.title || entry.date || "日付なし"}
+									</time>
+								</h2>
+							</header>
+							<div class="article-body">
+								<div class="article-content" set:html={entry.contentHtml} />
+							</div>
+							{entry.footnotes.length > 0 && (
+								<section class="footnotes diary-entry-footnotes" aria-label="脚注">
+									<hr />
+									<ol>
+										{entry.footnotes.map((footnote) => (
+											<li id={`fn-${footnote.targetId}`}>
+												<span>{footnote.text}</span>{" "}
+												<a href={`#fnref-${footnote.targetId}`}>↩</a>
+											</li>
+										))}
+									</ol>
+								</section>
+							)}
+						</article>
+					))
+				}
+			</section>
 		</section>
 	</section>
 </BaseLayout>

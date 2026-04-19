@@ -2,25 +2,11 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getPublishedPosts } from "../../lib/notion";
 
-export async function getStaticPaths() {
-	const posts = await getPublishedPosts({ type: "Article" });
-	const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))];
-
-	return tags.map((tag) => ({
-		params: { tag },
-	}));
-}
-
-const tagParam = Astro.params.tag ?? "";
-const tag = decodeURIComponent(tagParam);
-const posts = (await getPublishedPosts({ type: "Article" })).filter((post) =>
-	(post.tags ?? []).includes(tag),
-);
+const posts = await getPublishedPosts({ type: "Article" });
 ---
 
-<BaseLayout title={`タグ: ${tag}`}>
+<BaseLayout title="Articles | frog-blog">
 	<section class="page-container list-page">
-		<h1 class="page-title">Tag: {tag}</h1>
 		<section class="article-list article-list--text">
 			{
 				posts.map((post) => (
@@ -38,9 +24,9 @@ const posts = (await getPublishedPosts({ type: "Article" })).filter((post) =>
 							)}
 							{post.tags?.length > 0 && (
 								<div class="article-tags">
-									{post.tags.map((postTag) => (
-										<a class="tag-badge" href={`/tags/${encodeURIComponent(postTag)}`}>
-											{postTag}
+									{post.tags.map((tag) => (
+										<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
+											{tag}
 										</a>
 									))}
 								</div>

@@ -8,10 +8,14 @@ import SEO from "../components/SEO.astro";
 interface Props {
 	title?: string;
 	description?: string;
+	headerVariant?: "default" | "narrow";
 }
 
-const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
-	Astro.props as Props;
+const {
+	title = "frog-blog",
+	description = "frog-blog - 学習ブログ",
+	headerVariant = "default",
+} = Astro.props as Props;
 ---
 
 <!doctype html>
@@ -45,7 +49,7 @@ const { title = "frog-blog", description = "frog-blog - 学習ブログ" } =
 		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	</head>
 	<body>
-		<Header />
+		<Header variant={headerVariant} />
 		<main>
 			<slot />
 		</main>
