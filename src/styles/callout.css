@@ -19,11 +19,16 @@
 
 .callout .callout-content {
 	flex: 1 1 auto;
-	font-family: var(--font-body);
+	font-family:
+		"Noto Sans JP",
+		"Hiragino Kaku Gothic ProN",
+		"Yu Gothic",
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
 	color: #334155;
 	font-size: 1rem;
-	line-height: 1.85;
-	letter-spacing: 0.01em;
+	line-height: 1.72;
 	max-width: 60ch;
 	margin: 0;
 }
@@ -143,7 +148,7 @@
 }
 
 :root[data-theme="dark"] .callout .callout-content {
-	color: var(--color-text);
+	color: #b2bbc8;
 }
 
 :root[data-theme="dark"] .callout-definition {
