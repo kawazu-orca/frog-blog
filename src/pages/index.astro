@@ -1,6 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getPostBlocks, getPublishedPosts } from "../lib/notion";
+import {
+	formatDiaryDisplayTitle,
+	getPostBlocks,
+	getPublishedPosts,
+	resolveDiarySlug,
+} from "../lib/notion";
 import { renderBlocks } from "../lib/renderer";
 
 const latestArticles = (await getPublishedPosts({ type: "Article" })).slice(0, 3);
@@ -14,6 +19,8 @@ const latestDiaryEntries = await Promise.all(
 
 		return {
 			...post,
+			diarySlug: resolveDiarySlug(post),
+			displayTitle: formatDiaryDisplayTitle(post),
 			contentHtml: rendered.html,
 			footnotes: rendered.footnotes,
 		};
@@ -75,14 +82,12 @@ const latestDiaryEntries = await Promise.all(
 						<article class="diary-entry article-main" id={`home-${entry.slug}`}>
 							<header class="diary-entry-header">
 								<div class="article-meta">
-									<a class="diary-entry-link" href={`/posts/${entry.slug}`}>
+									<a class="diary-entry-link" href={`/diary/${entry.diarySlug}`}>
 										Permalink
 									</a>
 								</div>
 								<h2 class="diary-entry-title">
-									<time datetime={entry.date ?? ""}>
-										{entry.title || entry.date || "日付なし"}
-									</time>
+									<time datetime={entry.date ?? ""}>{entry.displayTitle}</time>
 								</h2>
 							</header>
 							<div class="article-body">

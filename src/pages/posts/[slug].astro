@@ -9,14 +9,14 @@ import {
 import { extractHeadings, renderBlocks } from "../../lib/renderer";
 
 export async function getStaticPaths() {
-	const posts = await getPublishedPosts();
+	const posts = await getPublishedPosts({ type: "Article" });
 	return posts.map((post) => ({
 		params: { slug: post.slug },
 	}));
 }
 
 const slug = Astro.params.slug;
-const posts = await getPublishedPosts();
+const posts = await getPublishedPosts({ type: "Article" });
 const currentIndex = posts.findIndex((item) => item.slug === slug);
 const post = currentIndex >= 0 ? posts[currentIndex] : undefined;
 
@@ -125,7 +125,7 @@ const hasEnoughHeadings = headings.length > 2;
 					)}
 				</nav>
 
-				<p class="article-back"><a href="/">記事一覧に戻る</a></p>
+				<p class="article-back"><a href="/articles">記事一覧に戻る</a></p>
 			</footer>
 		</article>
 	</div>

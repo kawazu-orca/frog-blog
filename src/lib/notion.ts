@@ -16,6 +16,7 @@ export interface PublishedPost {
 	pageId: string;
 	type: PostType;
 	title: string;
+	sourceSlug: string;
 	slug: string;
 	date: string | null;
 	tags: string[];
@@ -136,6 +137,90 @@ function getPostType(
 	return value === "Diary" ? "Diary" : "Article";
 }
 
+function parseDateValue(date: string | null): Date | null {
+	if (!date) {
+		return null;
+	}
+
+	const parsed = new Date(`${date.slice(0, 10)}T00:00:00`);
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDateYmd(date: string | null): string | null {
+	if (!date) {
+		return null;
+	}
+
+	const ymd = date.slice(0, 10);
+	return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
+}
+
+function formatDateWithSlash(date: string | null): string | null {
+	const ymd = formatDateYmd(date);
+	if (!ymd) {
+		return null;
+	}
+
+	return ymd.replaceAll("-", "/");
+}
+
+function formatWeekday(date: string | null): string | null {
+	const parsed = parseDateValue(date);
+	if (!parsed) {
+		return null;
+	}
+
+	return new Intl.DateTimeFormat("en", { weekday: "short" }).format(parsed);
+}
+
+export function resolveDiarySlug(post: PublishedPost): string {
+	const explicitSlug = post.sourceSlug.trim();
+	if (explicitSlug) {
+		return explicitSlug;
+	}
+
+	return formatDateYmd(post.date) ?? post.pageId;
+}
+
+export function formatDiaryDisplayTitle(post: PublishedPost): string {
+	const title = post.title.trim();
+	if (title) {
+		return title;
+	}
+
+	const displayDate = formatDateWithSlash(post.date);
+	const weekday = formatWeekday(post.date);
+	if (displayDate && weekday) {
+		return `${displayDate} (${weekday})`;
+	}
+
+	return displayDate ?? post.pageId;
+}
+
+export function assertUniqueDiarySlugs(posts: PublishedPost[]): void {
+	const slugToPageIds = new Map<string, string[]>();
+
+	for (const post of posts) {
+		const slug = resolveDiarySlug(post);
+		const pageIds = slugToPageIds.get(slug) ?? [];
+		pageIds.push(post.pageId);
+		slugToPageIds.set(slug, pageIds);
+	}
+
+	const duplicates = [...slugToPageIds.entries()].filter(
+		([, pageIds]) => pageIds.length > 1,
+	);
+	if (duplicates.length === 0) {
+		return;
+	}
+
+	const details = duplicates
+		.map(([slug, pageIds]) => `${slug}: ${pageIds.join(", ")}`)
+		.join("; ");
+
+	throw new Error(`Duplicate diary slugs found. Set explicit Slug values in Notion. ${details}`);
+}
+
 async function mapPageToPublishedPost(
 	page: PageObjectResponse,
 ): Promise<PublishedPost> {
@@ -151,7 +236,8 @@ async function mapPageToPublishedPost(
 	return {
 		pageId: page.id,
 		type,
-		title: title || "Untitled",
+		title,
+		sourceSlug: slug,
 		slug: slug || page.id,
 		date,
 		tags,

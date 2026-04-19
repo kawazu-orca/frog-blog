@@ -307,6 +307,72 @@ function getRichTextPlainText(items: RichTextItemResponse[]): string {
 	return items.map((item) => item.plain_text).join("").trim();
 }
 
+function getRichTextPlainTextWithoutFootnotes(
+	items: RichTextItemResponse[],
+): string {
+	return items
+		.filter((item) => !extractInlineCodeFootnote(item))
+		.map((item) => item.plain_text)
+		.join("")
+		.trim();
+}
+
+function getPlainTextForBlock(block: NotionBlockWithChildren): string {
+	switch (block.type) {
+		case "heading_1":
+			return getRichTextPlainTextWithoutFootnotes(block.heading_1.rich_text);
+		case "heading_2":
+			return getRichTextPlainTextWithoutFootnotes(block.heading_2.rich_text);
+		case "heading_3":
+			return getRichTextPlainTextWithoutFootnotes(block.heading_3.rich_text);
+		case "paragraph":
+			return getRichTextPlainTextWithoutFootnotes(block.paragraph.rich_text);
+		case "bulleted_list_item":
+			return getRichTextPlainTextWithoutFootnotes(
+				block.bulleted_list_item.rich_text,
+			);
+		case "numbered_list_item":
+			return getRichTextPlainTextWithoutFootnotes(
+				block.numbered_list_item.rich_text,
+			);
+		case "quote":
+			return getRichTextPlainTextWithoutFootnotes(block.quote.rich_text);
+		case "callout":
+			return getRichTextPlainTextWithoutFootnotes(block.callout.rich_text);
+		case "toggle":
+			return getRichTextPlainTextWithoutFootnotes(block.toggle.rich_text);
+		case "to_do":
+			return getRichTextPlainTextWithoutFootnotes(block.to_do.rich_text);
+		case "code":
+			return block.code.rich_text.map((item) => item.plain_text).join("").trim();
+		case "equation":
+			return block.equation.expression.trim();
+		default:
+			return "";
+	}
+}
+
+export function extractPlainTextFromBlocks(
+	blocks: NotionBlockWithChildren[],
+): string {
+	const parts: string[] = [];
+
+	const walk = (items: NotionBlockWithChildren[]) => {
+		for (const block of items) {
+			const text = getPlainTextForBlock(block);
+			if (text) {
+				parts.push(text);
+			}
+			if (block.children && block.children.length > 0) {
+				walk(block.children);
+			}
+		}
+	};
+
+	walk(blocks);
+	return parts.join(" ").replace(/\s+/g, " ").trim();
+}
+
 function slugifyHeading(text: string): string {
 	return text
 		.toLowerCase()

@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+	assertUniqueDiarySlugs,
+	formatDiaryDisplayTitle,
+	getPostBlocks,
+	getPublishedPosts,
+	resolveDiarySlug,
+	type PublishedPost,
+} from "../../lib/notion";
+import { renderBlocks } from "../../lib/renderer";
+
+const weekdayFormatter = new Intl.DateTimeFormat("en", { weekday: "short" });
+
+function parseDiaryDate(post: PublishedPost): Date | null {
+	const value = post.date ?? post.title;
+	const parsed = new Date(`${value.slice(0, 10)}T00:00:00`);
+
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDateLabel(date: Date | null, fallback: string): string {
+	if (!date) {
+		return fallback || "日付なし";
+	}
+
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${year}/${month}/${day}`;
+}
+
+function formatWeekday(date: Date | null): string {
+	return date ? weekdayFormatter.format(date) : "";
+}
+
+export async function getStaticPaths() {
+	const posts = await getPublishedPosts({ type: "Diary" });
+	assertUniqueDiarySlugs(posts);
+
+	return posts.map((post) => ({
+		params: { slug: resolveDiarySlug(post) },
+	}));
+}
+
+const slug = Astro.params.slug;
+const posts = await getPublishedPosts({ type: "Diary" });
+assertUniqueDiarySlugs(posts);
+
+const currentIndex = posts.findIndex((post) => resolveDiarySlug(post) === slug);
+const post = currentIndex >= 0 ? posts[currentIndex] : undefined;
+
+if (!post) {
+	throw new Error(`Diary not found for slug: ${slug}`);
+}
+
+const newerDiary = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
+const olderDiary =
+	currentIndex >= 0 && currentIndex < posts.length - 1
+		? posts[currentIndex + 1]
+		: undefined;
+const hasBothNavigation = Boolean(newerDiary && olderDiary);
+
+const diaryDate = parseDiaryDate(post);
+const displayTitle = formatDiaryDisplayTitle(post);
+const displayDate = formatDateLabel(diaryDate, post.date ?? post.title);
+const weekday = formatWeekday(diaryDate);
+const blocks = await getPostBlocks(post.pageId);
+const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
+	idPrefix: `diary-detail-${post.pageId}-`,
+});
+---
+
+<BaseLayout title={`${displayTitle} | Diary`} headerVariant="narrow">
+	<div class="article-grid diary-detail-grid">
+		<header class="article-header diary-detail-header">
+			<div class="article-meta diary-detail-meta">
+				<time datetime={post.date ?? ""}>{displayDate}</time>
+				{weekday && <span>({weekday})</span>}
+				{
+					post.tags.length > 0 && (
+						<span class="article-tags">
+							{post.tags.map((tag) => (
+								<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
+									{tag}
+								</a>
+							))}
+						</span>
+					)
+				}
+			</div>
+			<h1 class="article-title diary-detail-title">{displayTitle}</h1>
+		</header>
+
+		<article class="article-main">
+			<div class="article-body">
+				<div class="article-content" set:html={contentHtml} />
+			</div>
+
+			{
+				footnotes.length > 0 && (
+					<section class="footnotes diary-entry-footnotes" aria-label="脚注">
+						<hr />
+						<ol>
+							{footnotes.map((footnote) => (
+								<li id={`fn-${footnote.targetId}`}>
+									<span>{footnote.text}</span>{" "}
+									<a href={`#fnref-${footnote.targetId}`}>↩</a>
+								</li>
+							))}
+						</ol>
+					</section>
+				)
+			}
+
+			<footer class="article-end">
+				<nav
+					class={`article-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
+					aria-label="前後の日記"
+				>
+					{newerDiary && (
+						<p class="article-pagination-prev">
+							<a
+								class="article-pagination-block"
+								href={`/diary/${resolveDiarySlug(newerDiary)}`}
+							>
+								<span class="article-pagination-label">新しい日記</span>
+								<span class="article-pagination-link">
+									{formatDiaryDisplayTitle(newerDiary)}
+								</span>
+							</a>
+						</p>
+					)}
+					{olderDiary && (
+						<p class="article-pagination-next">
+							<a
+								class="article-pagination-block"
+								href={`/diary/${resolveDiarySlug(olderDiary)}`}
+							>
+								<span class="article-pagination-label">古い日記</span>
+								<span class="article-pagination-link">
+									{formatDiaryDisplayTitle(olderDiary)}
+								</span>
+							</a>
+						</p>
+					)}
+				</nav>
+
+				<p class="article-back"><a href="/diary">日記一覧に戻る</a></p>
+			</footer>
+		</article>
+	</div>
+</BaseLayout>

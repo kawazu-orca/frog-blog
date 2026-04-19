@@ -17,6 +17,7 @@ const ogImageUrl = new URL("/favicon.svg", Astro.url).toString();
 <meta name="viewport" content="width=device-width" />
 <meta name="generator" content={Astro.generator} />
 <meta name="description" content={description} />
+<link rel="canonical" href={Astro.url.toString()} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:type" content="website" />

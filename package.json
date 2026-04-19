@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/generate-diary-redirects.mjs",
     "build": "astro build",
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
