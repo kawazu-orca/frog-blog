@@ -750,9 +750,26 @@ img {
 	max-inline-size: 46em;
 }
 
+.home-index-grid .article-header,
 .article-index-grid .article-header,
 .diary-index-grid .article-header {
 	margin-bottom: 1.85rem;
+}
+
+.home-section {
+	padding: 0 0 2.35rem;
+	margin-bottom: 2.35rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
+}
+
+.home-section:last-child {
+	padding-bottom: 0;
+	margin-bottom: 0;
+	border-bottom: 0;
+}
+
+.home-section .home-section-header {
+	margin-bottom: 1.15rem;
 }
 
 .article-list--compact {
