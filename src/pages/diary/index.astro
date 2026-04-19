@@ -44,7 +44,7 @@ function formatWeekday(date: Date | null): string {
 	return date ? weekdayFormatter.format(date) : "";
 }
 
-function truncateText(value: string, maxLength = 110): string {
+function truncateText(value: string, maxLength: number): string {
 	const normalized = value.replace(/\s+/g, " ").trim();
 	if (normalized.length <= maxLength) {
 		return normalized;
@@ -53,13 +53,13 @@ function truncateText(value: string, maxLength = 110): string {
 	return `${normalized.slice(0, maxLength).trimEnd()}...`;
 }
 
-async function createExcerpt(post: PublishedPost): Promise<string> {
+async function createExcerptSource(post: PublishedPost): Promise<string> {
 	if (post.description.trim()) {
-		return truncateText(post.description);
+		return post.description;
 	}
 
 	const blocks = await getPostBlocks(post.pageId);
-	return truncateText(extractPlainTextFromBlocks(blocks));
+	return extractPlainTextFromBlocks(blocks);
 }
 
 const posts = await getPublishedPosts({ type: "Diary" });
@@ -69,7 +69,7 @@ const entries = await Promise.all(
 	posts.map(async (post) => {
 		const diaryDate = parseDiaryDate(post);
 		const slug = resolveDiarySlug(post);
-		const excerpt = await createExcerpt(post);
+		const excerptSource = await createExcerptSource(post);
 
 		return {
 			...post,
@@ -78,12 +78,15 @@ const entries = await Promise.all(
 			dateLabel: formatDateLabel(diaryDate, post.date ?? post.title),
 			weekday: formatWeekday(diaryDate),
 			monthLabel: formatMonthLabel(diaryDate),
-			excerpt,
+			excerpt: truncateText(excerptSource, 110),
+			featuredExcerpt: truncateText(excerptSource, 200),
 		};
 	}),
 );
 
-const diaryGroups = entries.reduce<
+const [featuredEntry, ...timelineEntries] = entries;
+
+const timelineGroups = timelineEntries.reduce<
 	Array<{ monthLabel: string; entries: typeof entries }>
 >((groups, entry) => {
 	const currentGroup = groups.at(-1);
@@ -107,21 +110,50 @@ const diaryGroups = entries.reduce<
 		</header>
 
 		{
+			featuredEntry && (
+				<a class="diary-featured" href={`/diary/${featuredEntry.slug}`}>
+					<div class="diary-featured-meta">
+						<time datetime={featuredEntry.date ?? ""}>{featuredEntry.dateLabel}</time>
+						{featuredEntry.weekday && <span>({featuredEntry.weekday})</span>}
+					</div>
+					<h2 class="diary-featured-title">{featuredEntry.displayTitle}</h2>
+					{featuredEntry.featuredExcerpt && (
+						<p class="diary-featured-excerpt">{featuredEntry.featuredExcerpt}</p>
+					)}
+					{featuredEntry.tags.length > 0 && (
+						<div class="diary-featured-tags" aria-label="タグ">
+							{featuredEntry.tags.map((tag) => (
+								<span class="tag-badge">{tag}</span>
+							))}
+						</div>
+					)}
+				</a>
+			)
+		}
+
+		{
 			entries.length === 0 ? (
 				<p class="diary-empty">まだ公開された日記はありません。</p>
+			) : timelineEntries.length === 0 ? (
+				<p class="diary-empty">タイムラインに表示する過去の日記はまだありません。</p>
 			) : (
-				<section class="diary-index-groups" aria-label="日記一覧">
-					{diaryGroups.map((group) => (
-						<section class="diary-index-month" aria-labelledby={`diary-${group.monthLabel}`}>
-							<h2 id={`diary-${group.monthLabel}`}>{group.monthLabel}</h2>
-							<div class="diary-index-list">
+				<section class="diary-timeline" aria-label="日記タイムライン">
+					{timelineGroups.map((group) => (
+						<section class="diary-timeline-month" aria-labelledby={`diary-${group.monthLabel}`}>
+							<div class="diary-timeline-track">
+								<h2 class="diary-timeline-month-label" id={`diary-${group.monthLabel}`}>
+									{group.monthLabel}
+								</h2>
+							</div>
+							<div class="diary-timeline-entries">
 								{group.entries.map((entry) => (
-									<article class="diary-index-item">
-										<div class="diary-index-date">
+									<article class="diary-timeline-entry">
+										<span class="diary-timeline-dot" aria-hidden="true" />
+										<div class="diary-timeline-date">
 											<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
 											{entry.weekday && <span>({entry.weekday})</span>}
 										</div>
-										<div class="diary-index-body">
+										<div class="diary-timeline-body">
 											<h3>
 												<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
 											</h3>
