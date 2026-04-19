@@ -103,7 +103,7 @@ const latestDiaryEntries = await Promise.all(
 									{post.tags?.length > 0 && (
 										<div class="article-tags">
 											{post.tags.map((tag) => (
-												<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
+												<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
 													{tag}
 												</a>
 											))}
@@ -136,7 +136,7 @@ const latestDiaryEntries = await Promise.all(
 								{entry.tags.length > 0 && (
 									<div class="article-tags">
 										{entry.tags.map((tag) => (
-											<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
+											<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
 												{tag}
 											</a>
 										))}

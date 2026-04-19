@@ -73,6 +73,24 @@ function getDateValue(property) {
 	return property.date?.start ?? null;
 }
 
+function getTagNames(property) {
+	if (!property || property.type !== "multi_select") {
+		return [];
+	}
+	return property.multi_select.map((tag) => tag.name);
+}
+
+function getSelectValue(property) {
+	if (!property || property.type !== "select") {
+		return undefined;
+	}
+	return property.select?.name ?? undefined;
+}
+
+function getPostType(property) {
+	return getSelectValue(property) === "Diary" ? "Diary" : "Article";
+}
+
 function formatDateYmd(date) {
 	if (!date) {
 		return null;
@@ -111,7 +129,7 @@ function assertUniqueDiarySlugs(posts) {
 	throw new Error(`Duplicate diary slugs found. Set explicit Slug values in Notion. ${details}`);
 }
 
-async function getPublishedDiaryPosts() {
+async function getPublishedPosts() {
 	const notion = new Client({ auth: getRequiredEnv("NOTION_API_KEY") });
 	const databaseId = getRequiredEnv("NOTION_DATABASE_ID");
 	const dataSourceId = await resolveDataSourceId(notion, databaseId);
@@ -120,20 +138,10 @@ async function getPublishedDiaryPosts() {
 		{
 			data_source_id: dataSourceId,
 			filter: {
-				and: [
-					{
-						property: "Status",
-						status: {
-							equals: "Published",
-						},
-					},
-					{
-						property: "Type",
-						select: {
-							equals: "Diary",
-						},
-					},
-				],
+				property: "Status",
+				status: {
+					equals: "Published",
+				},
 			},
 			sorts: [
 				{
@@ -149,29 +157,60 @@ async function getPublishedDiaryPosts() {
 		const sourceSlug = getPlainText(page.properties.Slug);
 		return {
 			pageId: page.id,
+			type: getPostType(page.properties.Type),
 			sourceSlug,
 			slug: sourceSlug || page.id,
 			date: getDateValue(page.properties.Date),
+			tags: getTagNames(page.properties.Tags),
 		};
 	});
 }
 
 await loadDotEnv();
 
-const posts = await getPublishedDiaryPosts();
-assertUniqueDiarySlugs(posts);
+const posts = await getPublishedPosts();
+const diaryPosts = posts.filter((post) => post.type === "Diary");
+assertUniqueDiarySlugs(diaryPosts);
 
-const redirects = Object.fromEntries(
-	posts.map((post) => [
+const diaryRedirects = Object.fromEntries(
+	diaryPosts.map((post) => [
 		`/posts/${post.slug}`,
 		`/diary/${resolveDiarySlug(post)}/`,
 	]),
 );
 
-const outputPath = path.join(process.cwd(), "src", "generated", "diary-redirects.json");
+const articleTags = [
+	...new Set(
+		posts
+			.filter((post) => post.type === "Article")
+			.flatMap((post) => post.tags),
+	),
+].sort((a, b) => a.localeCompare(b, "ja"));
+
+const tagRedirects = Object.fromEntries([
+	["/tags", "/articles"],
+	["/tags/", "/articles"],
+	...articleTags.flatMap((tag) => {
+		const encodedTag = encodeURIComponent(tag);
+		return [
+			[`/tags/${encodedTag}`, `/articles?tag=${encodedTag}`],
+			[`/tags/${encodedTag}/`, `/articles?tag=${encodedTag}`],
+		];
+	}),
+]);
+
+const redirects = Object.entries({
+	...tagRedirects,
+	...diaryRedirects,
+});
+
+const outputPath = path.join(process.cwd(), "public", "_redirects");
 await mkdir(path.dirname(outputPath), { recursive: true });
-await writeFile(outputPath, `${JSON.stringify(redirects, null, 2)}\n`);
+await writeFile(
+	outputPath,
+	`${redirects.map(([from, to]) => `${from}    ${to}    301`).join("\n")}\n`,
+);
 
 console.log(
-	`[generate-diary-redirects] wrote ${Object.keys(redirects).length} redirects to ${outputPath}`,
+	`[generate-diary-redirects] wrote ${redirects.length} redirects (${Object.keys(diaryRedirects).length} diary, ${Object.keys(tagRedirects).length} tags) to ${outputPath}`,
 );

@@ -3,6 +3,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getPublishedPosts } from "../../lib/notion";
 
 const posts = await getPublishedPosts({ type: "Article" });
+const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) =>
+	a.localeCompare(b, "ja"),
+);
 ---
 
 <BaseLayout title="Articles | frog-blog" headerVariant="narrow">
@@ -10,15 +13,43 @@ const posts = await getPublishedPosts({ type: "Article" });
 		<header class="article-header">
 			<h1 class="article-title">Articles</h1>
 			<div class="article-meta">
-				<span>{posts.length} articles</span>
+				<span data-article-count>{posts.length} / {posts.length} articles</span>
 			</div>
 		</header>
 
 		<article class="article-main">
+			<div class="article-filter" role="group" aria-label="タグフィルタ">
+				<button
+					type="button"
+					class="article-filter-chip article-filter-chip--active"
+					data-tag=""
+					aria-pressed="true"
+				>
+					すべて
+				</button>
+				{
+					tags.map((tag) => (
+						<button
+							type="button"
+							class="article-filter-chip"
+							data-tag={encodeURIComponent(tag)}
+							aria-pressed="false"
+						>
+							{tag}
+						</button>
+					))
+				}
+			</div>
+
+			<p class="article-empty" data-article-empty hidden>該当する記事がありません</p>
+
 			<section class="article-list article-list--compact" aria-label="記事一覧">
 			{
 				posts.map((post) => (
-					<article class="article-list-item">
+					<article
+						class="article-list-item"
+						data-tags={(post.tags ?? []).map((tag) => encodeURIComponent(tag)).join(" ")}
+					>
 						<div class="article-meta">
 							<div>{post.date ?? "日付なし"}</div>
 							{post.series && <div class="series-badge">{post.series}</div>}
@@ -33,7 +64,7 @@ const posts = await getPublishedPosts({ type: "Article" });
 							{post.tags?.length > 0 && (
 								<div class="article-tags">
 									{post.tags.map((tag) => (
-										<a class="tag-badge" href={`/tags/${encodeURIComponent(tag)}`}>
+										<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
 											{tag}
 										</a>
 									))}
@@ -46,4 +77,65 @@ const posts = await getPublishedPosts({ type: "Article" });
 			</section>
 		</article>
 	</div>
+
+	<script>
+		const chips = Array.from(
+			document.querySelectorAll(".article-filter-chip"),
+		);
+		const items = Array.from(
+			document.querySelectorAll(".article-list-item[data-tags]"),
+		);
+		const count = document.querySelector("[data-article-count]");
+		const empty = document.querySelector("[data-article-empty]");
+
+		const encodeTag = (value) => (value ? encodeURIComponent(value.trim()) : "");
+
+		const setUrlTag = (tag) => {
+			const url = new URL(window.location.href);
+			if (tag) {
+				url.searchParams.set("tag", decodeURIComponent(tag));
+			} else {
+				url.searchParams.delete("tag");
+			}
+			window.history.replaceState(null, "", url);
+		};
+
+		const applyFilter = (tag, updateUrl = true) => {
+			const selected = tag ?? "";
+			let visible = 0;
+
+			for (const chip of chips) {
+				if (!(chip instanceof HTMLButtonElement)) continue;
+				const active = chip.dataset.tag === selected;
+				chip.classList.toggle("article-filter-chip--active", active);
+				chip.setAttribute("aria-pressed", String(active));
+			}
+
+			for (const item of items) {
+				if (!(item instanceof HTMLElement)) continue;
+				const tags = (item.dataset.tags ?? "").split(" ").filter(Boolean);
+				const matched = !selected || tags.includes(selected);
+				item.dataset.hidden = matched ? "false" : "true";
+				if (matched) visible += 1;
+			}
+
+			if (count) {
+				count.textContent = `${visible} / ${items.length} articles`;
+			}
+			if (empty instanceof HTMLElement) {
+				empty.hidden = visible !== 0;
+			}
+			if (updateUrl) {
+				setUrlTag(selected);
+			}
+		};
+
+		for (const chip of chips) {
+			if (!(chip instanceof HTMLButtonElement)) continue;
+			chip.addEventListener("click", () => applyFilter(chip.dataset.tag ?? ""));
+		}
+
+		const initialTag = new URLSearchParams(window.location.search).get("tag");
+		applyFilter(encodeTag(initialTag), false);
+	</script>
 </BaseLayout>

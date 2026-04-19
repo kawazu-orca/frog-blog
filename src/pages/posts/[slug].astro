@@ -49,7 +49,7 @@ const hasEnoughHeadings = headings.length > 2;
 					post.tags.length > 0 && (
 						<span class="article-tags">
 							{post.tags.map((tag) => (
-								<a class="tag-link" href={`/tags/${encodeURIComponent(tag)}`}>
+								<a class="tag-link" href={`/articles?tag=${encodeURIComponent(tag)}`}>
 									{tag}
 								</a>
 							))}
