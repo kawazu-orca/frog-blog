@@ -71,9 +71,7 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 					post.tags.length > 0 && (
 						<span class="article-tags">
 							{post.tags.map((tag) => (
-								<a class="tag-link" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-									{tag}
-								</a>
+								<span class="tag-link">{tag}</span>
 							))}
 						</span>
 					)

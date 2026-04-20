@@ -22,18 +22,14 @@ const {
 <html lang="ja">
 	<head>
 		<SEO title={title} description={description} />
-		<meta name="twitter:widgets:theme" content="light" />
+		<meta name="twitter:widgets:theme" content="dark" />
 		<script is:inline>
 			(() => {
 				try {
 					const stored = localStorage.getItem("theme");
-					const systemDark = window.matchMedia?.("(prefers-color-scheme: dark)")
-						?.matches;
 					const theme = stored === "dark" || stored === "light"
 						? stored
-						: systemDark
-							? "dark"
-							: "light";
+						: "dark";
 					document.documentElement.dataset.theme = theme;
 					const meta = document.querySelector(
 						'meta[name="twitter:widgets:theme"]',
@@ -42,16 +38,13 @@ const {
 						meta.setAttribute("content", theme);
 					}
 				} catch {
-					document.documentElement.dataset.theme = "light";
+					document.documentElement.dataset.theme = "dark";
 				}
 			})();
 		</script>
 		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	</head>
 	<body>
-		<div class="scroll-progress" aria-hidden="true">
-			<div class="scroll-progress-bar"></div>
-		</div>
 		<Header variant={headerVariant} />
 		<main>
 			<slot />
@@ -94,25 +87,6 @@ const {
 					}
 				};
 
-				const initScrollProgress = () => {
-					const bar = document.querySelector(".scroll-progress-bar");
-					if (!(bar instanceof HTMLElement)) return;
-
-					const updateBar = () => {
-						const doc = document.documentElement;
-						const scrollTop = doc.scrollTop || document.body.scrollTop;
-						const max = doc.scrollHeight - doc.clientHeight;
-						const progress = max > 0
-							? Math.min(100, Math.max(0, (scrollTop / max) * 100))
-							: 0;
-						bar.style.width = `${progress}%`;
-					};
-
-					updateBar();
-					window.addEventListener("scroll", updateBar, { passive: true });
-					window.addEventListener("resize", updateBar);
-				};
-
 				const loadTwitterWidgets = () => {
 					if (typeof window === "undefined") return;
 					applyTwitterEmbedTheme();
@@ -123,10 +97,8 @@ const {
 				};
 
 				if (document.readyState === "loading") {
-					document.addEventListener("DOMContentLoaded", initScrollProgress);
 					document.addEventListener("DOMContentLoaded", loadTwitterWidgets);
 				} else {
-					initScrollProgress();
 					loadTwitterWidgets();
 				}
 

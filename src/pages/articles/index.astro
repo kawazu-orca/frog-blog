@@ -1,156 +1,28 @@
 ---
+import ArticleToggleList from "../../components/ArticleToggleList.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import {
-	formatDateWithSlash,
-	getPublishedPosts,
-	truncateText,
-} from "../../lib/notion";
+import { getPublishedPosts } from "../../lib/notion";
 
 const posts = await getPublishedPosts({ type: "Article" });
-const tags = [...new Set(posts.flatMap((post) => post.tags ?? []))].sort((a, b) =>
-	a.localeCompare(b, "ja"),
-);
 ---
 
 <BaseLayout title="Articles | frog-blog" headerVariant="narrow">
 	<div class="article-grid article-index-grid">
-		<header class="article-header">
-			<h1 class="article-title">Articles</h1>
-			<div class="article-meta">
-				<span data-article-count>{posts.length} / {posts.length} articles</span>
-			</div>
-		</header>
-
 		<article class="article-main">
-			<p class="article-filter-label">Filter by tag</p>
-			<div class="article-filter" role="group" aria-label="タグフィルタ">
-				<button
-					type="button"
-					class="article-filter-chip article-filter-chip--active"
-					data-tag=""
-					aria-pressed="true"
-				>
-					すべて
-				</button>
-				{
-					tags.map((tag) => (
-						<button
-							type="button"
-							class="article-filter-chip"
-							data-tag={encodeURIComponent(tag)}
-							aria-pressed="false"
-						>
-							{tag}
-						</button>
-					))
-				}
-			</div>
-
 			{
 				posts.length === 0 ? (
 					<p class="article-empty article-empty--initial">
 						まだ公開された記事はありません。
 					</p>
-				) : (
-					<p class="article-empty" data-article-empty hidden>
-						該当する記事がありません
-					</p>
-				)
+				) : null
 			}
 
-			<section class="article-list article-list--compact" aria-label="記事一覧">
-			{
-				posts.map((post) => (
-					<article
-						class="article-list-item"
-						data-tags={(post.tags ?? []).map((tag) => encodeURIComponent(tag)).join(" ")}
-					>
-						<div class="article-meta">
-							<div>{formatDateWithSlash(post.date) ?? "日付なし"}</div>
-							{post.series && <div class="series-badge">{post.series}</div>}
-						</div>
-						<div class="article-body">
-							<h2 class="article-list-title">
-								<a href={`/posts/${post.slug}`}>{post.title}</a>
-							</h2>
-							{post.description && (
-								<p class="article-description">{truncateText(post.description, 140)}</p>
-							)}
-							{post.tags?.length > 0 && (
-								<div class="article-tags">
-									{post.tags.map((tag) => (
-										<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-											{tag}
-										</a>
-									))}
-								</div>
-							)}
-						</div>
-					</article>
-				))
-			}
-			</section>
+			<div class="article-list-heading" aria-hidden="true">
+				<span>/Date</span>
+				<span>/Title</span>
+				<span></span>
+			</div>
+			<ArticleToggleList posts={posts} label="記事一覧" />
 		</article>
 	</div>
-
-	<script>
-		const chips = Array.from(
-			document.querySelectorAll(".article-filter-chip"),
-		);
-		const items = Array.from(
-			document.querySelectorAll(".article-list-item[data-tags]"),
-		);
-		const count = document.querySelector("[data-article-count]");
-		const empty = document.querySelector("[data-article-empty]");
-
-		const encodeTag = (value) => (value ? encodeURIComponent(value.trim()) : "");
-
-		const setUrlTag = (tag) => {
-			const url = new URL(window.location.href);
-			if (tag) {
-				url.searchParams.set("tag", decodeURIComponent(tag));
-			} else {
-				url.searchParams.delete("tag");
-			}
-			window.history.replaceState(null, "", url);
-		};
-
-		const applyFilter = (tag, updateUrl = true) => {
-			const selected = tag ?? "";
-			let visible = 0;
-
-			for (const chip of chips) {
-				if (!(chip instanceof HTMLButtonElement)) continue;
-				const active = chip.dataset.tag === selected;
-				chip.classList.toggle("article-filter-chip--active", active);
-				chip.setAttribute("aria-pressed", String(active));
-			}
-
-			for (const item of items) {
-				if (!(item instanceof HTMLElement)) continue;
-				const tags = (item.dataset.tags ?? "").split(" ").filter(Boolean);
-				const matched = !selected || tags.includes(selected);
-				item.dataset.hidden = matched ? "false" : "true";
-				if (matched) visible += 1;
-			}
-
-			if (count) {
-				count.textContent = `${visible} / ${items.length} articles`;
-			}
-			if (empty instanceof HTMLElement) {
-				empty.hidden = visible !== 0;
-			}
-			if (updateUrl) {
-				setUrlTag(selected);
-			}
-		};
-
-		for (const chip of chips) {
-			if (!(chip instanceof HTMLButtonElement)) continue;
-			chip.addEventListener("click", () => applyFilter(chip.dataset.tag ?? ""));
-		}
-
-		const initialTag = new URLSearchParams(window.location.search).get("tag");
-		applyFilter(encodeTag(initialTag), false);
-	</script>
 </BaseLayout>

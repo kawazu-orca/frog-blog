@@ -73,13 +73,6 @@ function getDateValue(property) {
 	return property.date?.start ?? null;
 }
 
-function getTagNames(property) {
-	if (!property || property.type !== "multi_select") {
-		return [];
-	}
-	return property.multi_select.map((tag) => tag.name);
-}
-
 function getSelectValue(property) {
 	if (!property || property.type !== "select") {
 		return undefined;
@@ -161,7 +154,6 @@ async function getPublishedPosts() {
 			sourceSlug,
 			slug: sourceSlug || page.id,
 			date: getDateValue(page.properties.Date),
-			tags: getTagNames(page.properties.Tags),
 		};
 	});
 }
@@ -179,30 +171,7 @@ const diaryRedirects = Object.fromEntries(
 	]),
 );
 
-const articleTags = [
-	...new Set(
-		posts
-			.filter((post) => post.type === "Article")
-			.flatMap((post) => post.tags),
-	),
-].sort((a, b) => a.localeCompare(b, "ja"));
-
-const tagRedirects = Object.fromEntries([
-	["/tags", "/articles"],
-	["/tags/", "/articles"],
-	...articleTags.flatMap((tag) => {
-		const encodedTag = encodeURIComponent(tag);
-		return [
-			[`/tags/${encodedTag}`, `/articles?tag=${encodedTag}`],
-			[`/tags/${encodedTag}/`, `/articles?tag=${encodedTag}`],
-		];
-	}),
-]);
-
-const redirects = Object.entries({
-	...tagRedirects,
-	...diaryRedirects,
-});
+const redirects = Object.entries(diaryRedirects);
 
 const outputPath = path.join(process.cwd(), "public", "_redirects");
 await mkdir(path.dirname(outputPath), { recursive: true });
@@ -212,5 +181,5 @@ await writeFile(
 );
 
 console.log(
-	`[generate-diary-redirects] wrote ${redirects.length} redirects (${Object.keys(diaryRedirects).length} diary, ${Object.keys(tagRedirects).length} tags) to ${outputPath}`,
+	`[generate-diary-redirects] wrote ${redirects.length} diary redirects to ${outputPath}`,
 );

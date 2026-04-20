@@ -20,7 +20,6 @@ export interface PublishedPost {
 	slug: string;
 	date: string | null;
 	tags: string[];
-	series?: string;
 	description: string;
 	properties: {
 		ShowToC: boolean;
@@ -246,7 +245,6 @@ async function mapPageToPublishedPost(
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
 	const tags = getTagNames(page.properties.Tags);
-	const series = getSelectValue(page.properties.Series);
 	const description = getPlainText(page.properties.Description);
 	const showToC = getCheckboxValue(page.properties.ShowToC);
 
@@ -258,7 +256,6 @@ async function mapPageToPublishedPost(
 		slug: slug || page.id,
 		date,
 		tags,
-		series,
 		description,
 		properties: {
 			ShowToC: showToC,

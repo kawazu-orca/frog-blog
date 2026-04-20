@@ -47,14 +47,11 @@ const hasEnoughHeadings = headings.length > 2;
 			<h1 class="article-title">{post.title}</h1>
 				<div class="article-meta">
 					<time datetime={post.date ?? ""}>{displayDate}</time>
-					{post.series && <span class="series-badge">{post.series}</span>}
 					{
 						post.tags.length > 0 && (
 							<span class="article-tags">
 								{post.tags.map((tag) => (
-									<a class="tag-link" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-										#{tag}
-									</a>
+									<span class="tag-link">#{tag}</span>
 								))}
 							</span>
 					)

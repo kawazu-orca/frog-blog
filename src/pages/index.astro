@@ -1,9 +1,8 @@
 ---
+import ArticleToggleList from "../components/ArticleToggleList.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
-	formatDateWithSlash,
 	formatDiaryDateLabel,
-	formatDiaryDisplayTitle,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
@@ -22,7 +21,7 @@ async function createDiaryExcerpt(post: PublishedPost): Promise<string> {
 }
 
 const latestArticles = (await getPublishedPosts({ type: "Article" })).slice(0, 3);
-const latestDiaryPosts = (await getPublishedPosts({ type: "Diary" })).slice(0, 2);
+const latestDiaryPosts = (await getPublishedPosts({ type: "Diary" })).slice(0, 1);
 const latestDiaryEntries = await Promise.all(
 	latestDiaryPosts.map(async (post) => {
 		const excerptSource = await createDiaryExcerpt(post);
@@ -34,8 +33,7 @@ const latestDiaryEntries = await Promise.all(
 		return {
 			...post,
 			diarySlug: resolveDiarySlug(post),
-			displayTitle: formatDiaryDisplayTitle(post),
-			dateLabel,
+			dateLabel: dateLabel.replaceAll("/", "."),
 			weekday,
 			excerpt: truncateText(excerptSource, 80),
 		};
@@ -45,80 +43,35 @@ const latestDiaryEntries = await Promise.all(
 
 <BaseLayout title="frog-blog" headerVariant="narrow">
 	<div class="article-grid home-index-grid">
-		<header class="article-header">
-			<h1 class="article-title">frog-blog</h1>
-			<div class="article-meta">
-				<span>Articles and diary entries</span>
-			</div>
-		</header>
-
 		<article class="article-main">
-			<section class="home-section" aria-labelledby="latest-articles-title">
+			<section class="home-section" aria-labelledby="latest-diary-title">
 				<div class="home-section-header">
-					<h2 id="latest-articles-title">Latest Articles</h2>
-					<a href="/articles">All Articles</a>
+					<h2 id="latest-diary-title">/LATEST DIARY</h2>
+					<a href="/diary">All diary</a>
 				</div>
-				<section class="article-list article-list--compact" aria-label="最新記事">
+				<section class="home-diary-list" aria-label="最新日記">
 					{
-						latestArticles.map((post) => (
-							<article class="article-list-item">
-								<div class="article-meta">
-									<div>{formatDateWithSlash(post.date) ?? "日付なし"}</div>
-									{post.series && <div class="series-badge">{post.series}</div>}
+						latestDiaryEntries.map((entry) => (
+							<article class="home-diary-item">
+								<div class="diary-list-date">
+									<a href={`/diary/${entry.diarySlug}`} aria-label={`${entry.dateLabel}の日記を開く`}>
+										<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
+									</a>
+									{entry.weekday && <span>/ {entry.weekday}</span>}
 								</div>
-								<div class="article-body">
-									<h2 class="article-list-title">
-										<a href={`/posts/${post.slug}`}>{post.title}</a>
-									</h2>
-									{post.description && (
-										<p class="article-description">{truncateText(post.description, 100)}</p>
-									)}
-									{post.tags?.length > 0 && (
-										<div class="article-tags">
-											{post.tags.map((tag) => (
-												<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-													{tag}
-												</a>
-											))}
-										</div>
-									)}
-								</div>
+								{entry.excerpt && <p class="home-diary-excerpt">{entry.excerpt}</p>}
 							</article>
 						))
 					}
 				</section>
 			</section>
 
-			<section class="home-section" aria-labelledby="latest-diary-title">
+			<section class="home-section" aria-labelledby="latest-articles-title">
 				<div class="home-section-header">
-					<h2 id="latest-diary-title">Latest Diary</h2>
-					<a href="/diary">All Diary</a>
+					<h2 id="latest-articles-title">/LATEST ARTICLES</h2>
+					<a href="/articles">All articles</a>
 				</div>
-				<section class="diary-list" aria-label="最新日記">
-					{
-						latestDiaryEntries.map((entry) => (
-							<article class="diary-list-item">
-								<div class="article-meta diary-list-meta">
-									<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-									{entry.weekday && <span>({entry.weekday})</span>}
-								</div>
-								<h2 class="diary-list-title">
-									<a href={`/diary/${entry.diarySlug}`}>{entry.displayTitle}</a>
-								</h2>
-								{entry.excerpt && <p class="diary-list-excerpt">{entry.excerpt}</p>}
-								{entry.tags.length > 0 && (
-									<div class="article-tags">
-										{entry.tags.map((tag) => (
-											<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-												{tag}
-											</a>
-										))}
-									</div>
-								)}
-							</article>
-						))
-					}
-				</section>
+				<ArticleToggleList posts={latestArticles} label="最新記事" />
 			</section>
 		</article>
 	</div>

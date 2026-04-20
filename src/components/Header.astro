@@ -4,14 +4,24 @@ interface Props {
 }
 
 const { variant = "default" } = Astro.props as Props;
+const path = Astro.url.pathname;
+const currentSection = path.startsWith("/diary")
+	? "diary"
+	: path.startsWith("/articles") || path.startsWith("/posts")
+		? "articles"
+		: "";
 ---
 
 <header class="site-header">
 	<div class={`header-inner${variant === "narrow" ? " header-inner--narrow" : ""}`}>
 		<a href="/" class="site-logo">frog-blog</a>
 		<nav class="site-nav">
-			<a href="/articles">Articles</a>
-			<a href="/diary">Diary</a>
+			<a href="/diary" aria-current={currentSection === "diary" ? "page" : undefined}>
+				DIARY
+			</a>
+			<a href="/articles" aria-current={currentSection === "articles" ? "page" : undefined}>
+				ARTICLES
+			</a>
 			<button
 				type="button"
 				class="theme-toggle"

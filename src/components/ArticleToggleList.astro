@@ -1,0 +1,95 @@
+---
+import {
+	formatDateWithSlash,
+	truncateText,
+	type PublishedPost,
+} from "../lib/notion";
+
+interface Props {
+	posts: PublishedPost[];
+	label: string;
+}
+
+const { posts, label } = Astro.props as Props;
+---
+
+<section class="article-toggle-list" aria-label={label}>
+	{
+		posts.map((post, index) => {
+			const detailsId = `article-details-${index}`;
+
+			return (
+				<article class="article-toggle-item">
+					<div class="article-toggle-row">
+						<time class="article-toggle-date" datetime={post.date ?? ""}>
+							{formatDateWithSlash(post.date) ?? "日付なし"}
+						</time>
+						<h2 class="article-toggle-title">
+							<a href={`/posts/${post.slug}`}>{post.title}</a>
+						</h2>
+						<button
+							type="button"
+							class="article-toggle-button"
+							aria-expanded="false"
+							aria-controls={detailsId}
+							aria-label={`${post.title}の詳細を表示`}
+							data-article-title={post.title}
+						>
+							<span aria-hidden="true"></span>
+						</button>
+					</div>
+					<div class="article-toggle-details" id={detailsId} hidden>
+						{post.description && (
+							<p class="article-toggle-description">
+								{truncateText(post.description, 180)}
+							</p>
+						)}
+						{post.tags.length > 0 && (
+							<div class="article-tags">
+								{post.tags.map((tag) => (
+									<span class="tag-badge">{tag}</span>
+								))}
+							</div>
+						)}
+					</div>
+				</article>
+			);
+		})
+	}
+</section>
+
+<script>
+	const initArticleToggles = () => {
+		const buttons = document.querySelectorAll(".article-toggle-button");
+
+		for (const button of buttons) {
+			if (!(button instanceof HTMLButtonElement)) continue;
+			if (button.dataset.toggleReady === "true") continue;
+
+			button.dataset.toggleReady = "true";
+			button.addEventListener("click", () => {
+				const controls = button.getAttribute("aria-controls");
+				if (!controls) return;
+
+				const details = document.getElementById(controls);
+				if (!(details instanceof HTMLElement)) return;
+
+				const willOpen = button.getAttribute("aria-expanded") !== "true";
+				button.setAttribute("aria-expanded", String(willOpen));
+				button.setAttribute(
+					"aria-label",
+					`${button.dataset.articleTitle ?? "記事"}の詳細を${willOpen ? "非表示" : "表示"}`,
+				);
+				details.hidden = !willOpen;
+			});
+		}
+	};
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initArticleToggles);
+	} else {
+		initArticleToggles();
+	}
+
+	document.addEventListener("astro:page-load", initArticleToggles);
+</script>

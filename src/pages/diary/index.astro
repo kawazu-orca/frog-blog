@@ -2,23 +2,35 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
 	assertUniqueDiarySlugs,
-	formatDiaryDateLabel,
+	formatDateWithSlash,
 	formatDiaryDisplayTitle,
+	formatWeekday,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
-	truncateText,
 	type PublishedPost,
 } from "../../lib/notion";
-import { extractPlainTextFromBlocks } from "../../lib/renderer";
+import { renderBlocks } from "../../lib/renderer";
 
-async function createExcerptSource(post: PublishedPost): Promise<string> {
-	if (post.description.trim()) {
-		return post.description;
+async function renderDiaryContent(post: PublishedPost): Promise<{
+	contentHtml: string;
+	footnotes: Awaited<ReturnType<typeof renderBlocks>>["footnotes"];
+}> {
+	const blocks = await getPostBlocks(post.pageId);
+	const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
+		idPrefix: `diary-index-${post.pageId}-`,
+	});
+
+	return { contentHtml, footnotes };
+}
+
+function shouldShowDiaryTitle(title: string): boolean {
+	const normalized = title.trim();
+	if (!normalized) {
+		return false;
 	}
 
-	const blocks = await getPostBlocks(post.pageId);
-	return extractPlainTextFromBlocks(blocks);
+	return !/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?:\s*\([^)]+\))?$/.test(normalized);
 }
 
 const posts = await getPublishedPosts({ type: "Diary" });
@@ -27,19 +39,17 @@ assertUniqueDiarySlugs(posts);
 const entries = await Promise.all(
 	posts.map(async (post) => {
 		const slug = resolveDiarySlug(post);
-		const excerptSource = await createExcerptSource(post);
-		const { dateLabel, weekday } = formatDiaryDateLabel(
-			post.date ?? post.title,
-			post.date ?? post.title,
-		);
+		const { contentHtml, footnotes } = await renderDiaryContent(post);
 
 		return {
 			...post,
 			slug,
 			displayTitle: formatDiaryDisplayTitle(post),
-			dateLabel,
-			weekday,
-			excerpt: truncateText(excerptSource, 110),
+			showTitle: shouldShowDiaryTitle(post.title),
+			dateLabel: formatDateWithSlash(post.date)?.replaceAll("/", ".") ?? "",
+			weekday: formatWeekday(post.date) ?? "",
+			contentHtml,
+			footnotes,
 		};
 	}),
 );
@@ -47,41 +57,58 @@ const entries = await Promise.all(
 
 <BaseLayout title="Diary | frog-blog" headerVariant="narrow">
 	<div class="article-grid diary-index-grid">
-		<header class="article-header diary-index-header">
-			<h1 class="article-title">Diary</h1>
-			<div class="article-meta">
-				<span>{entries.length} entries</span>
-			</div>
-		</header>
-
 		<article class="article-main">
 			{
 				entries.length === 0 ? (
 					<p class="diary-empty">まだ公開された日記はありません。</p>
 				) : (
-					<section class="diary-list" aria-label="日記一覧">
-						{entries.map((entry) => (
-							<article class="diary-list-item">
-								<div class="article-meta diary-list-meta">
-									<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-									{entry.weekday && <span>({entry.weekday})</span>}
-								</div>
-								<h2 class="diary-list-title">
-									<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
-								</h2>
-								{entry.excerpt && <p class="diary-list-excerpt">{entry.excerpt}</p>}
-								{entry.tags.length > 0 && (
-									<div class="article-tags">
-										{entry.tags.map((tag) => (
-											<a class="tag-badge" href={`/articles?tag=${encodeURIComponent(tag)}`}>
-												{tag}
+					<>
+						<p class="diary-list-label">/Diary</p>
+						<section class="diary-list" aria-label="日記一覧">
+							{entries.map((entry) => (
+								<article class="diary-list-item">
+									{entry.dateLabel && (
+										<div class="diary-list-date">
+											<a href={`/diary/${entry.slug}`} aria-label={`${entry.dateLabel}の日記を開く`}>
+												<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
 											</a>
-										))}
-									</div>
-								)}
-							</article>
-						))}
-					</section>
+											{entry.weekday && <span>/ {entry.weekday}</span>}
+										</div>
+									)}
+									{entry.showTitle && (
+										<h2 class="diary-list-title">
+											<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
+										</h2>
+									)}
+									{entry.contentHtml && (
+										<div class="diary-list-content article-body">
+											<div class="article-content" set:html={entry.contentHtml} />
+										</div>
+									)}
+									{entry.footnotes.length > 0 && (
+										<section class="footnotes diary-entry-footnotes" aria-label="脚注">
+											<hr />
+											<ol>
+												{entry.footnotes.map((footnote) => (
+													<li id={`fn-${footnote.targetId}`}>
+														<span>{footnote.text}</span>{" "}
+														<a href={`#fnref-${footnote.targetId}`}>↩</a>
+													</li>
+												))}
+											</ol>
+										</section>
+									)}
+									{entry.tags.length > 0 && (
+										<div class="article-tags">
+											{entry.tags.map((tag) => (
+												<span class="tag-badge">{tag}</span>
+											))}
+										</div>
+									)}
+								</article>
+							))}
+						</section>
+					</>
 				)
 			}
 		</article>
