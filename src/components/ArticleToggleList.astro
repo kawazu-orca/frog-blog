@@ -21,12 +21,12 @@ const { posts, label } = Astro.props as Props;
 			return (
 				<article class="article-toggle-item">
 					<div class="article-toggle-row">
-						<time class="article-toggle-date" datetime={post.date ?? ""}>
-							{formatDateWithSlash(post.date) ?? "日付なし"}
-						</time>
-						<h2 class="article-toggle-title">
-							<a href={`/posts/${post.slug}`}>{post.title}</a>
-						</h2>
+						<a class="article-toggle-link" href={`/posts/${post.slug}`}>
+							<time class="article-toggle-date" datetime={post.date ?? ""}>
+								{formatDateWithSlash(post.date) ?? "日付なし"}
+							</time>
+							<h2 class="article-toggle-title">{post.title}</h2>
+						</a>
 						<button
 							type="button"
 							class="article-toggle-button"
