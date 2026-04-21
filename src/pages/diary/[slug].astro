@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShareButtons from "../../components/ShareButtons.astro";
 import {
 	assertUniqueDiarySlugs,
 	formatDiaryDateLabel,
@@ -7,7 +8,6 @@ import {
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
-	truncateText,
 } from "../../lib/notion";
 import { renderBlocks } from "../../lib/renderer";
 
@@ -50,11 +50,50 @@ const olderDiaryDate = olderDiary
 		)
 	: undefined;
 
+function isDateLikeDiaryTitle(title: string): boolean {
+	const normalized = title.trim();
+	if (!normalized) {
+		return true;
+	}
+
+	return /^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?:\s*\([^)]+\))?$/.test(
+		normalized,
+	);
+}
+
 const displayTitle = formatDiaryDisplayTitle(post);
 const { dateLabel: displayDate, weekday } = formatDiaryDateLabel(
 	post.date ?? post.title,
 	post.date ?? post.title,
 );
+const displayDateText = displayDate.replaceAll("/", ".");
+const shouldShowTitle = Boolean(
+	post.title.trim() &&
+		!isDateLikeDiaryTitle(post.title) &&
+		post.title.trim() !== displayDate &&
+		post.title.trim() !== displayDateText,
+);
+
+function shouldShowDiaryNavigationTitle(postTitle: string): boolean {
+	return Boolean(postTitle.trim() && !isDateLikeDiaryTitle(postTitle));
+}
+
+function formatDiaryNavigationDate(
+	date: { dateLabel: string; weekday: string } | undefined,
+): { dateLabel: string; weekday: string } | undefined {
+	if (!date) {
+		return undefined;
+	}
+
+	return {
+		dateLabel: date.dateLabel.replaceAll("/", "."),
+		weekday: date.weekday,
+	};
+}
+
+const newerDiaryNavigationDate = formatDiaryNavigationDate(newerDiaryDate);
+const olderDiaryNavigationDate = formatDiaryNavigationDate(olderDiaryDate);
+
 const blocks = await getPostBlocks(post.pageId);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 	idPrefix: `diary-detail-${post.pageId}-`,
@@ -64,23 +103,24 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 <BaseLayout title={`${displayTitle} | Diary`} headerVariant="narrow">
 	<div class="article-grid diary-detail-grid">
 		<header class="article-header diary-detail-header">
-			<div class="article-meta diary-detail-meta">
-				<time datetime={post.date ?? ""}>{displayDate}</time>
-				{weekday && <span>({weekday})</span>}
-				{
-					post.tags.length > 0 && (
-						<span class="article-tags">
-							{post.tags.map((tag) => (
-								<span class="tag-link">{tag}</span>
-							))}
-						</span>
-					)
-				}
-			</div>
-			<h1 class="article-title diary-detail-title">{displayTitle}</h1>
+			<p class="diary-detail-kicker">/Diary</p>
+			<h1 class="article-title diary-detail-date">
+				<time datetime={post.date ?? ""}>{displayDateText}</time>
+				{weekday && <span>{weekday}</span>}
+			</h1>
+			{shouldShowTitle && <p class="diary-detail-title">{displayTitle}</p>}
+			{
+				post.tags.length > 0 && (
+					<div class="article-tags diary-detail-tags">
+						{post.tags.map((tag) => (
+							<span class="tag-link">{tag}</span>
+						))}
+					</div>
+				)
+			}
 		</header>
 
-		<article class="article-main">
+		<article class="article-main diary-detail-main">
 			<div class="article-body">
 				<div class="article-content" set:html={contentHtml} />
 			</div>
@@ -102,8 +142,12 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 			}
 
 			<footer class="article-end">
+				<section class="article-share diary-share" aria-label="日記を共有">
+					<ShareButtons title={displayTitle} url={Astro.url.href} showHatena={false} />
+				</section>
+
 				<nav
-					class={`article-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
+					class={`article-pagination diary-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
 					aria-label="前後の日記"
 				>
 					{newerDiary && (
@@ -112,17 +156,16 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(newerDiary)}`}
 								>
-									<span class="article-pagination-label">新しい日記</span>
+									<span class="diary-pagination-arrow" aria-hidden="true">←</span>
 									<span class="article-pagination-date">
-										{newerDiaryDate?.dateLabel}
-										{newerDiaryDate?.weekday && <> ({newerDiaryDate.weekday})</>}
+										{newerDiaryNavigationDate?.dateLabel}
+										{newerDiaryNavigationDate?.weekday && (
+											<span>{newerDiaryNavigationDate.weekday}</span>
+										)}
 									</span>
-									<span class="article-pagination-title">
-										{formatDiaryDisplayTitle(newerDiary)}
-									</span>
-									{newerDiary.description && (
-										<span class="article-pagination-excerpt">
-											{truncateText(newerDiary.description, 110)}
+									{shouldShowDiaryNavigationTitle(newerDiary.title) && (
+										<span class="article-pagination-title">
+											{formatDiaryDisplayTitle(newerDiary)}
 										</span>
 									)}
 								</a>
@@ -134,17 +177,16 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(olderDiary)}`}
 								>
-									<span class="article-pagination-label">古い日記</span>
 									<span class="article-pagination-date">
-										{olderDiaryDate?.dateLabel}
-										{olderDiaryDate?.weekday && <> ({olderDiaryDate.weekday})</>}
+										{olderDiaryNavigationDate?.dateLabel}
+										{olderDiaryNavigationDate?.weekday && (
+											<span>{olderDiaryNavigationDate.weekday}</span>
+										)}
 									</span>
-									<span class="article-pagination-title">
-										{formatDiaryDisplayTitle(olderDiary)}
-									</span>
-									{olderDiary.description && (
-										<span class="article-pagination-excerpt">
-											{truncateText(olderDiary.description, 110)}
+									<span class="diary-pagination-arrow" aria-hidden="true">→</span>
+									{shouldShowDiaryNavigationTitle(olderDiary.title) && (
+										<span class="article-pagination-title">
+											{formatDiaryDisplayTitle(olderDiary)}
 										</span>
 									)}
 								</a>

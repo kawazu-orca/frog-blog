@@ -397,6 +397,44 @@ img {
 	border-bottom-color: color-mix(in srgb, #c6d1df 18%, transparent);
 }
 
+:root[data-theme="dark"] .article-detail-tags .tag-link {
+	background: transparent;
+	color: #a8b2bf;
+}
+
+:root[data-theme="dark"] .article-detail-pagination.article-pagination {
+	border-top-color: color-mix(in srgb, var(--color-text) 9%, transparent);
+}
+
+:root[data-theme="dark"] .article-detail-pagination .article-pagination-block {
+	color: #a8b2bf;
+}
+
+:root[data-theme="dark"] .article-detail-pagination .article-pagination-block:hover {
+	color: #d7dce4;
+}
+
+:root[data-theme="dark"] .diary-detail-date {
+	color: #d7dce4;
+}
+
+:root[data-theme="dark"] .diary-detail-date span,
+:root[data-theme="dark"] .diary-detail-title {
+	color: #a8b2bf;
+}
+
+:root[data-theme="dark"] .diary-pagination.article-pagination {
+	border-top-color: color-mix(in srgb, var(--color-text) 9%, transparent);
+}
+
+:root[data-theme="dark"] .diary-pagination .article-pagination-block {
+	color: #a8b2bf;
+}
+
+:root[data-theme="dark"] .diary-pagination .article-pagination-block:hover {
+	color: #d7dce4;
+}
+
 :root[data-theme="dark"] .article-main .article-body p,
 :root[data-theme="dark"] .article-main .article-body ul,
 :root[data-theme="dark"] .article-main .article-body ol,
@@ -460,6 +498,14 @@ img {
 }
 
 :root[data-theme="dark"] .home-diary-excerpt {
+	color: #b7c0cc;
+}
+
+:root[data-theme="dark"] .home-diary-readmore {
+	color: #8e99a8;
+}
+
+:root[data-theme="dark"] .home-diary-readmore:hover {
 	color: #b7c0cc;
 }
 
@@ -616,6 +662,22 @@ img {
 	font-size: 0.86rem;
 	line-height: 1.66;
 	color: #5f6b7a;
+}
+
+.home-diary-readmore {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.64rem;
+	font-size: 0.76rem;
+	font-weight: 500;
+	line-height: 1.4;
+	color: #7a8798;
+	text-decoration: none;
+}
+
+.home-diary-readmore:hover {
+	color: #617082;
+	text-decoration: none;
 }
 
 .page-title {
@@ -1020,7 +1082,7 @@ a.tag-badge:hover {
 	margin-bottom: 0.7rem;
 	color: #7a8797;
 	font-family: var(--font-title);
-	font-size: 1rem;
+	font-size: 1.08rem;
 	font-weight: 600;
 	letter-spacing: 0;
 	line-height: 1.2;
@@ -1047,7 +1109,7 @@ a.tag-badge:hover {
 
 .diary-list-date span {
 	color: #98a3b0;
-	font-size: 0.78rem;
+	font-size: 0.82rem;
 	font-weight: 500;
 }
 
@@ -1198,6 +1260,67 @@ a.tag-badge:hover {
 .article-meta time {
 	color: #7a8797;
 	line-height: 1.2;
+}
+
+.article-detail-header {
+	margin-bottom: 1.8rem;
+	padding-bottom: 1.05rem;
+}
+
+.article-detail-header .article-title {
+	font-size: 1.86rem;
+	line-height: 1.25;
+	margin-bottom: 0;
+}
+
+.article-detail-kicker {
+	margin: 0 0 0.52rem;
+	color: var(--color-muted);
+	font-size: 0.74rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	line-height: 1.2;
+}
+
+.article-detail-meta {
+	margin-top: 0.72rem;
+	margin-bottom: 0;
+	gap: 0.65rem;
+}
+
+.article-detail-tags {
+	margin-top: 0;
+}
+
+.article-detail-tags .tag-link {
+	background: transparent;
+	padding: 0;
+	color: #7a8798;
+}
+
+.article-detail-tags .tag-link::before {
+	content: "#";
+}
+
+.article-detail-main {
+	margin-top: 0.85rem;
+}
+
+.article-detail-main .article-body p,
+.article-detail-main .article-body > p:first-of-type,
+.article-detail-main .article-body ul,
+.article-detail-main .article-body ol {
+	font-size: 0.94rem;
+}
+
+.article-detail-main .article-body h2 {
+	font-size: 1.34rem;
+	margin-top: 2.25rem;
+}
+
+.article-detail-main .article-body h3 {
+	font-size: 1.12rem;
+	margin-top: 1.75rem;
 }
 
 .article-tags {
@@ -1671,15 +1794,137 @@ a.tag-link:hover {
 }
 
 .diary-detail-header {
-	margin-bottom: 2.2rem;
+	margin-bottom: 0.9rem;
+	padding-bottom: 0.95rem;
 }
 
-.diary-detail-meta {
-	margin-bottom: 0.7rem;
+.diary-detail-kicker {
+	margin: 0 0 0.48rem;
+	color: var(--color-muted);
+	font-size: 0.74rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	line-height: 1.2;
+}
+
+.diary-detail-date {
+	display: flex;
+	align-items: baseline;
+	gap: 0.42rem;
+	margin-bottom: 0;
+	font-size: 1.16rem;
+	font-weight: 600;
+	letter-spacing: 0;
+	line-height: 1.2;
+	color: #475569;
+	font-variant-numeric: tabular-nums;
+}
+
+.diary-detail-date span {
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: #98a3b0;
 }
 
 .diary-detail-title {
-	margin-bottom: 0;
+	margin: 0.7rem 0 0;
+	font-family: var(--font-title);
+	font-size: 1.34rem;
+	font-weight: 600;
+	line-height: 1.24;
+	letter-spacing: -0.004em;
+	color: #475569;
+}
+
+.diary-detail-tags {
+	margin-top: 0.85rem;
+}
+
+.diary-detail-main {
+	margin-top: 0.45rem;
+}
+
+.diary-detail-main .article-body p,
+.diary-detail-main .article-body > p:first-of-type {
+	font-size: 0.92rem;
+	line-height: 1.68;
+	margin-bottom: 1.35rem;
+}
+
+.diary-detail-main .article-body ul,
+.diary-detail-main .article-body ol {
+	font-size: 0.92rem;
+	line-height: 1.68;
+}
+
+.diary-detail-main .article-end {
+	margin-top: 1.25rem;
+}
+
+.diary-share.article-share {
+	display: flex;
+	justify-content: flex-start;
+	margin-top: 0;
+}
+
+.diary-pagination.article-pagination {
+	align-items: baseline;
+	gap: 1rem;
+	margin-top: 0.75rem;
+	border-top: 1px solid color-mix(in srgb, var(--color-heading) 8%, transparent);
+	padding-top: 0.85rem;
+}
+
+.diary-pagination .article-pagination-block {
+	display: inline-grid;
+	grid-template-columns: auto auto;
+	align-items: baseline;
+	column-gap: 0.34rem;
+	row-gap: 0.16rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	color: #64748b;
+}
+
+.diary-pagination .article-pagination-block:hover {
+	color: #475569;
+	opacity: 1;
+}
+
+.diary-pagination .article-pagination-label {
+	font-size: 0.72rem;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.diary-pagination .article-pagination-title {
+	grid-column: 2;
+	font-size: 0.78rem;
+	font-weight: 500;
+	line-height: 1.35;
+	color: var(--color-muted);
+}
+
+.diary-pagination-next .article-pagination-title {
+	grid-column: 1;
+}
+
+.diary-pagination .article-pagination-date {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.34rem;
+	font-size: 0.84rem;
+	font-weight: 500;
+	line-height: 1.35;
+	color: inherit;
+}
+
+.diary-pagination .article-pagination-date span,
+.diary-pagination-arrow {
+	color: var(--color-muted);
+	font-size: 0.72rem;
+	font-weight: 500;
 }
 
 .article-end {
@@ -1687,9 +1932,70 @@ a.tag-link:hover {
 	padding-top: 0.25rem;
 }
 
+.article-detail-main .article-end {
+	margin-top: 2rem;
+}
+
 .article-share {
 	margin-top: 0;
 	padding-top: 0;
+}
+
+.article-detail-share.article-share {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.article-detail-pagination.article-pagination {
+	align-items: baseline;
+	gap: 1rem;
+	margin-top: 1.05rem;
+	border-top: 1px solid color-mix(in srgb, var(--color-heading) 8%, transparent);
+	padding-top: 0.95rem;
+}
+
+.article-detail-pagination .article-pagination-block {
+	display: inline-grid;
+	grid-template-columns: auto auto;
+	align-items: baseline;
+	column-gap: 0.36rem;
+	row-gap: 0.18rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	color: #64748b;
+	text-align: left;
+}
+
+.article-detail-pagination .article-pagination-block:hover {
+	color: #475569;
+	opacity: 1;
+}
+
+.article-detail-pagination .article-pagination-date {
+	display: block;
+	font-size: 0.78rem;
+	font-weight: 500;
+	line-height: 1.35;
+	color: var(--color-muted);
+}
+
+.article-detail-pagination .article-pagination-title {
+	grid-column: 2;
+	font-size: 0.9rem;
+	font-weight: 500;
+	line-height: 1.4;
+	color: inherit;
+}
+
+.article-detail-pagination .article-pagination-next .article-pagination-title {
+	grid-column: 1;
+}
+
+.article-detail-pagination .article-pagination-arrow {
+	color: var(--color-muted);
+	font-size: 0.76rem;
+	font-weight: 500;
 }
 
 .article-share hr {
@@ -2123,6 +2429,31 @@ html {
 
 	.article-title {
 		font-size: 1.75rem;
+	}
+
+	.article-detail-header .article-title {
+		font-size: 1.56rem;
+	}
+
+	.article-detail-main .article-body h2 {
+		font-size: 1.24rem;
+	}
+
+	.article-detail-main .article-body h3 {
+		font-size: 1.06rem;
+	}
+
+	.diary-detail-header {
+		margin-bottom: 0.85rem;
+		padding-bottom: 0.85rem;
+	}
+
+	.diary-detail-date {
+		font-size: 1.04rem;
+	}
+
+	.diary-detail-main {
+		margin-top: 0.25rem;
 	}
 
 	.article-share {

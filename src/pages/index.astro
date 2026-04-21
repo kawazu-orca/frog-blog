@@ -60,6 +60,9 @@ const latestDiaryEntries = await Promise.all(
 									{entry.weekday && <span>/ {entry.weekday}</span>}
 								</div>
 								{entry.excerpt && <p class="home-diary-excerpt">{entry.excerpt}</p>}
+								<a class="home-diary-readmore" href={`/diary/${entry.diarySlug}`}>
+									全文を読む
+								</a>
 							</article>
 						))
 					}

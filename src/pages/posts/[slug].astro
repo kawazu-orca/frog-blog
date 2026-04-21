@@ -6,7 +6,6 @@ import {
 	formatDateWithSlash,
 	getPostBlocks,
 	getPublishedPosts,
-	truncateText,
 } from "../../lib/notion";
 import { extractHeadings, renderBlocks } from "../../lib/renderer";
 
@@ -37,23 +36,31 @@ const blocks = await getPostBlocks(post.pageId);
 const headings = extractHeadings(blocks);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks);
 const displayDate = formatDateWithSlash(post.date) ?? "日付なし";
+const displayDateText = displayDate.replaceAll("/", ".");
+const previousPostDate = previousPost
+	? (formatDateWithSlash(previousPost.date) ?? "日付なし").replaceAll("/", ".")
+	: undefined;
+const nextPostDate = nextPost
+	? (formatDateWithSlash(nextPost.date) ?? "日付なし").replaceAll("/", ".")
+	: undefined;
 const showToC = post.properties.ShowToC === true;
 const hasEnoughHeadings = headings.length > 2;
 ---
 
 <BaseLayout title={post.title} headerVariant="narrow">
-	<div class="article-grid">
-		<header class="article-header">
+	<div class="article-grid article-detail-grid">
+		<header class="article-header article-detail-header">
+			<p class="article-detail-kicker">/Article</p>
 			<h1 class="article-title">{post.title}</h1>
-				<div class="article-meta">
-					<time datetime={post.date ?? ""}>{displayDate}</time>
-					{
-						post.tags.length > 0 && (
-							<span class="article-tags">
-								{post.tags.map((tag) => (
-									<span class="tag-link">#{tag}</span>
-								))}
-							</span>
+			<div class="article-meta article-detail-meta">
+				<time datetime={post.date ?? ""}>{displayDateText}</time>
+				{
+					post.tags.length > 0 && (
+						<span class="article-tags article-detail-tags">
+							{post.tags.map((tag) => (
+								<span class="tag-link">{tag}</span>
+							))}
+						</span>
 					)
 				}
 			</div>
@@ -65,7 +72,7 @@ const hasEnoughHeadings = headings.length > 2;
 			</aside>
 		)}
 
-		<article class="article-main">
+		<article class="article-main article-detail-main">
 			<div class="article-body" style="position: relative;">
 				<div class="article-content" set:html={contentHtml} />
 				{
@@ -98,44 +105,29 @@ const hasEnoughHeadings = headings.length > 2;
 			}
 
 			<footer class="article-end">
-				<section class="article-share">
-					<hr />
+				<section class="article-share article-detail-share" aria-label="記事を共有">
 					<ShareButtons title={post.title} url={Astro.url.href} />
 				</section>
 
 				<nav
-					class={`article-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
+					class={`article-pagination article-detail-pagination${hasBothNavigation ? " has-both-navigation" : ""}`}
 					aria-label="前後の記事"
 				>
 						{previousPost && (
 							<p class="article-pagination-prev">
 								<a class="article-pagination-block" href={`/posts/${previousPost.slug}`}>
-									<span class="article-pagination-label">前の記事</span>
+									<span class="article-pagination-arrow" aria-hidden="true">←</span>
+									<span class="article-pagination-date">{previousPostDate}</span>
 									<span class="article-pagination-title">{previousPost.title}</span>
-									<span class="article-pagination-date">
-										{formatDateWithSlash(previousPost.date) ?? "日付なし"}
-									</span>
-									{previousPost.description && (
-										<span class="article-pagination-excerpt">
-											{truncateText(previousPost.description, 140)}
-										</span>
-									)}
 								</a>
 							</p>
 						)}
 						{nextPost && (
 							<p class="article-pagination-next">
 								<a class="article-pagination-block" href={`/posts/${nextPost.slug}`}>
-									<span class="article-pagination-label">次の記事</span>
+									<span class="article-pagination-date">{nextPostDate}</span>
+									<span class="article-pagination-arrow" aria-hidden="true">→</span>
 									<span class="article-pagination-title">{nextPost.title}</span>
-									<span class="article-pagination-date">
-										{formatDateWithSlash(nextPost.date) ?? "日付なし"}
-									</span>
-									{nextPost.description && (
-										<span class="article-pagination-excerpt">
-											{truncateText(nextPost.description, 140)}
-										</span>
-									)}
 								</a>
 							</p>
 						)}
