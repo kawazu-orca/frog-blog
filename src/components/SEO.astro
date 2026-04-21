@@ -5,11 +5,12 @@ interface Props {
 }
 
 const { title, description } = Astro.props as Props;
-const ogImageUrl = new URL("/favicon.svg", Astro.url).toString();
+const faviconUrl = "/favicon-96.png";
+const ogImageUrl = new URL(faviconUrl, Astro.url).toString();
 ---
 
 <meta charset="utf-8" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="96x96" href={faviconUrl} />
 <link
 	rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"

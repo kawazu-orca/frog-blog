@@ -37,12 +37,6 @@ const headings = extractHeadings(blocks);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks);
 const displayDate = formatDateWithSlash(post.date) ?? "日付なし";
 const displayDateText = displayDate.replaceAll("/", ".");
-const previousPostDate = previousPost
-	? (formatDateWithSlash(previousPost.date) ?? "日付なし").replaceAll("/", ".")
-	: undefined;
-const nextPostDate = nextPost
-	? (formatDateWithSlash(nextPost.date) ?? "日付なし").replaceAll("/", ".")
-	: undefined;
 const showToC = post.properties.ShowToC === true;
 const hasEnoughHeadings = headings.length > 2;
 ---
@@ -50,7 +44,7 @@ const hasEnoughHeadings = headings.length > 2;
 <BaseLayout title={post.title} headerVariant="narrow">
 	<div class="article-grid article-detail-grid">
 		<header class="article-header article-detail-header">
-			<p class="article-detail-kicker">/Article</p>
+			<a class="article-detail-kicker" href="/articles">/Article</a>
 			<h1 class="article-title">{post.title}</h1>
 			<div class="article-meta article-detail-meta">
 				<time datetime={post.date ?? ""}>{displayDateText}</time>
@@ -106,7 +100,7 @@ const hasEnoughHeadings = headings.length > 2;
 
 			<footer class="article-end">
 				<section class="article-share article-detail-share" aria-label="記事を共有">
-					<ShareButtons title={post.title} url={Astro.url.href} />
+					<ShareButtons title={post.title} url={Astro.url.href} showHatena={false} />
 				</section>
 
 				<nav
@@ -117,7 +111,6 @@ const hasEnoughHeadings = headings.length > 2;
 							<p class="article-pagination-prev">
 								<a class="article-pagination-block" href={`/posts/${previousPost.slug}`}>
 									<span class="article-pagination-arrow" aria-hidden="true">←</span>
-									<span class="article-pagination-date">{previousPostDate}</span>
 									<span class="article-pagination-title">{previousPost.title}</span>
 								</a>
 							</p>
@@ -125,9 +118,8 @@ const hasEnoughHeadings = headings.length > 2;
 						{nextPost && (
 							<p class="article-pagination-next">
 								<a class="article-pagination-block" href={`/posts/${nextPost.slug}`}>
-									<span class="article-pagination-date">{nextPostDate}</span>
-									<span class="article-pagination-arrow" aria-hidden="true">→</span>
 									<span class="article-pagination-title">{nextPost.title}</span>
+									<span class="article-pagination-arrow" aria-hidden="true">→</span>
 								</a>
 							</p>
 						)}
