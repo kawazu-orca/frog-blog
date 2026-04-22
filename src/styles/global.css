@@ -1945,7 +1945,7 @@ a.tag-link:hover {
 
 .diary-detail-main {
 	max-width: var(--readable-text-measure);
-	margin-top: 1.35rem;
+	margin-top: 1rem;
 }
 
 .diary-detail-main .article-body {
@@ -1960,7 +1960,7 @@ a.tag-link:hover {
 	letter-spacing: 0;
 	color: #3f4c5c;
 	margin-top: 0;
-	margin-bottom: 1rem;
+	margin-bottom: 1.5rem;
 }
 
 .diary-detail-main .article-body ul,
@@ -1969,6 +1969,10 @@ a.tag-link:hover {
 	line-height: 1.74;
 	letter-spacing: 0;
 	color: #3f4c5c;
+}
+
+.diary-detail-main .article-content > :last-child {
+	margin-bottom: 0;
 }
 
 .diary-detail-main .article-end {
@@ -2568,7 +2572,7 @@ html {
 	}
 
 	.diary-detail-main {
-		margin-top: 1.35rem;
+		margin-top: 1rem;
 	}
 
 	.article-detail-main .article-body p,
