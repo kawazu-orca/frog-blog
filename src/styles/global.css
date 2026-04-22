@@ -1945,7 +1945,7 @@ a.tag-link:hover {
 
 .diary-detail-main {
 	max-width: var(--readable-text-measure);
-	margin-top: 1rem;
+	margin-top: 1.25rem;
 }
 
 .diary-detail-main .article-body {
@@ -2572,7 +2572,7 @@ html {
 	}
 
 	.diary-detail-main {
-		margin-top: 1rem;
+		margin-top: 1.25rem;
 	}
 
 	.article-detail-main .article-body p,
