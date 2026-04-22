@@ -38,6 +38,7 @@
 	--article-text-measure: 34em;
 	--readable-text-measure: 31.5em;
 	--diary-rule-date-gap: 1.4rem;
+	--diary-body-letter-spacing: 0.012em;
 }
 
 :root[data-theme="dark"] {
@@ -688,7 +689,7 @@ img {
 	margin: 0;
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--diary-body-letter-spacing);
 	color: #3f4c5c;
 }
 
@@ -1226,7 +1227,7 @@ a.diary-page-kicker:hover {
 .article-main .diary-list-content.article-body > p:first-of-type {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--diary-body-letter-spacing);
 	color: #3f4c5c;
 }
 
@@ -1962,7 +1963,7 @@ a.tag-link:hover {
 .diary-detail-main .article-body > p:first-of-type {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--diary-body-letter-spacing);
 	color: #3f4c5c;
 	margin-top: 0;
 	margin-bottom: 1.5rem;
@@ -1972,7 +1973,7 @@ a.tag-link:hover {
 .diary-detail-main .article-body ol {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--diary-body-letter-spacing);
 	color: #3f4c5c;
 }
 
