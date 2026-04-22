@@ -104,20 +104,22 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 	<div class="article-grid diary-detail-grid">
 		<header class="article-header diary-detail-header">
 			<a class="diary-detail-kicker" href="/diary">/Diary</a>
-			<h1 class="article-title diary-detail-date">
-				<time datetime={post.date ?? ""}>{displayDateText}</time>
-				{weekday && <span>/ {weekday}</span>}
-			</h1>
-			{shouldShowTitle && <p class="diary-detail-title">{displayTitle}</p>}
-			{
-				post.tags.length > 0 && (
-					<div class="article-tags diary-detail-tags">
-						{post.tags.map((tag) => (
-							<span class="tag-link">{tag}</span>
-						))}
-					</div>
-				)
-			}
+			<div class="diary-detail-entry">
+				<h1 class="article-title diary-detail-date">
+					<time datetime={post.date ?? ""}>{displayDateText}</time>
+					{weekday && <span>/ {weekday}</span>}
+				</h1>
+				{shouldShowTitle && <p class="diary-detail-title">{displayTitle}</p>}
+				{
+					post.tags.length > 0 && (
+						<div class="article-tags diary-detail-tags">
+							{post.tags.map((tag) => (
+								<span class="tag-badge">{tag}</span>
+							))}
+						</div>
+					)
+				}
+			</div>
 		</header>
 
 		<article class="article-main diary-detail-main">

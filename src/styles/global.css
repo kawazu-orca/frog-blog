@@ -414,13 +414,16 @@ img {
 	color: #d7dce4;
 }
 
-:root[data-theme="dark"] .diary-detail-date {
+:root[data-theme="dark"] .diary-detail-entry {
 	border-top-color: color-mix(in srgb, var(--color-text) 9%, transparent);
+}
+
+:root[data-theme="dark"] .diary-detail-date {
 	color: #d7dce4;
 }
 
 :root[data-theme="dark"] .diary-detail-date span {
-	color: #a8b2bf;
+	color: #7d8794;
 }
 
 :root[data-theme="dark"] .diary-detail-title {
@@ -1803,14 +1806,14 @@ a.tag-link:hover {
 }
 
 .diary-detail-header {
-	margin-bottom: 0.9rem;
+	margin-bottom: 0;
 	padding-bottom: 0;
 	border-bottom: 0;
 }
 
 .diary-detail-kicker {
 	display: inline-block;
-	margin: 0 0 0.48rem;
+	margin: 0 0 0.8rem;
 	color: var(--color-muted);
 	font-size: 0.74rem;
 	font-weight: 600;
@@ -1824,13 +1827,16 @@ a.tag-link:hover {
 	text-decoration: none;
 }
 
+.diary-detail-entry {
+	padding-top: 1.65rem;
+	border-top: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
+}
+
 .diary-detail-date {
 	display: flex;
 	align-items: baseline;
 	gap: 0.42rem;
-	margin-bottom: 0.7rem;
-	padding-top: 1.65rem;
-	border-top: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
+	margin: 0 0 0.7rem;
 	font-size: 1.08rem;
 	font-weight: 600;
 	letter-spacing: 0;
@@ -1856,23 +1862,23 @@ a.tag-link:hover {
 }
 
 .diary-detail-tags {
-	margin-top: 0.85rem;
+	margin-top: 0.7rem;
 }
 
 .diary-detail-main {
-	margin-top: 0.45rem;
+	margin-top: 1rem;
 }
 
 .diary-detail-main .article-body p,
 .diary-detail-main .article-body > p:first-of-type {
-	font-size: 0.92rem;
+	font-size: 0.9rem;
 	line-height: 1.68;
 	margin-bottom: 1.35rem;
 }
 
 .diary-detail-main .article-body ul,
 .diary-detail-main .article-body ol {
-	font-size: 0.92rem;
+	font-size: 0.9rem;
 	line-height: 1.68;
 }
 
@@ -2464,7 +2470,7 @@ html {
 	}
 
 	.diary-detail-header {
-		margin-bottom: 0.85rem;
+		margin-bottom: 0;
 		padding-bottom: 0;
 	}
 
@@ -2473,7 +2479,7 @@ html {
 	}
 
 	.diary-detail-main {
-		margin-top: 0.25rem;
+		margin-top: 1rem;
 	}
 
 	.article-share {
