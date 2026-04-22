@@ -7,8 +7,21 @@ interface Props {
 
 const { title, url, showHatena = true } = Astro.props as Props;
 
-const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
-const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}`;
+function normalizeShareUrl(input: string): string {
+	try {
+		const parsedUrl = new URL(input);
+		parsedUrl.search = "";
+		parsedUrl.hash = "";
+		return parsedUrl.toString();
+	} catch {
+		return input;
+	}
+}
+
+const shareUrl = normalizeShareUrl(url);
+const shareTitle = `${title} | frog-blog`;
+const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}&hashtags=frogblog`;
+const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${shareUrl.replace(/^https?:\/\//, "")}`;
 ---
 
 <div class="share-buttons">
@@ -17,8 +30,8 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 		href={xUrl}
 		target="_blank"
 		rel="noopener noreferrer"
-		aria-label="Xでシェア"
-		title="Xでシェア"
+		aria-label="Xで共有"
+		title="Xで共有"
 	>
 		<svg viewBox="0 0 24 24" aria-hidden="true">
 			<path
@@ -49,7 +62,7 @@ const hatenaUrl = `https://b.hatena.ne.jp/entry/s/${url.replace("https://", "")}
 	<button
 		class="share-button copy"
 		type="button"
-		data-copy-url={url}
+		data-copy-url={shareUrl}
 		aria-label="リンクをコピー"
 		title="リンクをコピー"
 	>

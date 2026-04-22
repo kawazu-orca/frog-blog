@@ -665,8 +665,12 @@ img {
 	color: #5f6b7a;
 }
 
+.home-diary-item .diary-list-heading-link {
+	margin-bottom: 0.95rem;
+}
+
 .home-diary-title {
-	margin-bottom: 0.8rem;
+	margin-bottom: 0;
 }
 
 .home-diary-readmore {
