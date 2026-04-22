@@ -3,6 +3,7 @@ import ArticleToggleList from "../components/ArticleToggleList.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
 	formatDiaryDateLabel,
+	formatDiaryDisplayTitle,
 	getPostBlocks,
 	getPublishedPosts,
 	resolveDiarySlug,
@@ -20,6 +21,15 @@ async function createDiaryExcerpt(post: PublishedPost): Promise<string> {
 	return extractPlainTextFromBlocks(blocks);
 }
 
+function shouldShowDiaryTitle(title: string): boolean {
+	const normalized = title.trim();
+	if (!normalized) {
+		return false;
+	}
+
+	return !/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?:\s*\([^)]+\))?$/.test(normalized);
+}
+
 const latestArticles = (await getPublishedPosts({ type: "Article" })).slice(0, 3);
 const latestDiaryPosts = (await getPublishedPosts({ type: "Diary" })).slice(0, 1);
 const latestDiaryEntries = await Promise.all(
@@ -33,6 +43,8 @@ const latestDiaryEntries = await Promise.all(
 		return {
 			...post,
 			diarySlug: resolveDiarySlug(post),
+			displayTitle: formatDiaryDisplayTitle(post),
+			showTitle: shouldShowDiaryTitle(post.title),
 			dateLabel: dateLabel.replaceAll("/", "."),
 			weekday,
 			excerpt: truncateText(excerptSource, 80),
@@ -53,12 +65,21 @@ const latestDiaryEntries = await Promise.all(
 					{
 						latestDiaryEntries.map((entry) => (
 							<article class="home-diary-item">
-								<div class="diary-list-date">
-									<a href={`/diary/${entry.diarySlug}`} aria-label={`${entry.dateLabel}の日記を開く`}>
+								<a
+									class="diary-list-heading-link"
+									href={`/diary/${entry.diarySlug}`}
+									aria-label={`${entry.displayTitle}の日記を開く`}
+								>
+									<div class="diary-list-date">
 										<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-									</a>
-									{entry.weekday && <span>/ {entry.weekday}</span>}
-								</div>
+										{entry.weekday && <span>/ {entry.weekday}</span>}
+									</div>
+									{entry.showTitle && (
+										<h3 class="diary-list-title home-diary-title">
+											{entry.displayTitle}
+										</h3>
+									)}
+								</a>
 								{entry.excerpt && <p class="home-diary-excerpt">{entry.excerpt}</p>}
 								<a class="home-diary-readmore" href={`/diary/${entry.diarySlug}`}>
 									全文を読む

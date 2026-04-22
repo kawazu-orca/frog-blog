@@ -67,19 +67,21 @@ const entries = await Promise.all(
 						<section class="diary-list" aria-label="日記一覧">
 							{entries.map((entry) => (
 								<article class="diary-list-item">
-									{entry.dateLabel && (
-										<div class="diary-list-date">
-											<a href={`/diary/${entry.slug}`} aria-label={`${entry.dateLabel}の日記を開く`}>
+									<a
+										class="diary-list-heading-link"
+										href={`/diary/${entry.slug}`}
+										aria-label={`${entry.displayTitle}の日記を開く`}
+									>
+										{entry.dateLabel && (
+											<div class="diary-list-date">
 												<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-											</a>
-											{entry.weekday && <span>/ {entry.weekday}</span>}
-										</div>
-									)}
-									{entry.showTitle && (
-										<h2 class="diary-list-title">
-											<a href={`/diary/${entry.slug}`}>{entry.displayTitle}</a>
-										</h2>
-									)}
+												{entry.weekday && <span>/ {entry.weekday}</span>}
+											</div>
+										)}
+										{entry.showTitle && (
+											<h2 class="diary-list-title">{entry.displayTitle}</h2>
+										)}
+									</a>
 									{entry.contentHtml && (
 										<div class="diary-list-content article-body">
 											<div class="article-content" set:html={entry.contentHtml} />
