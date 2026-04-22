@@ -57,60 +57,64 @@ const entries = await Promise.all(
 
 <BaseLayout title="Diary | frog-blog" headerVariant="narrow">
 	<div class="article-grid diary-index-grid">
+		{
+			entries.length > 0 && (
+				<header class="article-header diary-index-header">
+					<p class="diary-page-kicker">/Diary</p>
+				</header>
+			)
+		}
 		<article class="article-main">
 			{
 				entries.length === 0 ? (
 					<p class="diary-empty">まだ公開された日記はありません。</p>
 				) : (
-					<>
-						<p class="diary-list-label">/Diary</p>
-						<section class="diary-list" aria-label="日記一覧">
-							{entries.map((entry) => (
-								<article class="diary-list-item">
-									<a
-										class="diary-list-heading-link"
-										href={`/diary/${entry.slug}`}
-										aria-label={`${entry.displayTitle}の日記を開く`}
-									>
-										{entry.dateLabel && (
-											<div class="diary-list-date">
-												<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
-												{entry.weekday && <span>/ {entry.weekday}</span>}
-											</div>
-										)}
-										{entry.showTitle && (
-											<h2 class="diary-list-title">{entry.displayTitle}</h2>
-										)}
-									</a>
-									{entry.contentHtml && (
-										<div class="diary-list-content article-body">
-											<div class="article-content" set:html={entry.contentHtml} />
+					<section class="diary-list" aria-label="日記一覧">
+						{entries.map((entry) => (
+							<article class="diary-list-item">
+								<a
+									class="diary-list-heading-link"
+									href={`/diary/${entry.slug}`}
+									aria-label={`${entry.displayTitle}の日記を開く`}
+								>
+									{entry.dateLabel && (
+										<div class="diary-list-date">
+											<time datetime={entry.date ?? ""}>{entry.dateLabel}</time>
+											{entry.weekday && <span>/ {entry.weekday}</span>}
 										</div>
 									)}
-									{entry.footnotes.length > 0 && (
-										<section class="footnotes diary-entry-footnotes" aria-label="脚注">
-											<hr />
-											<ol>
-												{entry.footnotes.map((footnote) => (
-													<li id={`fn-${footnote.targetId}`}>
-														<span>{footnote.text}</span>{" "}
-														<a href={`#fnref-${footnote.targetId}`}>↩</a>
-													</li>
-												))}
-											</ol>
-										</section>
+									{entry.showTitle && (
+										<h2 class="diary-list-title">{entry.displayTitle}</h2>
 									)}
-									{entry.tags.length > 0 && (
-										<div class="article-tags">
-											{entry.tags.map((tag) => (
-												<span class="tag-badge">{tag}</span>
+								</a>
+								{entry.contentHtml && (
+									<div class="diary-list-content article-body">
+										<div class="article-content" set:html={entry.contentHtml} />
+									</div>
+								)}
+								{entry.footnotes.length > 0 && (
+									<section class="footnotes diary-entry-footnotes" aria-label="脚注">
+										<hr />
+										<ol>
+											{entry.footnotes.map((footnote) => (
+												<li id={`fn-${footnote.targetId}`}>
+													<span>{footnote.text}</span>{" "}
+													<a href={`#fnref-${footnote.targetId}`}>↩</a>
+												</li>
 											))}
-										</div>
-									)}
-								</article>
-							))}
-						</section>
-					</>
+										</ol>
+									</section>
+								)}
+								{entry.tags.length > 0 && (
+									<div class="article-tags">
+										{entry.tags.map((tag) => (
+											<span class="tag-badge">{tag}</span>
+										))}
+									</div>
+								)}
+							</article>
+						))}
+					</section>
 				)
 			}
 		</article>
