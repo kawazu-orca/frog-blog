@@ -1,6 +1,6 @@
 ---
 interface Props {
-	variant?: "default" | "narrow";
+	variant?: "default" | "narrow" | "diary";
 }
 
 const { variant = "default" } = Astro.props as Props;
@@ -13,7 +13,7 @@ const currentSection = path.startsWith("/diary")
 ---
 
 <header class="site-header">
-	<div class={`header-inner${variant === "narrow" ? " header-inner--narrow" : ""}`}>
+	<div class={`header-inner${variant !== "default" ? ` header-inner--${variant}` : ""}`}>
 		<a href="/" class="site-logo">frog-blog</a>
 		<nav class="site-nav">
 			<a href="/diary" aria-current={currentSection === "diary" ? "page" : undefined}>

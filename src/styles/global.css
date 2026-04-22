@@ -36,6 +36,7 @@
 	--article-top-offset: 5.75rem;
 	--article-body-offset: 1.5rem;
 	--article-text-measure: 34em;
+	--readable-text-measure: 31.5em;
 }
 
 :root[data-theme="dark"] {
@@ -218,7 +219,11 @@ img {
 }
 
 .header-inner--narrow {
-	max-width: calc(var(--article-text-measure) + 3rem);
+	max-width: calc(var(--readable-text-measure) + 3rem);
+}
+
+.header-inner--diary {
+	max-width: calc(var(--readable-text-measure) + 3rem);
 }
 
 .site-logo {
@@ -449,6 +454,19 @@ img {
 	color: #adb5bf;
 }
 
+:root[data-theme="dark"] .diary-detail-main .article-body p,
+:root[data-theme="dark"] .diary-detail-main .article-body ul,
+:root[data-theme="dark"] .diary-detail-main .article-body ol,
+:root[data-theme="dark"] .article-detail-main .article-body p,
+:root[data-theme="dark"] .article-detail-main .article-body ul,
+:root[data-theme="dark"] .article-detail-main .article-body ol,
+:root[data-theme="dark"] .article-index-grid .article-toggle-description,
+:root[data-theme="dark"] .article-main .diary-list-content.article-body p,
+:root[data-theme="dark"] .article-main .diary-list-content.article-body ul,
+:root[data-theme="dark"] .article-main .diary-list-content.article-body ol {
+	color: #bac2cc;
+}
+
 :root[data-theme="dark"] .article-main .article-body pre {
 	background: #1a222e;
 	border-color: #313c4d;
@@ -505,7 +523,11 @@ img {
 }
 
 :root[data-theme="dark"] .home-diary-excerpt {
-	color: #b7c0cc;
+	color: #bac2cc;
+}
+
+:root[data-theme="dark"] .home-index-grid .article-toggle-description {
+	color: #bac2cc;
 }
 
 :root[data-theme="dark"] .home-diary-readmore {
@@ -663,16 +685,26 @@ img {
 
 .home-diary-excerpt {
 	margin: 0;
-	font-size: 0.86rem;
-	line-height: 1.66;
-	color: #5f6b7a;
+	font-size: 0.92rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
 }
 
 .home-diary-item .diary-list-heading-link {
 	margin-bottom: 0.95rem;
 }
 
-.home-diary-title {
+.home-diary-item .diary-list-date {
+	font-size: 0.94rem;
+}
+
+.home-diary-item .diary-list-date span {
+	font-size: 0.74rem;
+}
+
+.home-diary-item .home-diary-title {
+	font-size: 1.2rem;
 	margin-bottom: 0;
 }
 
@@ -833,16 +865,23 @@ a.tag-badge:hover {
 }
 
 .article-index-grid .article-main {
+	max-width: var(--readable-text-measure);
+	margin-top: 0;
+}
+
+.home-index-grid .article-main {
+	max-width: var(--readable-text-measure);
 	margin-top: 0;
 }
 
 .diary-index-grid .article-main {
+	max-width: var(--readable-text-measure);
 	margin-top: 0;
 }
 
 .article-list-heading {
 	display: grid;
-	grid-template-columns: 7.25rem minmax(0, 1fr) 2.5rem;
+	grid-template-columns: 6.75rem minmax(0, 1fr) 2.5rem;
 	gap: 1rem;
 	margin: 0 0 0.55rem;
 	padding-inline: 0.28rem;
@@ -851,6 +890,20 @@ a.tag-badge:hover {
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	line-height: 1.2;
+}
+
+.article-index-grid .article-toggle-description {
+	font-size: 0.9rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
+}
+
+.home-index-grid .article-toggle-description {
+	font-size: 0.9rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
 }
 
 .diary-list-label {
@@ -909,7 +962,7 @@ a.tag-badge:hover {
 
 .article-toggle-link {
 	display: grid;
-	grid-template-columns: 7.25rem minmax(0, 1fr);
+	grid-template-columns: 6.75rem minmax(0, 1fr);
 	gap: 1rem;
 	align-items: center;
 	min-width: 0;
@@ -1143,7 +1196,7 @@ a.tag-badge:hover {
 .diary-list-content {
 	margin-top: 1rem;
 	font-size: 0.9rem;
-	line-height: 1.68;
+	line-height: 1.74;
 }
 
 .diary-list-content .article-content > :first-child {
@@ -1158,8 +1211,10 @@ a.tag-badge:hover {
 .article-main .diary-list-content.article-body ul,
 .article-main .diary-list-content.article-body ol,
 .article-main .diary-list-content.article-body > p:first-of-type {
-	font-size: 0.9rem;
-	line-height: 1.68;
+	font-size: 0.92rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
 }
 
 .diary-list-item .article-tags {
@@ -1315,7 +1370,13 @@ a.tag-badge:hover {
 }
 
 .article-detail-main {
-	margin-top: 0.85rem;
+	max-width: var(--readable-text-measure);
+	margin-top: 1.35rem;
+}
+
+.article-detail-header {
+	max-width: var(--readable-text-measure);
+	margin-bottom: 0;
 }
 
 .article-detail-main .article-body p,
@@ -1323,6 +1384,9 @@ a.tag-badge:hover {
 .article-detail-main .article-body ul,
 .article-detail-main .article-body ol {
 	font-size: 0.94rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
 }
 
 .article-detail-main .article-body h2 {
@@ -1443,6 +1507,17 @@ a.tag-link:hover {
 	max-width: 100%;
 	margin-top: 0;
 	margin-bottom: 2rem;
+}
+
+.article-detail-main .article-body p,
+.article-detail-main .article-body > p:first-of-type,
+.article-detail-main .article-body ul,
+.article-detail-main .article-body ol {
+	font-size: 0.94rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
+	margin-bottom: 1rem;
 }
 
 .article-main .article-body a {
@@ -1806,6 +1881,9 @@ a.tag-link:hover {
 }
 
 .diary-detail-header {
+	max-width: var(--readable-text-measure);
+	margin-left: auto;
+	margin-right: auto;
 	margin-bottom: 0;
 	padding-bottom: 0;
 	border-bottom: 0;
@@ -1866,20 +1944,31 @@ a.tag-link:hover {
 }
 
 .diary-detail-main {
-	margin-top: 1rem;
+	max-width: var(--readable-text-measure);
+	margin-top: 1.35rem;
+}
+
+.diary-detail-main .article-body {
+	max-width: none;
+	margin-right: auto;
 }
 
 .diary-detail-main .article-body p,
 .diary-detail-main .article-body > p:first-of-type {
-	font-size: 0.9rem;
-	line-height: 1.68;
-	margin-bottom: 1.35rem;
+	font-size: 0.92rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
+	margin-top: 0;
+	margin-bottom: 1rem;
 }
 
 .diary-detail-main .article-body ul,
 .diary-detail-main .article-body ol {
-	font-size: 0.9rem;
-	line-height: 1.68;
+	font-size: 0.92rem;
+	line-height: 1.74;
+	letter-spacing: 0;
+	color: #3f4c5c;
 }
 
 .diary-detail-main .article-end {
@@ -2479,7 +2568,23 @@ html {
 	}
 
 	.diary-detail-main {
-		margin-top: 1rem;
+		margin-top: 1.35rem;
+	}
+
+	.article-detail-main .article-body p,
+	.article-detail-main .article-body > p:first-of-type,
+	.article-detail-main .article-body ul,
+	.article-detail-main .article-body ol,
+	.article-main .diary-list-content.article-body p,
+	.article-main .diary-list-content.article-body ul,
+	.article-main .diary-list-content.article-body ol,
+	.article-main .diary-list-content.article-body > p:first-of-type,
+	.home-diary-excerpt,
+	.diary-detail-main .article-body p,
+	.diary-detail-main .article-body > p:first-of-type,
+	.diary-detail-main .article-body ul,
+	.diary-detail-main .article-body ol {
+		font-size: 0.94rem;
 	}
 
 	.article-share {
