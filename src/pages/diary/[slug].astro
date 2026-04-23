@@ -97,6 +97,7 @@ const olderDiaryNavigationDate = formatDiaryNavigationDate(olderDiaryDate);
 const blocks = await getPostBlocks(post.pageId);
 const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 	idPrefix: `diary-detail-${post.pageId}-`,
+	enhanceJapaneseSpacing: true,
 });
 ---
 

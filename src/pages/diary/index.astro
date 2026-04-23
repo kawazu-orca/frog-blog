@@ -19,6 +19,7 @@ async function renderDiaryContent(post: PublishedPost): Promise<{
 	const blocks = await getPostBlocks(post.pageId);
 	const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 		idPrefix: `diary-index-${post.pageId}-`,
+		enhanceJapaneseSpacing: true,
 	});
 
 	return { contentHtml, footnotes };

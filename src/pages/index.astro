@@ -10,7 +10,10 @@ import {
 	truncateText,
 	type PublishedPost,
 } from "../lib/notion";
-import { extractPlainTextFromBlocks } from "../lib/renderer";
+import {
+	extractPlainTextFromBlocks,
+	renderJapaneseSpacedText,
+} from "../lib/renderer";
 
 async function createDiaryExcerpt(post: PublishedPost): Promise<string> {
 	if (post.description.trim()) {
@@ -47,7 +50,7 @@ const latestDiaryEntries = await Promise.all(
 			showTitle: shouldShowDiaryTitle(post.title),
 			dateLabel: dateLabel.replaceAll("/", "."),
 			weekday,
-			excerpt: truncateText(excerptSource, 80),
+			excerptHtml: renderJapaneseSpacedText(truncateText(excerptSource, 80)),
 		};
 	}),
 );
@@ -80,7 +83,9 @@ const latestDiaryEntries = await Promise.all(
 										</h3>
 									)}
 								</a>
-								{entry.excerpt && <p class="home-diary-excerpt">{entry.excerpt}</p>}
+								{entry.excerptHtml && (
+									<p class="home-diary-excerpt" set:html={entry.excerptHtml} />
+								)}
 								<a class="home-diary-readmore" href={`/diary/${entry.diarySlug}`}>
 									全文を読む
 								</a>

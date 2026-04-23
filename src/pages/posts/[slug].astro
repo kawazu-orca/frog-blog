@@ -34,7 +34,9 @@ const hasBothNavigation = Boolean(previousPost && nextPost);
 
 const blocks = await getPostBlocks(post.pageId);
 const headings = extractHeadings(blocks);
-const { html: contentHtml, footnotes } = await renderBlocks(blocks);
+const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
+	enhanceJapaneseSpacing: true,
+});
 const displayDate = formatDateWithSlash(post.date) ?? "日付なし";
 const displayDateText = displayDate.replaceAll("/", ".");
 const showToC = post.properties.ShowToC === true;

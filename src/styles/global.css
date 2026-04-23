@@ -38,6 +38,14 @@
 	--article-text-measure: 34em;
 	--readable-text-measure: 31.5em;
 	--diary-rule-date-gap: 1.4rem;
+	--diary-kicker-rule-gap: 0.38rem;
+	--content-body-letter-spacing: 0.014em;
+	--content-comma-period-gap: 0.2em;
+	--content-exclaim-gap-start: 0.07em;
+	--content-exclaim-gap-end: 0.12em;
+	--content-bracket-gap: 0.08em;
+	--content-bracket-after-exclaim-gap: 0.035em;
+	--content-script-gap: 0.07em;
 }
 
 :root[data-theme="dark"] {
@@ -688,7 +696,7 @@ img {
 	margin: 0;
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 }
 
@@ -896,14 +904,14 @@ a.tag-badge:hover {
 .article-index-grid .article-toggle-description {
 	font-size: 0.9rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 }
 
 .home-index-grid .article-toggle-description {
 	font-size: 0.9rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 }
 
@@ -1226,8 +1234,67 @@ a.diary-page-kicker:hover {
 .article-main .diary-list-content.article-body > p:first-of-type {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
+}
+
+.diary-list-content .jp-punct,
+.diary-detail-main .jp-punct,
+.article-detail-main .jp-punct,
+.home-diary-excerpt .jp-punct,
+.content-text .jp-punct {
+	letter-spacing: 0;
+}
+
+.diary-list-content .jp-script-gap,
+.diary-detail-main .jp-script-gap,
+.article-detail-main .jp-script-gap,
+.home-diary-excerpt .jp-script-gap,
+.content-text .jp-script-gap {
+	display: inline-block;
+	width: var(--content-script-gap);
+	letter-spacing: 0;
+}
+
+.diary-list-content .jp-comma-period,
+.diary-detail-main .jp-comma-period,
+.article-detail-main .jp-comma-period,
+.home-diary-excerpt .jp-comma-period,
+.content-text .jp-comma-period {
+	margin-inline-end: var(--content-comma-period-gap);
+}
+
+.diary-list-content .jp-exclaim-question,
+.diary-detail-main .jp-exclaim-question,
+.article-detail-main .jp-exclaim-question,
+.home-diary-excerpt .jp-exclaim-question,
+.content-text .jp-exclaim-question {
+	margin-inline-start: var(--content-exclaim-gap-start);
+	margin-inline-end: var(--content-exclaim-gap-end);
+}
+
+.diary-list-content .jp-bracket-open,
+.diary-detail-main .jp-bracket-open,
+.article-detail-main .jp-bracket-open,
+.home-diary-excerpt .jp-bracket-open,
+.content-text .jp-bracket-open {
+	margin-inline-start: var(--content-bracket-gap);
+}
+
+.diary-list-content .jp-exclaim-question + .jp-bracket-open,
+.diary-detail-main .jp-exclaim-question + .jp-bracket-open,
+.article-detail-main .jp-exclaim-question + .jp-bracket-open,
+.home-diary-excerpt .jp-exclaim-question + .jp-bracket-open,
+.content-text .jp-exclaim-question + .jp-bracket-open {
+	margin-inline-start: var(--content-bracket-after-exclaim-gap);
+}
+
+.diary-list-content .jp-bracket-close,
+.diary-detail-main .jp-bracket-close,
+.article-detail-main .jp-bracket-close,
+.home-diary-excerpt .jp-bracket-close,
+.content-text .jp-bracket-close {
+	margin-inline-end: var(--content-bracket-gap);
 }
 
 .diary-list-item .article-tags {
@@ -1311,7 +1378,7 @@ a.diary-page-kicker:hover {
 
 .article-header.diary-index-header {
 	max-width: var(--readable-text-measure);
-	margin-bottom: 0.8rem;
+	margin-bottom: var(--diary-kicker-rule-gap);
 	padding-bottom: 0;
 	border-bottom: 0;
 }
@@ -1405,7 +1472,7 @@ a.diary-page-kicker:hover {
 .article-detail-main .article-body ol {
 	font-size: 0.94rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 }
 
@@ -1535,7 +1602,7 @@ a.tag-link:hover {
 .article-detail-main .article-body ol {
 	font-size: 0.94rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 	margin-bottom: 1rem;
 }
@@ -1910,7 +1977,7 @@ a.tag-link:hover {
 }
 
 .diary-detail-entry {
-	margin-top: 0.8rem;
+	margin-top: var(--diary-kicker-rule-gap);
 	padding-top: var(--diary-rule-date-gap);
 	border-top: 1px solid color-mix(in srgb, var(--color-heading) 9%, transparent);
 }
@@ -1962,7 +2029,7 @@ a.tag-link:hover {
 .diary-detail-main .article-body > p:first-of-type {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 	margin-top: 0;
 	margin-bottom: 1.5rem;
@@ -1972,7 +2039,7 @@ a.tag-link:hover {
 .diary-detail-main .article-body ol {
 	font-size: 0.92rem;
 	line-height: 1.74;
-	letter-spacing: 0;
+	letter-spacing: var(--content-body-letter-spacing);
 	color: #3f4c5c;
 }
 

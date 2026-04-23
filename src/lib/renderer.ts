@@ -12,6 +12,7 @@ export type Footnote = { id: number; targetId: string; text: string };
 
 interface RenderBlocksOptions {
 	idPrefix?: string;
+	enhanceJapaneseSpacing?: boolean;
 }
 
 type RenderContext = {
@@ -19,6 +20,7 @@ type RenderContext = {
 	footnotes: Footnote[];
 	footnoteIndex: number;
 	idPrefix: string;
+	enhanceJapaneseSpacing: boolean;
 };
 
 function escapeHtml(value: string): string {
@@ -32,6 +34,41 @@ function escapeHtml(value: string): string {
 
 function escapeAttr(value: string): string {
 	return escapeHtml(value);
+}
+
+const japaneseLetterPattern = "[\\u3040-\\u30ff\\u3400-\\u9fff]";
+const latinLetterPattern = "[A-Za-z]";
+
+function applyJapaneseSpacing(text: string): string {
+	return text
+		.replace(
+			new RegExp(`(${latinLetterPattern})(?=${japaneseLetterPattern})`, "g"),
+			'$1<span class="jp-script-gap"></span>',
+		)
+		.replace(
+			new RegExp(`(${japaneseLetterPattern})(?=${latinLetterPattern})`, "g"),
+			'$1<span class="jp-script-gap"></span>',
+		)
+		.replace(
+			/[、。]/g,
+			(match) => `<span class="jp-punct jp-comma-period">${match}</span>`,
+		)
+		.replace(
+			/[！？]/g,
+			(match) => `<span class="jp-punct jp-exclaim-question">${match}</span>`,
+		)
+		.replace(
+			/[「『（〔［【]/g,
+			(match) => `<span class="jp-punct jp-bracket-open">${match}</span>`,
+		)
+		.replace(
+			/[」』）〕］】]/g,
+			(match) => `<span class="jp-punct jp-bracket-close">${match}</span>`,
+		);
+}
+
+export function renderJapaneseSpacedText(text: string): string {
+	return applyJapaneseSpacing(escapeHtml(text));
 }
 
 function notionColorToCss(color: string): string | null {
@@ -262,12 +299,18 @@ function extractFileLikeUrl(
 	return { url: null, kind: "unknown" };
 }
 
-function renderRichTextItem(item: RichTextItemResponse): string {
+function renderRichTextItem(
+	item: RichTextItemResponse,
+	context: RenderContext,
+): string {
 	const annotations = item.annotations;
 	let content = "";
 
 	if (item.type === "text") {
 		content = escapeHtml(item.text.content);
+		if (context.enhanceJapaneseSpacing && !annotations.code) {
+			content = applyJapaneseSpacing(content);
+		}
 		if (item.text.link?.url) {
 			content = `<a href="${escapeAttr(item.text.link.url)}">${content}</a>`;
 		}
@@ -299,8 +342,11 @@ function renderRichTextItem(item: RichTextItemResponse): string {
 	return renderInlineColor(content, annotations.color);
 }
 
-function renderRichText(items: RichTextItemResponse[]): string {
-	return items.map((item) => renderRichTextItem(item)).join("");
+function renderRichText(
+	items: RichTextItemResponse[],
+	context: RenderContext,
+): string {
+	return items.map((item) => renderRichTextItem(item, context)).join("");
 }
 
 function getRichTextPlainText(items: RichTextItemResponse[]): string {
@@ -412,7 +458,7 @@ function renderRichTextWithFootnoteMarkers(
 	for (const item of items) {
 		const footnoteText = extractInlineCodeFootnote(item);
 		if (!footnoteText) {
-			html.push(renderRichTextItem(item));
+			html.push(renderRichTextItem(item, context));
 			continue;
 		}
 
@@ -576,7 +622,7 @@ async function renderBlock(
 		case "image": {
 			const item = block.image;
 			const src = await resolveImageSrc(block);
-			const caption = renderRichText(item.caption);
+			const caption = renderRichText(item.caption, context);
 			return `<figure><img src="${escapeAttr(src)}" alt="${escapeAttr(
 				item.caption.map((richTextItem) => richTextItem.plain_text).join(""),
 			)}" />${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
@@ -599,14 +645,14 @@ async function renderBlock(
 			}
 			const maybeEmbedUrl = toEmbedUrl(url);
 			if (maybeEmbedUrl !== url) {
-				const caption = renderRichText(item.caption);
+				const caption = renderRichText(item.caption, context);
 				return `<figure><div class="embed-block"><iframe src="${escapeAttr(
 					maybeEmbedUrl,
 				)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>${
 					caption ? `<figcaption>${caption}</figcaption>` : ""
 				}</figure>`;
 			}
-			const caption = renderRichText(item.caption);
+			const caption = renderRichText(item.caption, context);
 			return `<figure><video controls preload="metadata" src="${escapeAttr(
 				url,
 			)}"></video>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
@@ -617,7 +663,7 @@ async function renderBlock(
 			if (!url) {
 				return "<!-- unsupported block: audio(no-url) -->";
 			}
-			const caption = renderRichText(item.caption);
+			const caption = renderRichText(item.caption, context);
 			return `<figure><audio controls preload="metadata" src="${escapeAttr(
 				url,
 			)}"></audio>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
@@ -649,7 +695,7 @@ async function renderBlock(
 			if (!url) {
 				return "<!-- unsupported block: file(no-url) -->";
 			}
-			const caption = renderRichText(item.caption);
+			const caption = renderRichText(item.caption, context);
 			return `<p><a href="${escapeAttr(
 				url,
 			)}" target="_blank" rel="noopener noreferrer">ファイルを開く</a>${
@@ -741,6 +787,7 @@ export async function renderBlocks(
 		footnotes: [],
 		footnoteIndex: 0,
 		idPrefix: options.idPrefix ?? "",
+		enhanceJapaneseSpacing: options.enhanceJapaneseSpacing ?? false,
 	};
 
 	const html = await renderBlocksWithContext(blocks, context);

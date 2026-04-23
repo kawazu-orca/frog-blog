@@ -4,6 +4,7 @@ import {
 	truncateText,
 	type PublishedPost,
 } from "../lib/notion";
+import { renderJapaneseSpacedText } from "../lib/renderer";
 
 interface Props {
 	posts: PublishedPost[];
@@ -40,9 +41,12 @@ const { posts, label } = Astro.props as Props;
 					</div>
 					<div class="article-toggle-details" id={detailsId} hidden>
 						{post.description && (
-							<p class="article-toggle-description">
-								{truncateText(post.description, 180)}
-							</p>
+							<p
+								class="article-toggle-description content-text"
+								set:html={renderJapaneseSpacedText(
+									truncateText(post.description, 180),
+								)}
+							/>
 						)}
 						{post.tags.length > 0 && (
 							<div class="article-tags">
