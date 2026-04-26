@@ -67,9 +67,12 @@ const latestDiaryEntries = await Promise.all(
 				<section class="home-diary-list" aria-label="最新日記">
 					{
 						latestDiaryEntries.map((entry) => (
-							<article class="home-diary-item">
+							<article class:list={["home-diary-item", !entry.showTitle && "home-diary-item-titleless"]}>
 								<a
-									class="diary-list-heading-link"
+									class:list={[
+										"diary-list-heading-link",
+										!entry.showTitle && "diary-list-heading-link-titleless",
+									]}
 									href={`/diary/${entry.diarySlug}`}
 									aria-label={`${entry.displayTitle}の日記を開く`}
 								>
@@ -84,7 +87,13 @@ const latestDiaryEntries = await Promise.all(
 									)}
 								</a>
 								{entry.excerptHtml && (
-									<p class="home-diary-excerpt" set:html={entry.excerptHtml} />
+									<p
+										class:list={[
+											"home-diary-excerpt",
+											!entry.showTitle && "home-diary-excerpt-titleless",
+										]}
+										set:html={entry.excerptHtml}
+									/>
 								)}
 								<a class="home-diary-readmore" href={`/diary/${entry.diarySlug}`}>
 									全文を読む

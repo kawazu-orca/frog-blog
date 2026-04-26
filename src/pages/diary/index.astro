@@ -72,9 +72,12 @@ const entries = await Promise.all(
 				) : (
 					<section class="diary-list" aria-label="日記一覧">
 						{entries.map((entry) => (
-							<article class="diary-list-item">
+							<article class:list={["diary-list-item", !entry.showTitle && "diary-list-item-titleless"]}>
 								<a
-									class="diary-list-heading-link"
+									class:list={[
+										"diary-list-heading-link",
+										!entry.showTitle && "diary-list-heading-link-titleless",
+									]}
 									href={`/diary/${entry.slug}`}
 									aria-label={`${entry.displayTitle}の日記を開く`}
 								>
@@ -89,7 +92,13 @@ const entries = await Promise.all(
 									)}
 								</a>
 								{entry.contentHtml && (
-									<div class="diary-list-content article-body">
+									<div
+										class:list={[
+											"diary-list-content",
+											"article-body",
+											!entry.showTitle && "diary-list-content-titleless",
+										]}
+									>
 										<div class="article-content" set:html={entry.contentHtml} />
 									</div>
 								)}

@@ -103,7 +103,13 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 
 <BaseLayout title={`${displayTitle} | Diary`} headerVariant="diary">
 	<div class="article-grid diary-detail-grid">
-		<header class="article-header diary-detail-header">
+		<header
+			class:list={[
+				"article-header",
+				"diary-detail-header",
+				!shouldShowTitle && "diary-detail-header-titleless",
+			]}
+		>
 			<a class="diary-page-kicker" href="/diary">/Diary</a>
 			<div class="diary-detail-entry">
 				<h1 class="article-title diary-detail-date">
@@ -158,8 +164,9 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 							<a
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(newerDiary)}`}
-								>
-									<span class="diary-pagination-arrow" aria-hidden="true">←</span>
+							>
+								<span class="diary-pagination-arrow" aria-hidden="true">←</span>
+								<span class="diary-pagination-content">
 									<span class="article-pagination-date">
 										{newerDiaryNavigationDate?.dateLabel}
 										{newerDiaryNavigationDate?.weekday && (
@@ -171,30 +178,33 @@ const { html: contentHtml, footnotes } = await renderBlocks(blocks, {
 											{formatDiaryDisplayTitle(newerDiary)}
 										</span>
 									)}
-								</a>
-							</p>
-						)}
+								</span>
+							</a>
+						</p>
+					)}
 					{olderDiary && (
 						<p class="article-pagination-next">
 							<a
 								class="article-pagination-block"
 								href={`/diary/${resolveDiarySlug(olderDiary)}`}
-								>
+							>
+								<span class="diary-pagination-content">
 									<span class="article-pagination-date">
 										{olderDiaryNavigationDate?.dateLabel}
 										{olderDiaryNavigationDate?.weekday && (
 											<span>{olderDiaryNavigationDate.weekday}</span>
 										)}
 									</span>
-									<span class="diary-pagination-arrow" aria-hidden="true">→</span>
 									{shouldShowDiaryNavigationTitle(olderDiary.title) && (
 										<span class="article-pagination-title">
 											{formatDiaryDisplayTitle(olderDiary)}
 										</span>
 									)}
-								</a>
-							</p>
-						)}
+								</span>
+								<span class="diary-pagination-arrow" aria-hidden="true">→</span>
+							</a>
+						</p>
+					)}
 				</nav>
 
 				<p class="article-back"><a href="/diary">日記一覧に戻る</a></p>
