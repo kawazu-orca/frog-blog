@@ -16,6 +16,7 @@ export interface PublishedPost {
 	pageId: string;
 	type: PostType;
 	title: string;
+	subtitle: string;
 	sourceSlug: string;
 	slug: string;
 	date: string | null;
@@ -78,7 +79,13 @@ async function resolveDataSourceId(
 	return defaultDataSource.id;
 }
 
-function getPlainText(property: PageObjectResponse["properties"][string]): string {
+function getPlainText(
+	property: PageObjectResponse["properties"][string] | undefined,
+): string {
+	if (!property) {
+		return "";
+	}
+
 	if (property.type === "title") {
 		return property.title.map((item) => item.plain_text).join("");
 	}
@@ -241,6 +248,7 @@ async function mapPageToPublishedPost(
 	page: PageObjectResponse,
 ): Promise<PublishedPost> {
 	const title = getPlainText(page.properties.Title);
+	const subtitle = getPlainText(page.properties.Subtitle);
 	const type = getPostType(page.properties.Type);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
@@ -252,6 +260,7 @@ async function mapPageToPublishedPost(
 		pageId: page.id,
 		type,
 		title,
+		subtitle,
 		sourceSlug: slug,
 		slug: slug || page.id,
 		date,

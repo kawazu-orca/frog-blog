@@ -26,7 +26,12 @@ const { posts, label } = Astro.props as Props;
 							<time class="article-toggle-date" datetime={post.date ?? ""}>
 								{formatDateWithSlash(post.date) ?? "日付なし"}
 							</time>
-							<h2 class="article-toggle-title">{post.title}</h2>
+							<div class="article-toggle-heading">
+								<h2 class="article-toggle-title">{post.title}</h2>
+								{post.subtitle && (
+									<p class="article-toggle-subtitle">{post.subtitle}</p>
+								)}
+							</div>
 						</a>
 						<button
 							type="button"

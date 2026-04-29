@@ -41,13 +41,15 @@ const displayDate = formatDateWithSlash(post.date) ?? "日付なし";
 const displayDateText = displayDate.replaceAll("/", ".");
 const showToC = post.properties.ShowToC === true;
 const hasEnoughHeadings = headings.length > 2;
+const pageDescription = post.description || post.subtitle || undefined;
 ---
 
-<BaseLayout title={post.title} headerVariant="narrow">
+<BaseLayout title={post.title} description={pageDescription} headerVariant="narrow">
 	<div class="article-grid article-detail-grid">
 		<header class="article-header article-detail-header">
 			<a class="article-detail-kicker" href="/articles">/Article</a>
 			<h1 class="article-title">{post.title}</h1>
+			{post.subtitle && <p class="article-subtitle">{post.subtitle}</p>}
 			<div class="article-meta article-detail-meta">
 				<time datetime={post.date ?? ""}>{displayDateText}</time>
 				{
