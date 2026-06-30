@@ -4,7 +4,7 @@ import {
 	truncateText,
 	type PublishedPost,
 } from "../lib/notion";
-import { renderJapaneseSpacedText } from "../lib/renderer";
+import { renderInlineMathText, renderJapaneseSpacedText } from "../lib/renderer";
 
 interface Props {
 	posts: PublishedPost[];
@@ -18,18 +18,49 @@ const { posts, label } = Astro.props as Props;
 	{
 		posts.map((post, index) => {
 			const detailsId = `article-details-${index}`;
+			const episodeTitle = post.subtitle || post.title;
+			const isSeries = Boolean(post.seriesPart.trim());
 
 			return (
 				<article class="article-toggle-item">
 					<div class="article-toggle-row">
 						<a class="article-toggle-link" href={`/posts/${post.slug}`}>
-							<time class="article-toggle-date" datetime={post.date ?? ""}>
-								{formatDateWithSlash(post.date) ?? "日付なし"}
-							</time>
-							<div class="article-toggle-heading">
-								<h2 class="article-toggle-title">{post.title}</h2>
-								{post.subtitle && (
-									<p class="article-toggle-subtitle">{post.subtitle}</p>
+							<div
+								class:list={[
+									"article-toggle-heading",
+									isSeries && "article-toggle-heading-series",
+								]}
+							>
+								{isSeries ? (
+									<>
+										<p class="article-toggle-series-line">
+											<span class="article-series-badge">連載</span>
+											<span
+												class="article-toggle-series-title"
+												set:html={renderInlineMathText(post.title)}
+											/>
+										</p>
+										<h2 class="article-toggle-title article-toggle-episode-title">
+											<span
+												class="article-series-part"
+												set:html={renderInlineMathText(post.seriesPart)}
+											/>
+											<span
+												class="article-episode-text"
+												set:html={renderInlineMathText(episodeTitle)}
+											/>
+										</h2>
+									</>
+								) : (
+									<>
+										<h2 class="article-toggle-title" set:html={renderInlineMathText(post.title)} />
+										{post.subtitle && (
+											<p
+												class="article-toggle-subtitle"
+												set:html={renderInlineMathText(post.subtitle)}
+											/>
+										)}
+									</>
 								)}
 							</div>
 						</a>
@@ -45,6 +76,18 @@ const { posts, label } = Astro.props as Props;
 						</button>
 					</div>
 					<div class="article-toggle-details" id={detailsId} hidden>
+						<div class="article-toggle-detail-meta">
+							<time class="article-toggle-date" datetime={post.date ?? ""}>
+								{formatDateWithSlash(post.date) ?? "日付なし"}
+							</time>
+							{post.tags.length > 0 && (
+								<span class="article-tags">
+									{post.tags.map((tag) => (
+										<span class="tag-badge">{tag}</span>
+									))}
+								</span>
+							)}
+						</div>
 						{post.description && (
 							<p
 								class="article-toggle-description content-text"
@@ -52,13 +95,6 @@ const { posts, label } = Astro.props as Props;
 									truncateText(post.description, 180),
 								)}
 							/>
-						)}
-						{post.tags.length > 0 && (
-							<div class="article-tags">
-								{post.tags.map((tag) => (
-									<span class="tag-badge">{tag}</span>
-								))}
-							</div>
 						)}
 					</div>
 				</article>

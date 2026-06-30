@@ -17,6 +17,7 @@ export interface PublishedPost {
 	type: PostType;
 	title: string;
 	subtitle: string;
+	seriesPart: string;
 	sourceSlug: string;
 	slug: string;
 	date: string | null;
@@ -249,6 +250,7 @@ async function mapPageToPublishedPost(
 ): Promise<PublishedPost> {
 	const title = getPlainText(page.properties.Title);
 	const subtitle = getPlainText(page.properties.Subtitle);
+	const seriesPart = getPlainText(page.properties.SeriesPart);
 	const type = getPostType(page.properties.Type);
 	const slug = getPlainText(page.properties.Slug);
 	const date = getDateValue(page.properties.Date);
@@ -261,6 +263,7 @@ async function mapPageToPublishedPost(
 		type,
 		title,
 		subtitle,
+		seriesPart,
 		sourceSlug: slug,
 		slug: slug || page.id,
 		date,

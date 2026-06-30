@@ -71,6 +71,43 @@ export function renderJapaneseSpacedText(text: string): string {
 	return applyJapaneseSpacing(escapeHtml(text));
 }
 
+export function renderInlineMathText(text: string): string {
+	const parts: string[] = [];
+	let cursor = 0;
+
+	while (cursor < text.length) {
+		const start = text.indexOf("$", cursor);
+		if (start === -1) {
+			parts.push(escapeHtml(text.slice(cursor)));
+			break;
+		}
+
+		const end = text.indexOf("$", start + 1);
+		if (end === -1) {
+			parts.push(escapeHtml(text.slice(cursor)));
+			break;
+		}
+
+		const expression = text.slice(start + 1, end).trim();
+		parts.push(escapeHtml(text.slice(cursor, start)));
+
+		if (expression) {
+			parts.push(
+				katex.renderToString(expression, {
+					displayMode: false,
+					throwOnError: false,
+				}),
+			);
+		} else {
+			parts.push("$$");
+		}
+
+		cursor = end + 1;
+	}
+
+	return parts.join("");
+}
+
 function notionColorToCss(color: string): string | null {
 	const map: Record<string, string> = {
 		gray_background: "#f1f1ef",
