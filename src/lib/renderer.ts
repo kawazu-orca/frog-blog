@@ -36,6 +36,10 @@ function escapeAttr(value: string): string {
 	return escapeHtml(value);
 }
 
+function replaceLineBreaks(text: string): string {
+	return text.replaceAll("\n", "<br />");
+}
+
 const japaneseLetterPattern = "[\\u3040-\\u30ff\\u3400-\\u9fff]";
 const latinLetterPattern = "[A-Za-z]";
 
@@ -348,6 +352,9 @@ function renderRichTextItem(
 		if (context.enhanceJapaneseSpacing && !annotations.code) {
 			content = applyJapaneseSpacing(content);
 		}
+		if (!annotations.code) {
+			content = replaceLineBreaks(content);
+		}
 		if (item.text.link?.url) {
 			content = `<a href="${escapeAttr(item.text.link.url)}">${content}</a>`;
 		}
@@ -379,6 +386,18 @@ function renderRichTextItem(
 	return renderInlineColor(content, annotations.color);
 }
 
+function getRuntimeBlockPayload(
+	block: NotionBlockWithChildren,
+	key: string,
+): { rich_text?: RichTextItemResponse[] } | null {
+	const value = (block as Record<string, unknown>)[key];
+	if (!value || typeof value !== "object") {
+		return null;
+	}
+
+	return value as { rich_text?: RichTextItemResponse[] };
+}
+
 function renderRichText(
 	items: RichTextItemResponse[],
 	context: RenderContext,
@@ -401,6 +420,14 @@ function getRichTextPlainTextWithoutFootnotes(
 }
 
 function getPlainTextForBlock(block: NotionBlockWithChildren): string {
+	const runtimeType = (block as { type?: string }).type;
+	if (runtimeType === "heading_4") {
+		const payload = getRuntimeBlockPayload(block, "heading_4");
+		if (payload?.rich_text) {
+			return getRichTextPlainTextWithoutFootnotes(payload.rich_text);
+		}
+	}
+
 	switch (block.type) {
 		case "heading_1":
 			return getRichTextPlainTextWithoutFootnotes(block.heading_1.rich_text);
@@ -576,10 +603,97 @@ async function renderNumberedListItem(
 	)}${await renderChildren(block, context)}</li>`;
 }
 
+function renderTableCell(
+	cell: RichTextItemResponse[],
+	context: RenderContext,
+): { content: string; attrs: string } {
+	const color = cell
+		.map((item) => item.annotations.color)
+		.find((value) => value && value !== "default");
+	const styles: string[] = [];
+	const attrs: string[] = [];
+
+	if (color) {
+		const cssColor = notionColorToCss(color);
+		if (cssColor) {
+			if (color.endsWith("_background")) {
+				styles.push(`background-color:${cssColor}`);
+				attrs.push(`data-notion-cell-color="${escapeAttr(color)}"`);
+			} else {
+				styles.push(`color:${cssColor}`);
+				attrs.push(`data-notion-cell-color="${escapeAttr(color)}"`);
+			}
+		}
+	}
+
+	if (styles.length > 0) {
+		attrs.push(`style="${escapeAttr(styles.join(";"))}"`);
+	}
+
+	return {
+		content: renderRichTextWithFootnoteMarkers(cell, context) || "",
+		attrs: attrs.length > 0 ? ` ${attrs.join(" ")}` : "",
+	};
+}
+
+function renderTable(
+	block: BlockOf<"table">,
+	context: RenderContext,
+): string {
+	const rows = (block.children ?? []).filter(
+		(child): child is BlockOf<"table_row"> => child.type === "table_row",
+	);
+	if (rows.length === 0) {
+		return "";
+	}
+
+	const headerRowCount = block.table.has_column_header ? 1 : 0;
+	const bodyRows = rows.slice(headerRowCount);
+	const headerCells = headerRowCount > 0 ? rows[0].table_row.cells : [];
+
+	const renderRow = (
+		row: BlockOf<"table_row">,
+		tagName: "td" | "th",
+	): string =>
+		`<tr>${row.table_row.cells
+			.map((cell, cellIndex) => {
+				const isRowHeader = block.table.has_row_header && cellIndex === 0;
+				const cellTag = isRowHeader || tagName === "th" ? "th" : "td";
+				const scope =
+					cellTag === "th"
+						? isRowHeader && tagName !== "th"
+							? ' scope="row"'
+							: ' scope="col"'
+						: "";
+				const renderedCell = renderTableCell(cell, context);
+				return `<${cellTag}${scope}${renderedCell.attrs}>${renderedCell.content}</${cellTag}>`;
+			})
+			.join("")}</tr>`;
+
+	const thead = headerCells.length
+		? `<thead>${renderRow(rows[0], "th")}</thead>`
+		: "";
+	const tbody = bodyRows.length
+		? `<tbody>${bodyRows.map((row) => renderRow(row, "td")).join("")}</tbody>`
+		: headerCells.length
+			? ""
+			: `<tbody>${rows.map((row) => renderRow(row, "td")).join("")}</tbody>`;
+
+	return `<div class="table-wrapper"><table>${thead}${tbody}</table></div>`;
+}
+
 async function renderBlock(
 	block: NotionBlockWithChildren,
 	context: RenderContext,
 ): Promise<string> {
+	const runtimeType = (block as { type?: string }).type;
+	if (runtimeType === "heading_4") {
+		const payload = getRuntimeBlockPayload(block, "heading_4");
+		if (payload?.rich_text) {
+			return `<h4>${renderRichTextWithFootnoteMarkers(payload.rich_text, context)}</h4>`;
+		}
+	}
+
 	switch (block.type) {
 		case "heading_1": {
 			const item = block.heading_1;
@@ -633,13 +747,13 @@ async function renderBlock(
 		}
 		case "toggle": {
 			const item = block.toggle;
-			return `<details><summary>${renderRichTextWithFootnoteMarkers(
+			const children = await renderChildren(block, context);
+			return `<details class="notion-toggle"><summary>${renderRichTextWithFootnoteMarkers(
 				item.rich_text,
 				context,
-			)}</summary>${await renderChildren(
-				block,
-				context,
-			)}</details>`;
+			)}</summary>${
+				children ? `<div class="notion-toggle-content">${children}</div>` : ""
+			}</details>`;
 		}
 		case "code": {
 			const item = block.code;
@@ -656,6 +770,8 @@ async function renderBlock(
 				throwOnError: false,
 			});
 		}
+		case "table":
+			return renderTable(block, context);
 		case "image": {
 			const item = block.image;
 			const src = await resolveImageSrc(block);
@@ -768,7 +884,7 @@ async function renderBlock(
 		case "numbered_list_item":
 			return await renderNumberedListItem(block, context);
 		default:
-			return `<!-- unsupported block: ${block.type} -->`;
+			return `<!-- unsupported block: ${(block as { type?: string }).type ?? "unknown"} -->`;
 	}
 }
 

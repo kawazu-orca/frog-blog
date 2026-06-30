@@ -19,17 +19,12 @@
 
 .callout .callout-content {
 	flex: 1 1 auto;
-	font-family:
-		"Noto Sans JP",
-		"Hiragino Kaku Gothic ProN",
-		"Yu Gothic",
-		-apple-system,
-		BlinkMacSystemFont,
-		sans-serif;
-	color: #334155;
-	font-size: 1rem;
-	line-height: 1.72;
-	max-width: 60ch;
+	font-family: var(--font-prose);
+	color: var(--prose-color);
+	font-size: var(--prose-font-size);
+	line-height: var(--prose-line-height);
+	letter-spacing: var(--content-body-letter-spacing);
+	max-width: 100%;
 	margin: 0;
 }
 
@@ -44,16 +39,16 @@
 .callout .callout-content > p:first-child > strong:first-child,
 .callout .callout-content > strong:first-child {
 	display: inline-block;
-	font-family: var(--font-heading);
-	font-weight: 700;
-	font-size: 1.04rem;
+	font-family: var(--font-prose);
+	font-weight: 600;
+	font-size: var(--prose-font-size);
 	letter-spacing: 0.01em;
 	color: var(--callout-heading, #1f2b3a);
-	margin-bottom: 0.3rem;
+	margin-bottom: 0.14rem;
 }
 
 .callout .callout-content p {
-	margin: 0 0 0.85rem;
+	margin: 0 0 0.42rem;
 }
 
 .callout .callout-content p:last-child {
@@ -62,7 +57,7 @@
 
 .callout .callout-content ul,
 .callout .callout-content ol {
-	margin: 0;
+	margin: 0 0 0.62rem;
 	padding-left: 1.35rem;
 }
 
@@ -72,7 +67,7 @@
 }
 
 .callout .callout-content li {
-	margin-bottom: 0.35rem;
+	margin-bottom: 0.18rem;
 }
 
 .callout .callout-content li:last-child {
@@ -177,7 +172,7 @@
 }
 
 :root[data-theme="dark"] .callout .callout-content {
-	color: #b2bbc8;
+	color: #bac2cc;
 }
 
 :root[data-theme="dark"] .callout-definition {
