@@ -16,11 +16,6 @@ const posts = await getPublishedPosts({ type: "Article" });
 					</p>
 				) : null
 			}
-
-			<div class="article-list-heading" aria-hidden="true">
-				<span>/Title</span>
-				<span></span>
-			</div>
 			<ArticleToggleList posts={posts} label="記事一覧" />
 		</article>
 	</div>

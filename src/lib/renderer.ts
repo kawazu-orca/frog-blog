@@ -97,10 +97,10 @@ export function renderInlineMathText(text: string): string {
 
 		if (expression) {
 			parts.push(
-				katex.renderToString(expression, {
+				`<span class="inline-math">${katex.renderToString(expression, {
 					displayMode: false,
 					throwOnError: false,
-				}),
+				})}</span>`,
 			);
 		} else {
 			parts.push("$$");
@@ -359,10 +359,13 @@ function renderRichTextItem(
 			content = `<a href="${escapeAttr(item.text.link.url)}">${content}</a>`;
 		}
 	} else if (item.type === "equation") {
-		content = katex.renderToString(item.equation.expression, {
-			displayMode: false,
-			throwOnError: false,
-		});
+		content = `<span class="inline-math">${katex.renderToString(
+			item.equation.expression,
+			{
+				displayMode: false,
+				throwOnError: false,
+			},
+		)}</span>`;
 	} else {
 		content = escapeHtml(item.plain_text);
 	}
@@ -562,23 +565,21 @@ function renderCalloutIcon(block: BlockOf<"callout">): string {
 }
 
 function getCalloutClass(block: BlockOf<"callout">): string {
-	if (!block.callout.icon || block.callout.icon.type !== "emoji") {
-		return "callout-default";
-	}
-
+	const notionColor = block.callout.color.replace("_background", "");
 	const classMap: Record<string, string> = {
-		"📣": "callout-pullquote",
-		"📘": "callout-definition",
-		"⭐": "callout-theorem",
-		"🧩": "callout-lemma",
-		"🔁": "callout-corollary",
-		"💡": "callout-example",
-		"⚠️": "callout-warning",
-		"🧠": "callout-intuition",
-		"✅": "callout-summary",
+		default: "callout-default",
+		gray: "callout-intuition",
+		brown: "callout-lemma",
+		orange: "callout-corollary",
+		yellow: "callout-example",
+		green: "callout-summary",
+		blue: "callout-definition",
+		purple: "callout-theorem",
+		pink: "callout-intuition",
+		red: "callout-warning",
 	};
 
-	return classMap[block.callout.icon.emoji] ?? "callout-default";
+	return classMap[notionColor] ?? "callout-default";
 }
 
 async function renderBulletedListItem(

@@ -2,7 +2,7 @@
 	border-radius: 6px;
 	padding: 14px 22px;
 	margin: 16px 0;
-	border: 1px solid #dde4ee;
+	border: 1px solid #d4deea;
 }
 
 .callout .callout-body {
@@ -76,65 +76,65 @@
 
 .callout-definition {
 	--callout-heading: #234f8f;
-	border-left: 3px solid #5b8fda;
-	background: #f6f9fe;
-	border-color: #d9e5f6;
+	border-left: 4px solid #4f86d6;
+	background: #f2f7fd;
+	border-color: #cfdff4;
 }
 
 .callout-theorem {
 	--callout-heading: #9d3656;
-	border-left: 3px solid #d17493;
-	background: #fdf5f8;
-	border-color: #f0d6df;
+	border-left: 4px solid #c56c9c;
+	background: #fcf3f8;
+	border-color: #ead0df;
 }
 
 .callout-lemma {
 	--callout-heading: #8b4d2f;
-	border-left: 3px solid #c78a64;
-	background: #fdf8f5;
-	border-color: #efdfd5;
+	border-left: 4px solid #bb805a;
+	background: #fcf7f3;
+	border-color: #eadbcc;
 }
 
 .callout-corollary {
 	--callout-heading: #8a5534;
-	border-left: 3px solid #c99772;
-	background: #fdf9f6;
-	border-color: #efe3da;
+	border-left: 4px solid #bf8c63;
+	background: #fcf8f4;
+	border-color: #e9dccf;
 }
 
 .callout-example {
 	--callout-heading: #6d5a27;
-	border-left: 3px solid #b7a166;
-	background: #fcfaf4;
-	border-color: #ece5d1;
+	border-left: 4px solid #b59a4d;
+	background: #fbf8ee;
+	border-color: #e8e0c3;
 }
 
 .callout-warning {
 	--callout-heading: #9a3434;
-	border-left: 3px solid #c76666;
-	background: #fdf6f6;
-	border-color: #eed8d8;
+	border-left: 4px solid #c85f5f;
+	background: #fcf2f2;
+	border-color: #ecd0d0;
 }
 
 .callout-intuition {
 	--callout-heading: #4c596c;
-	border-left: 3px solid #7f8ea2;
-	background: #f7f9fb;
-	border-color: #dce3eb;
+	border-left: 4px solid #73859b;
+	background: #f4f7fa;
+	border-color: #d3dce7;
 }
 
 .callout-summary {
 	--callout-heading: #2f6b72;
-	border-left: 3px solid #6f9ca3;
-	background: #f3f8f9;
-	border-color: #dbe8ea;
+	border-left: 4px solid #5d969e;
+	background: #eef7f7;
+	border-color: #d0e3e5;
 }
 
 .callout-default {
 	--callout-heading: #4f5d70;
-	border-left: 3px solid #95a2b4;
-	background: #f8fafc;
-	border-color: #dde4ed;
+	border-left: 4px solid #8d9cb0;
+	background: #f5f8fb;
+	border-color: #d5deea;
 }
 
 .callout-pullquote {
@@ -177,65 +177,65 @@
 
 :root[data-theme="dark"] .callout-definition {
 	--callout-heading: #a6bddf;
-	border-left-color: #607d9f;
-	background: #1a232f;
-	border-color: #304359;
+	border-left-color: #7398c6;
+	background: #1b2634;
+	border-color: #35506d;
 }
 
 :root[data-theme="dark"] .callout-theorem {
 	--callout-heading: #d4a8b6;
-	border-left-color: #9b6576;
-	background: #281f25;
-	border-color: #473441;
+	border-left-color: #b37a93;
+	background: #2b2128;
+	border-color: #573b49;
 }
 
 :root[data-theme="dark"] .callout-lemma {
 	--callout-heading: #d1b49f;
-	border-left-color: #8f725c;
-	background: #26221f;
-	border-color: #443830;
+	border-left-color: #a68266;
+	background: #282320;
+	border-color: #513f33;
 }
 
 :root[data-theme="dark"] .callout-corollary {
 	--callout-heading: #d0b8a6;
-	border-left-color: #8f7a66;
-	background: #272321;
-	border-color: #443b35;
+	border-left-color: #a88a6b;
+	background: #292421;
+	border-color: #534238;
 }
 
 :root[data-theme="dark"] .callout-example {
 	--callout-heading: #cabd95;
-	border-left-color: #847956;
-	background: #262520;
-	border-color: #413d30;
+	border-left-color: #9d8b4e;
+	background: #292720;
+	border-color: #504a31;
 }
 
 :root[data-theme="dark"] .callout-warning {
 	--callout-heading: #d3abab;
-	border-left-color: #9a6767;
-	background: #2a2020;
-	border-color: #4a3636;
+	border-left-color: #b97575;
+	background: #2d2121;
+	border-color: #583d3d;
 }
 
 :root[data-theme="dark"] .callout-intuition {
 	--callout-heading: #b7c0cc;
-	border-left-color: #6c7786;
-	background: #1f242c;
-	border-color: #343d48;
+	border-left-color: #8697aa;
+	background: #202731;
+	border-color: #3d4a58;
 }
 
 :root[data-theme="dark"] .callout-summary {
 	--callout-heading: #a8c1c4;
-	border-left-color: #607f83;
-	background: #1d2628;
-	border-color: #314346;
+	border-left-color: #6f9ca1;
+	background: #1f2a2d;
+	border-color: #395054;
 }
 
 :root[data-theme="dark"] .callout-default {
 	--callout-heading: #b2bccb;
-	border-left-color: #6e7a8a;
-	background: #1f242c;
-	border-color: #343d48;
+	border-left-color: #8593a6;
+	background: #202731;
+	border-color: #3d4a58;
 }
 
 :root[data-theme="dark"] .callout-pullquote {

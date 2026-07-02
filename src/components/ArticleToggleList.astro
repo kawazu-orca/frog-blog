@@ -1,140 +1,54 @@
 ---
 import {
 	formatDateWithSlash,
-	truncateText,
 	type PublishedPost,
 } from "../lib/notion";
-import { renderInlineMathText, renderJapaneseSpacedText } from "../lib/renderer";
+import { renderInlineMathText } from "../lib/renderer";
 
 interface Props {
 	posts: PublishedPost[];
 	label: string;
+	showHeader?: boolean;
 }
 
-const { posts, label } = Astro.props as Props;
+const { posts, label, showHeader = true } = Astro.props as Props;
 ---
 
-<section class="article-toggle-list" aria-label={label}>
-	{
-		posts.map((post, index) => {
-			const detailsId = `article-details-${index}`;
-			const episodeTitle = post.subtitle || post.title;
-			const isSeries = Boolean(post.seriesPart.trim());
-
-			return (
-				<article class="article-toggle-item">
-					<div class="article-toggle-row">
-						<a class="article-toggle-link" href={`/posts/${post.slug}`}>
-							<div
-								class:list={[
-									"article-toggle-heading",
-									isSeries && "article-toggle-heading-series",
-								]}
-							>
-								{isSeries ? (
-									<>
-										<p class="article-toggle-series-line">
-											<span class="article-series-badge">連載</span>
-											<span
-												class="article-toggle-series-title"
-												set:html={renderInlineMathText(post.title)}
-											/>
-										</p>
-										<h2 class="article-toggle-title article-toggle-episode-title">
-											<span
-												class="article-series-part"
-												set:html={renderInlineMathText(post.seriesPart)}
-											/>
-											<span
-												class="article-episode-text"
-												set:html={renderInlineMathText(episodeTitle)}
-											/>
-										</h2>
-									</>
-								) : (
-									<>
-										<h2 class="article-toggle-title" set:html={renderInlineMathText(post.title)} />
-										{post.subtitle && (
-											<p
-												class="article-toggle-subtitle"
-												set:html={renderInlineMathText(post.subtitle)}
-											/>
-										)}
-									</>
+<section class="article-toggle-list-wrap" aria-label={label}>
+	{showHeader && (
+		<div class="article-toggle-head" aria-hidden="true">
+			<span class="article-toggle-head-date">/Date</span>
+			<span class="article-toggle-head-title">/Title</span>
+			<span class="article-toggle-head-tag">/Tag</span>
+		</div>
+	)}
+	<div class="article-toggle-list">
+		{
+			posts.map((post) => {
+				return (
+					<article class="article-toggle-item">
+						<a class="article-toggle-row article-toggle-link" href={`/posts/${post.slug}`}>
+							<div class="article-toggle-date-block">
+								<time class="article-toggle-date" datetime={post.date ?? ""}>
+									{formatDateWithSlash(post.date) ?? "日付なし"}
+								</time>
+							</div>
+							<div class="article-toggle-heading">
+								<h2 class="article-toggle-title" set:html={renderInlineMathText(post.title)} />
+							</div>
+							<div class="article-toggle-meta">
+								{post.tags.length > 0 && (
+									<span class="article-toggle-tags">
+										{post.tags.map((tag) => (
+											<span class="tag-badge">{tag}</span>
+										))}
+									</span>
 								)}
 							</div>
 						</a>
-						<button
-							type="button"
-							class="article-toggle-button"
-							aria-expanded="false"
-							aria-controls={detailsId}
-							aria-label={`${post.title}の詳細を表示`}
-							data-article-title={post.title}
-						>
-							<span aria-hidden="true"></span>
-						</button>
-					</div>
-					<div class="article-toggle-details" id={detailsId} hidden>
-						<div class="article-toggle-detail-meta">
-							<time class="article-toggle-date" datetime={post.date ?? ""}>
-								{formatDateWithSlash(post.date) ?? "日付なし"}
-							</time>
-							{post.tags.length > 0 && (
-								<span class="article-tags">
-									{post.tags.map((tag) => (
-										<span class="tag-badge">{tag}</span>
-									))}
-								</span>
-							)}
-						</div>
-						{post.description && (
-							<p
-								class="article-toggle-description content-text"
-								set:html={renderJapaneseSpacedText(
-									truncateText(post.description, 180),
-								)}
-							/>
-						)}
-					</div>
-				</article>
-			);
-		})
-	}
-</section>
-
-<script>
-	const initArticleToggles = () => {
-		const buttons = document.querySelectorAll(".article-toggle-button");
-
-		for (const button of buttons) {
-			if (!(button instanceof HTMLButtonElement)) continue;
-			if (button.dataset.toggleReady === "true") continue;
-
-			button.dataset.toggleReady = "true";
-			button.addEventListener("click", () => {
-				const controls = button.getAttribute("aria-controls");
-				if (!controls) return;
-
-				const details = document.getElementById(controls);
-				if (!(details instanceof HTMLElement)) return;
-
-				const willOpen = button.getAttribute("aria-expanded") !== "true";
-				button.setAttribute("aria-expanded", String(willOpen));
-				button.setAttribute(
-					"aria-label",
-					`${button.dataset.articleTitle ?? "記事"}の詳細を${willOpen ? "非表示" : "表示"}`,
+					</article>
 				);
-				details.hidden = !willOpen;
-			});
+			})
 		}
-	};
-
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", initArticleToggles);
-	} else {
-		initArticleToggles();
-	}
-
-	document.addEventListener("astro:page-load", initArticleToggles);
-</script>
+	</div>
+</section>
