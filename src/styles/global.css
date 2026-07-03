@@ -57,7 +57,7 @@
 	--prose-code-block-bg: #f7f6f3;
 	--prose-code-block-border: rgba(135, 131, 120, 0.2);
 	--prose-blockquote-border: rgba(55, 53, 47, 0.16);
-	--prose-blockquote-color: rgba(55, 53, 47, 0.72);
+	--prose-blockquote-color: var(--prose-color);
 	--diary-rule-date-gap: 1.4rem;
 	--diary-kicker-rule-gap: 0.38rem;
 	--content-body-letter-spacing: 0.014em;
@@ -2825,19 +2825,19 @@ html {
 	}
 
 	.site-nav a {
-		font-size: 0.72rem;
-		padding: 0.2rem 0.44rem;
+		font-size: 0.83rem;
+		padding: 0.24rem 0.58rem;
 	}
 
 	.theme-toggle {
-		flex: 0 0 1.82rem;
-		width: 1.82rem;
-		height: 1.82rem;
+		flex: 0 0 2rem;
+		width: 2rem;
+		height: 2rem;
 	}
 
 	.theme-toggle .icon {
-		width: 0.92rem;
-		height: 0.92rem;
+		width: 1rem;
+		height: 1rem;
 	}
 
 	.page-container {
@@ -3176,14 +3176,14 @@ html {
 	}
 
 	.site-nav a {
-		font-size: 0.66rem;
-		padding: 0.18rem 0.34rem;
+		font-size: 0.78rem;
+		padding: 0.22rem 0.48rem;
 	}
 
 	.theme-toggle {
-		flex-basis: 1.72rem;
-		width: 1.72rem;
-		height: 1.72rem;
+		flex-basis: 1.96rem;
+		width: 1.96rem;
+		height: 1.96rem;
 	}
 }
 
