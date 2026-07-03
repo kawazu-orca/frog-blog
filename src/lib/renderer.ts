@@ -749,10 +749,10 @@ async function renderBlock(
 		case "toggle": {
 			const item = block.toggle;
 			const children = await renderChildren(block, context);
-			return `<details class="notion-toggle"><summary>${renderRichTextWithFootnoteMarkers(
+			return `<details class="notion-toggle"><summary><span class="notion-toggle-summary-text">${renderRichTextWithFootnoteMarkers(
 				item.rich_text,
 				context,
-			)}</summary>${
+			)}</span></summary>${
 				children ? `<div class="notion-toggle-content">${children}</div>` : ""
 			}</details>`;
 		}

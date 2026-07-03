@@ -246,6 +246,19 @@
 }
 
 @media (max-width: 768px) {
+	.article-detail-main .callout {
+		max-width: 100%;
+		overflow-x: auto;
+		overflow-wrap: break-word;
+		padding: 12px 14px;
+		margin: 1rem 0;
+	}
+
+	.article-detail-main .callout .callout-content {
+		font-size: var(--prose-font-size);
+		line-height: var(--prose-line-height);
+	}
+
 	.callout-pullquote {
 		padding-left: 1rem;
 		font-size: 1.1rem;
